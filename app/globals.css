@@ -3,11 +3,43 @@
    Plain CSS. Colors come from --start-bg / --accent (set at runtime), apps set --app.
    ========================================================================== */
 
+/* Selawik: Microsoft's open-source (OFL) stand-in for Segoe UI, used when Segoe UI isn't installed. */
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawkl.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawksl.woff2") format("woff2");
+  font-weight: 350;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawk.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawksb.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawkb.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   --start-bg: #1b0f4a;
   --accent: #5b3bd1;
   --app: var(--accent);
-  --font: "Segoe UI", "Open Sans", "Selawik", system-ui, -apple-system, sans-serif;
+  --font: "Segoe UI", "Selawik", "Open Sans", system-ui, -apple-system, sans-serif;
   --ease: cubic-bezier(0.1, 0.9, 0.2, 1);
   --ease-in: cubic-bezier(0.7, 0, 1, 0.5);
   --tu: 70px;
@@ -5190,4 +5222,88 @@ html[data-motion="reduced"] *::after {
   to {
     stroke-dashoffset: -14;
   }
+}
+
+/* Metro app bar inside apps (components/metro/AppBar.tsx) */
+.metro-appbar {
+  position: fixed;
+  z-index: 40;
+}
+.metro-appbar button:disabled {
+  opacity: 0.4;
+}
+.metro-appbar button.on svg {
+  background: #fff;
+  color: #111;
+}
+
+/* Start: "show my desktop background on Start" */
+.pattern-desktop {
+  inset: 0 !important;
+  width: 100% !important;
+}
+.pattern-desktop .pattern-wallpaper {
+  position: absolute;
+  inset: 0 -60px 0 0;
+  width: calc(100% + 60px);
+  height: 100%;
+}
+.pattern-desktop .pattern-wallpaper svg,
+.pattern-desktop .pattern-wallpaper img {
+  width: 100%;
+  height: 100%;
+}
+.pattern-desktop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+.tile-shell {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+.group-name-input {
+  display: block;
+  width: calc(var(--tu) * 4);
+  height: 30px;
+  margin: -4px 0 8px;
+  padding: 0 8px;
+  font: 300 18px var(--font);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  outline: none;
+}
+.group-name-input:focus {
+  background: #fff;
+  color: #000;
+}
+.group-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+.pcs-meter {
+  height: 10px;
+  max-width: 420px;
+  background: rgba(127, 127, 127, 0.3);
+  margin: 6px 0;
+}
+.pcs-meter i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.pcs-net {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 12px;
+  max-width: 420px;
+  background: rgba(127, 127, 127, 0.15);
+}
+.pcs-net div {
+  display: flex;
+  flex-direction: column;
+}
+.pcs-net small {
+  opacity: 0.75;
 }

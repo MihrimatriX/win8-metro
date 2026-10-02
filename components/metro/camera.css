@@ -1,0 +1,645 @@
+/* Camera (Kamera): Windows 8.1 camera app. Prefix: cam- */
+.cam {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  user-select: none;
+  touch-action: pan-y;
+}
+.cam-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s ease,
+    visibility 0s linear 0.4s;
+}
+.cam-preview.on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease;
+}
+
+/* Rule-of-thirds grid */
+.cam-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cam-grid i {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+.cam-grid i:nth-child(1),
+.cam-grid i:nth-child(2) {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  left: 33.333%;
+}
+.cam-grid i:nth-child(2) {
+  left: 66.666%;
+}
+.cam-grid i:nth-child(3),
+.cam-grid i:nth-child(4) {
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: 33.333%;
+}
+.cam-grid i:nth-child(4) {
+  top: 66.666%;
+}
+
+/* Starting: the Win8 running dots */
+.cam-starting {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.cam-dots {
+  position: relative;
+  width: 260px;
+  height: 6px;
+  overflow: hidden;
+}
+.cam-dots i {
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  animation: cam-dot 2.6s cubic-bezier(0.2, 0.7, 0.8, 0.3) infinite;
+}
+.cam-dots i:nth-child(2) {
+  animation-delay: 0.16s;
+}
+.cam-dots i:nth-child(3) {
+  animation-delay: 0.32s;
+}
+.cam-dots i:nth-child(4) {
+  animation-delay: 0.48s;
+}
+.cam-dots i:nth-child(5) {
+  animation-delay: 0.64s;
+}
+@keyframes cam-dot {
+  0% {
+    left: -10px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 270px;
+    opacity: 0;
+  }
+}
+
+/* No camera / no permission */
+.cam-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 40px;
+  animation: cam-in 0.5s var(--ease) both;
+}
+.cam-msg svg {
+  color: #9a9a9a;
+  margin-bottom: 26px;
+}
+.cam-msg h2 {
+  margin: 0 0 12px;
+  max-width: 640px;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1.25;
+}
+.cam-msg p {
+  margin: 0 0 28px;
+  max-width: 520px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #b5b5b5;
+}
+.cam-retry,
+.cam-opt-close {
+  min-width: 120px;
+  padding: 5px 20px 7px;
+  border: 2px solid #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+.cam-retry:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.cam-retry:active {
+  background: #fff;
+  color: #000;
+}
+@keyframes cam-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+/* Shutter flash */
+.cam-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  pointer-events: none;
+  animation: cam-flash 0.45s ease-out forwards;
+}
+@keyframes cam-flash {
+  0% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Self-timer countdown */
+.cam-count {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 240px;
+  font-weight: 200;
+  line-height: 1;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+  animation: cam-count 1s ease-out both;
+}
+@keyframes cam-count {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.4);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+.cam-badge {
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+}
+
+/* Recording clock */
+.cam-rectime {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 6px;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 22px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+.cam-rectime i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e81123;
+  animation: cam-blink 1s steps(2, start) infinite;
+}
+@keyframes cam-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Capture buttons, right edge */
+.cam-controls {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  z-index: 2;
+}
+.cam-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(0, 0, 0, 0.38);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
+  transition:
+    width 0.25s var(--ease),
+    height 0.25s var(--ease),
+    background 0.15s;
+}
+.cam-btn.main {
+  width: 96px;
+  height: 96px;
+  border-width: 3px;
+}
+.cam-btn.pano {
+  width: 48px;
+  height: 48px;
+}
+.cam-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22);
+}
+.cam-btn:active:not(:disabled) {
+  background: #fff;
+  color: #000;
+}
+.cam-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.cam-btn.rec {
+  width: 96px;
+  height: 96px;
+  background: #e81123;
+  border-color: #fff;
+  animation: cam-pulse 1.6s ease-in-out infinite;
+}
+.cam-btn.rec:hover {
+  background: #f1323f;
+}
+@keyframes cam-pulse {
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(232, 17, 35, 0.25),
+      0 0 10px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Camera roll handle, left edge */
+.cam-rollbtn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 8px 4px;
+  background: rgba(0, 0, 0, 0.42);
+  z-index: 2;
+}
+.cam-rollbtn:hover {
+  background: rgba(40, 40, 40, 0.7);
+}
+.cam-rollthumb {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 2px solid #fff;
+  overflow: hidden;
+  background: #222;
+  animation: cam-thumb 0.5s var(--ease) both;
+}
+.cam-rollthumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cam-rollthumb svg {
+  position: absolute;
+  left: 3px;
+  bottom: 2px;
+  filter: drop-shadow(0 0 2px #000);
+}
+@keyframes cam-thumb {
+  from {
+    transform: scale(1.6) translateX(40px);
+    opacity: 0;
+  }
+}
+
+/* Options flyout (Win8 flyouts are white) */
+.cam-options {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  z-index: 45;
+  width: 360px;
+  max-width: calc(100% - 48px);
+  padding: 20px 24px 22px;
+  background: #fff;
+  color: #000;
+  border: 2px solid #b0b0b0;
+  animation: cam-fly 0.3s var(--ease) both;
+}
+@keyframes cam-fly {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+}
+.cam-options h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 400;
+}
+.cam-options label > span,
+.cam-opt-row > span {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.cam-options select {
+  width: 100%;
+  height: 32px;
+  padding: 0 6px;
+  border: 2px solid #bababa;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+.cam-options select:focus {
+  outline: none;
+  border-color: #000;
+}
+.cam-opt-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 12px;
+  margin-bottom: 14px;
+}
+.cam-opt-row > span {
+  grid-column: 1 / -1;
+}
+.cam-opt-row small {
+  font-size: 15px;
+}
+.cam-toggle {
+  position: relative;
+  width: 50px;
+  height: 22px;
+  border: 2px solid #333;
+  background: #fff;
+}
+.cam-toggle i {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 1px;
+  width: 12px;
+  background: #000;
+  transition: transform 0.2s var(--ease);
+}
+.cam-toggle.on {
+  background: var(--app);
+  border-color: var(--app);
+}
+.cam-toggle.on i {
+  transform: translateX(32px);
+}
+.cam-opt-close {
+  border-color: #000;
+  margin-top: 6px;
+  float: right;
+}
+.cam-opt-close:hover {
+  background: #e5e5e5;
+}
+
+/* Camera roll viewer */
+.cam-roll {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #000;
+  animation: cam-roll-in 0.35s var(--ease) both;
+}
+@keyframes cam-roll-in {
+  from {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+}
+.cam-roll-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  animation: cam-stage 0.3s ease both;
+}
+@keyframes cam-stage {
+  from {
+    opacity: 0;
+  }
+}
+/* Videos stop above the strip so their controls stay usable. */
+.cam-roll-stage.video {
+  top: 110px;
+  bottom: 96px;
+}
+.cam-roll-stage img,
+.cam-roll-stage video {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.cam-roll-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 36px 40px 40px;
+  background: linear-gradient(rgba(0, 0, 0, 0.65), transparent);
+  pointer-events: none;
+}
+.cam-roll-head > * {
+  pointer-events: auto;
+}
+.cam-roll-head .circle-btn {
+  color: #fff;
+}
+.cam-roll-head div {
+  flex: 1;
+  min-width: 0;
+}
+.cam-roll-head b {
+  display: block;
+  font-size: 20px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cam-roll-head small {
+  font-size: 13px;
+  opacity: 0.75;
+}
+.cam-roll-count {
+  font-size: 15px;
+  opacity: 0.8;
+}
+.cam-roll-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.82);
+  color: #000;
+}
+.cam-roll-nav:hover {
+  background: #fff;
+}
+.cam-roll-nav.prev {
+  left: 0;
+}
+.cam-roll-nav.next {
+  right: 0;
+}
+.cam-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 6px;
+  padding: 26px 40px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+}
+.cam-strip button {
+  position: relative;
+  flex: none;
+  width: 92px;
+  height: 62px;
+  background: #222;
+  opacity: 0.7;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+.cam-strip button:hover {
+  opacity: 1;
+}
+.cam-strip button.on {
+  opacity: 1;
+  outline-color: #fff;
+}
+.cam-strip img,
+.cam-strip span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cam-strip em {
+  position: absolute;
+  left: 4px;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-style: normal;
+  font-size: 11px;
+  text-shadow: 0 0 3px #000;
+}
+
+/* Phone: buttons along the bottom, roll handle bottom left */
+[data-layout="phone"] .cam-controls {
+  top: auto;
+  right: auto;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  flex-direction: row;
+}
+[data-layout="phone"] .cam-btn.main,
+[data-layout="phone"] .cam-btn.rec {
+  width: 80px;
+  height: 80px;
+}
+[data-layout="phone"] .cam-btn {
+  width: 52px;
+  height: 52px;
+}
+[data-layout="phone"] .cam-btn.pano {
+  width: 42px;
+  height: 42px;
+}
+[data-layout="phone"] .cam-rollbtn {
+  top: auto;
+  bottom: 30px;
+  transform: none;
+  padding: 4px 6px 4px 2px;
+}
+[data-layout="phone"] .cam-rollthumb {
+  width: 48px;
+  height: 48px;
+}
+[data-layout="phone"] .cam-rollbtn svg:first-child {
+  display: none;
+}
+[data-layout="phone"] .cam-count {
+  font-size: 160px;
+}
+[data-layout="phone"] .cam-roll-head {
+  padding: 16px 12px 30px;
+  gap: 12px;
+}
+[data-layout="phone"] .cam-strip {
+  padding: 20px 12px 12px;
+}
+[data-layout="phone"] .cam-msg h2 {
+  font-size: 24px;
+}

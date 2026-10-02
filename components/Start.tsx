@@ -2,7 +2,8 @@
 /** The Start screen: groups of live tiles on a horizontal strip, semantic zoom, tile app bar and the Apps view entry. */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useOS, type View } from "@/lib/os";
-import { GROUPS, SPAN, defaultTiles, moveTile, sizesFor, type GroupId, type TileSize, type TileState } from "@/lib/model";
+import { GROUPS, SPAN, defaultTiles, isDesktopApp, moveTile, sizesFor, type DesktopAppId, type GroupId, type TileSize, type TileState } from "@/lib/model";
+import { taskbarPins } from "./desktop/Taskbar";
 import { sound } from "@/lib/sound";
 import { profile } from "@/content/portfolio";
 import { Icon } from "./Icons";
@@ -176,7 +177,8 @@ export function useLauncher(onLaunchStart?: () => void) {
 
 export function StartScreen({ hidden }: { hidden: boolean }) {
   const os = useOS();
-  const { t, tiles, setTiles, setCharm, user, power, earn, open } = os;
+  const { t, tiles, setTiles, setCharm, user, power, earn, open, groupNames, setPref } = os;
+  const [naming, setNaming] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const savedScroll = useRef(0);
@@ -351,6 +353,8 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
 
   const sel = tiles.filter((x) => selected.includes(x.key));
   const one = sel.length === 1 ? sel[0] : null;
+  // Desktop programs get the Windows 8.1 desktop commands instead of "live tile".
+  const oneDesktop = one && one.key.startsWith("app:") && isDesktopApp(one.key.slice(4)) ? (one.key.slice(4) as DesktopAppId) : null;
   const update = (fn: (t: TileState) => TileState) => setTiles((all) => all.map((x) => (selected.includes(x.key) ? fn(x) : x)));
 
   let idx = 0;
@@ -359,15 +363,16 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
 
   return (
     <div
-      className={`start ${entering ? "entering" : ""} ${launching ? "launching" : ""} ${zoomed ? "zoomed" : ""} ${drag ? "customizing" : ""}`}
+      className={`start ${entering ? "entering" : ""} ${launching ? "launching" : ""} ${zoomed ? "zoomed" : ""} ${drag || naming ? "customizing" : ""}`}
       hidden={hidden}
       style={style}
       onContextMenu={(e) => {
         e.preventDefault();
         setBar((b) => !b);
       }}
-      onClick={() => {
+      onClick={(e) => {
         setPowerMenu(false);
+        if (naming && !(e.target as HTMLElement).closest("input")) setNaming(false);
       }}
     >
       <Pattern offset={scrollX} />
@@ -414,7 +419,18 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
                     : undefined
                 }
               >
-                <h2 className="group-title">{t(g.title)}</h2>
+                {naming ? (
+                  <input
+                    className="group-name-input"
+                    defaultValue={groupNames[g.id] ?? t(g.title)}
+                    placeholder={t("group.name")}
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
+                    onBlur={(e) => setPref("groupNames", { ...groupNames, [g.id]: e.currentTarget.value.trim() })}
+                  />
+                ) : (
+                  <h2 className="group-title">{groupNames[g.id] ?? t(g.title)}</h2>
+                )}
                 <div className="group-grid">
                   {list.map((tile) => (
                     <Tile
@@ -504,10 +520,33 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
                   )}
                 </div>
               )}
-              <button onClick={() => update((x) => ({ ...x, live: !(one ?? sel[0]).live }))}>
-                <Icon name="refresh" size={20} />
-                <span>{(one ?? sel[0]).live ? t("tile.liveOff") : t("tile.liveOn")}</span>
-              </button>
+              {oneDesktop ? (
+                <>
+                  <button
+                    onClick={() => {
+                      taskbarPins.toggle(oneDesktop);
+                      setSelected([]);
+                      setBar(false);
+                    }}
+                  >
+                    <Icon name={taskbarPins.get().includes(oneDesktop) ? "unpin" : "pin"} size={20} />
+                    <span>{t(taskbarPins.get().includes(oneDesktop) ? "tile.unpinTaskbar" : "tile.pinTaskbar")}</span>
+                  </button>
+                  <button onClick={() => open({ kind: "app", app: oneDesktop })}>
+                    <Icon name="new" size={20} />
+                    <span>{t("tile.newWindow")}</span>
+                  </button>
+                  <button onClick={() => open({ kind: "app", app: "explorer", param: oneDesktop === "ie" ? "C:\\Program Files\\Internet Explorer" : "C:\\Windows\\System32" })}>
+                    <Icon name="folder" size={20} />
+                    <span>{t("tile.fileLocation")}</span>
+                  </button>
+                </>
+              ) : (
+                <button onClick={() => update((x) => ({ ...x, live: !(one ?? sel[0]).live }))}>
+                  <Icon name="refresh" size={20} />
+                  <span>{(one ?? sel[0]).live ? t("tile.liveOff") : t("tile.liveOn")}</span>
+                </button>
+              )}
             </div>
           </>
         ) : (
@@ -527,6 +566,15 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
               >
                 <Icon name="refresh" size={20} />
                 <span>{t("tile.reset")}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setNaming((n) => !n);
+                  setBar(false);
+                }}
+              >
+                <Icon name="edit" size={20} />
+                <span>{t(naming ? "group.done" : "group.customize")}</span>
               </button>
               <button onClick={() => { setBar(false); setCharm("personalize"); }}>
                 <Icon name="brush" size={20} />

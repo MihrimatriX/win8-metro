@@ -8,8 +8,9 @@ import { CoverArt } from "../CoverArt";
 import { Icon } from "../Icons";
 import { Avatar, lockArt } from "../Lock";
 import { BackButton } from "../AppHost";
+import { fs, formatSize, HOME, useFS } from "@/lib/fs";
 
-type Cat = "personalize" | "accounts" | "time" | "ease" | "update" | "pcinfo";
+type Cat = "personalize" | "accounts" | "skydrive" | "privacy" | "network" | "time" | "ease" | "update" | "pcinfo";
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   const { t } = useOS();
@@ -31,6 +32,9 @@ export function SettingsApp({ param }: { param?: string }) {
   const cats: [Cat, Parameters<typeof t>[0]][] = [
     ["personalize", "pc.personalize"],
     ["accounts", "pc.accounts"],
+    ["skydrive", "pc.skydrive"],
+    ["privacy", "pc.privacy"],
+    ["network", "pc.network"],
     ["time", "pc.time"],
     ["ease", "pc.ease"],
     ["update", "pc.update"],
@@ -66,6 +70,9 @@ export function SettingsApp({ param }: { param?: string }) {
         )}
         {cat === "personalize" && <Personalize />}
         {cat === "accounts" && <Accounts />}
+        {cat === "skydrive" && <SkyDriveInfo />}
+        {cat === "privacy" && <Privacy />}
+        {cat === "network" && <Network />}
         {cat === "time" && <TimeLang />}
         {cat === "ease" && <Ease />}
         {cat === "update" && <Update />}
@@ -142,6 +149,66 @@ function Accounts() {
   );
 }
 
+function SkyDriveInfo() {
+  const { t, lang, openApp } = useOS();
+  useFS();
+  const used = fs.size(fs.get(HOME) ?? { name: "", kind: "dir", created: 0, modified: 0 });
+  const total = 7 * 1024 ** 3;
+  return (
+    <>
+      <h2>{t("pc.storage")}</h2>
+      <p className="pcs-big">{formatSize(total - used, lang)} {lang === "tr" ? "kullanılabilir" : "available"}</p>
+      <div className="pcs-meter">
+        <i style={{ width: `${Math.max(1, (used / total) * 100)}%` }} />
+      </div>
+      <p className="dim">
+        {formatSize(used, lang)} / {formatSize(total, lang)}
+      </p>
+      <button className="btn" onClick={() => openApp("skydrive")}>
+        {lang === "tr" ? "SkyDrive'ı aç" : "Open SkyDrive"}
+      </button>
+    </>
+  );
+}
+
+function Privacy() {
+  const { t, lang } = useOS();
+  const [st, setSt] = useState({ location: true, camera: true, mic: true, ads: false });
+  const flip = (k: keyof typeof st) => (v: boolean) => setSt((x) => ({ ...x, [k]: v }));
+  return (
+    <>
+      <h2>{t("pc.privacy")}</h2>
+      <Toggle label={lang === "tr" ? "Uygulamaların konumumu kullanmasına izin ver" : "Let apps use my location"} on={st.location} onChange={flip("location")} />
+      <Toggle label={lang === "tr" ? "Uygulamaların web kameramı kullanmasına izin ver" : "Let apps use my webcam"} on={st.camera} onChange={flip("camera")} />
+      <Toggle label={lang === "tr" ? "Uygulamaların mikrofonumu kullanmasına izin ver" : "Let apps use my microphone"} on={st.mic} onChange={flip("mic")} />
+      <Toggle label={lang === "tr" ? "Uygulamaların reklam kimliğimi kullanmasına izin ver" : "Let apps use my advertising ID"} on={st.ads} onChange={flip("ads")} />
+      <p className="dim small">{lang === "tr" ? "Kamera, mikrofon ve konum için tarayıcınız ayrıca izin isteyecektir." : "Your browser will also ask before apps use the camera, microphone or location."}</p>
+    </>
+  );
+}
+
+function Network() {
+  const { t, lang } = useOS();
+  const [airplane, setAirplane] = useState(false);
+  const online = typeof navigator === "undefined" ? true : navigator.onLine;
+  const conn = (typeof navigator !== "undefined" ? (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number } }).connection : undefined) ?? {};
+  return (
+    <>
+      <h2>{t("pc.network")}</h2>
+      <Toggle label={lang === "tr" ? "Uçak modu" : "Airplane mode"} on={airplane} onChange={setAirplane} />
+      <h2>{lang === "tr" ? "Bağlantılar" : "Connections"}</h2>
+      <div className="pcs-net">
+        <Icon name="wifi" size={28} />
+        <div>
+          <strong>AFU-Ev</strong>
+          <small>{airplane ? (lang === "tr" ? "Kapalı" : "Off") : online ? (lang === "tr" ? "Bağlı" : "Connected") : lang === "tr" ? "İnternet erişimi yok" : "No Internet access"}</small>
+          {conn.effectiveType && <small>{`${conn.effectiveType.toUpperCase()} · ${conn.downlink ?? "?"} Mb/s`}</small>}
+        </div>
+      </div>
+    </>
+  );
+}
+
 function TimeLang() {
   const { t, lang, setPref } = useOS();
   const now = new Date(useTick(1000));
@@ -203,6 +270,24 @@ function Update() {
       <button className="btn" onClick={() => setTiles(() => defaultTiles())}>
         {t("tile.reset")}
       </button>
+      <h2>{t("pc.resetAll")}</h2>
+      <p className="dim">{t("pc.resetAllNote")}</p>
+      <button
+        className="btn"
+        onClick={() => {
+          if (!window.confirm(t("pc.resetAllConfirm"))) return;
+          try {
+            Object.keys(window.localStorage)
+              .filter((k) => k.startsWith("afu-metro:"))
+              .forEach((k) => window.localStorage.removeItem(k));
+          } catch {
+            /* nothing stored */
+          }
+          window.location.reload();
+        }}
+      >
+        {t("pc.resetAllGo")}
+      </button>
     </>
   );
 }
@@ -212,8 +297,9 @@ function PcInfo() {
   const now = useTick(1000);
   const s = Math.floor((now - sessionStart) / 1000);
   const rows: [string, string][] = [
-    [t("pc.edition"), `${profile.name} OS 8.1 · Portfolio Edition`],
-    [t("pc.build"), "9600.2026"],
+    [t("pc.edition"), "Windows 8.1 Pro"],
+    [t("pc.build"), "6.3.9600"],
+    [lang === "tr" ? "Bilgisayar adı" : "PC name", `${profile.name}-PC`],
     ["CPU", `${typeof navigator !== "undefined" ? navigator.hardwareConcurrency ?? "?" : "?"} ${lang === "tr" ? "çekirdek" : "cores"}`],
     [t("pc.screen"), typeof window !== "undefined" ? `${window.innerWidth} × ${window.innerHeight}` : ""],
     [t("group.projects"), String(projects.length)],
@@ -232,8 +318,8 @@ function PcInfo() {
       </dl>
       <p className="dim small">
         {lang === "tr"
-          ? "Bu arayüz bir portfolyo için yapılmış özgün bir yeniden yorumdur; hiçbir sistem logosu, yazı tipi dosyası ya da sesi içermez."
-          : "This interface is an original re-creation built for a portfolio; it contains no system logos, font files or sounds."}
+          ? "Tarayıcıda çalışan, hayran yapımı bir Windows 8.1 yeniden yapımı. Microsoft ile bağlantılı değildir; tüm simgeler sıfırdan çizildi."
+          : "A fan-made Windows 8.1 re-creation that runs in the browser. Not affiliated with Microsoft; every icon is drawn from scratch."}
       </p>
     </>
   );

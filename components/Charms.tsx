@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useOS, useTick, type View } from "@/lib/os";
 import { longDate, pick, time, dayName, type Key } from "@/lib/i18n";
-import { APPS, COLORS, PATTERNS, VISITOR_ACHIEVEMENTS, app, socialIcon, type IconName } from "@/lib/model";
+import { APPS, COLORS, PATTERNS, VISITOR_ACHIEVEMENTS, app, socialIcon, type AppId, type IconName, type ShellIconName } from "@/lib/model";
+import { fs, join, HOME, type FNode } from "@/lib/fs";
+import { AppIcon } from "./icons/AppIcon";
+import { ShellIcon } from "./icons/ShellIcons";
+import { nodeIcon, useOpenPath } from "./desktop/shell";
 import { sound } from "@/lib/sound";
 import { achievements, media, profile, projects, socials } from "@/content/portfolio";
 import { Icon } from "./Icons";
@@ -69,7 +73,7 @@ export function Charms() {
       <div className="corner corner-tr" onMouseEnter={enterCorner} />
       <div className="corner corner-br" onMouseEnter={enterCorner} />
       <div className="corner corner-tl" onMouseEnter={() => prevApp && setLeft("top")} />
-      <div className="corner corner-bl" onMouseEnter={() => view.kind !== "start" && setLeft("bottom")} onContextMenu={openWinx} />
+      {!(view.kind === "app" && view.app === "desktop") && <div className="corner corner-bl" onMouseEnter={() => view.kind !== "start" && setLeft("bottom")} onContextMenu={openWinx} />}
       {winx && <PowerUserMenu onClose={() => setWinx(false)} />}
 
       {left && (
@@ -150,8 +154,9 @@ export function Charms() {
 
 /** Win+X "power user" menu: right-click the Start button or the bottom-left corner. */
 export function PowerUserMenu({ onClose, bottom = 0 }: { onClose: () => void; bottom?: number }) {
-  const { t, open, openApp, setCharm, power } = useOS();
+  const { t, open, setCharm, power } = useOS();
   const [sub, setSub] = useState(false);
+  const go = (app: View) => () => open(app);
   const item = (label: Key, fn: () => void) => (
     <button
       key={label}
@@ -167,12 +172,20 @@ export function PowerUserMenu({ onClose, bottom = 0 }: { onClose: () => void; bo
     <>
       <div className="menu-scrim" onPointerDown={onClose} onContextMenu={(e) => e.preventDefault()} />
       <div className="flyout winx" style={{ bottom }} onContextMenu={(e) => e.preventDefault()}>
-        {item("winx.programs", () => open({ kind: "apps" }))}
-        {item("winx.system", () => openApp("settings", "pcinfo"))}
-        {item("winx.control", () => openApp("settings"))}
+        {item("winx.programs", go({ kind: "app", app: "control", param: "programs" }))}
+        {item("winx.powerOptions", go({ kind: "app", app: "control", param: "power" }))}
+        {item("winx.system", go({ kind: "app", app: "control", param: "system" }))}
+        {item("winx.devices", go({ kind: "app", app: "control", param: "devices" }))}
+        {item("winx.network", go({ kind: "app", app: "control", param: "network" }))}
+        {item("winx.disk", go({ kind: "app", app: "explorer", param: "::thispc" }))}
+        {item("winx.cmd", go({ kind: "app", app: "cmd" }))}
+        {item("winx.cmdAdmin", go({ kind: "app", app: "cmd", param: "C:\\Windows\\system32" }))}
         <hr />
-        {item("winx.explorer", () => openApp("desktop"))}
+        {item("winx.taskmgr", go({ kind: "app", app: "taskmgr" }))}
+        {item("winx.control", go({ kind: "app", app: "control" }))}
+        {item("winx.explorer", go({ kind: "app", app: "explorer" }))}
         {item("winx.search", () => setCharm("search"))}
+        {item("winx.run", go({ kind: "app", app: "run" }))}
         <hr />
         <div className="winx-sub" onMouseEnter={() => setSub(true)} onMouseLeave={() => setSub(false)}>
           <button onClick={() => setSub((s) => !s)}>
@@ -187,7 +200,7 @@ export function PowerUserMenu({ onClose, bottom = 0 }: { onClose: () => void; bo
             </div>
           )}
         </div>
-        {item("winx.desktop", () => openApp("desktop"))}
+        {item("winx.desktop", go({ kind: "app", app: "desktop" }))}
       </div>
     </>
   );
@@ -199,7 +212,7 @@ function SwitchThumb({ v, onPick, inList }: { v: View; onPick: (v: View) => void
   const a = app(v.app);
   return (
     <button className={`switch-thumb ${inList ? "in-list" : ""}`} style={{ background: a.color }} onClick={() => onPick(v)} title={t(a.title)}>
-      <Icon name={a.icon} size={inList ? 30 : 40} />
+      <AppIcon id={a.id} size={inList ? 30 : 40} />
       {!inList && <span>{t(a.title)}</span>}
     </button>
   );
@@ -238,16 +251,50 @@ function Pane({ title, children, className, onBack }: { title: string; children:
   );
 }
 
-type Hit = { id: string; title: string; sub: string; icon: IconName; color: string; view?: View; url?: string; art?: { seed: string; motif: (typeof projects)[number]["motif"]; palette: [string, string, string] } };
+type Hit = {
+  id: string;
+  title: string;
+  sub: string;
+  icon: IconName;
+  color: string;
+  view?: View;
+  url?: string;
+  /** Draw this app's own icon (desktop programs have colorful ones). */
+  app?: AppId;
+  /** A file on the desktop's file system. */
+  path?: string;
+  shell?: ShellIconName;
+  art?: { seed: string; motif: (typeof projects)[number]["motif"]; palette: [string, string, string] };
+};
 
-export function useSearch(q: string): Hit[] {
+/** Files whose names match, searched from the user's folder down (Windows 8.1 "Everywhere" search includes files). */
+function findFiles(s: string, lang: "tr" | "en", limit = 8) {
+  const out: { path: string; node: FNode }[] = [];
+  const walk = (dir: string, depth: number) => {
+    for (const n of fs.list(dir)) {
+      if (out.length >= limit) return;
+      const p = join(dir, n.name);
+      if (fs.label(n, lang).toLocaleLowerCase(lang).includes(s) && n.kind !== "drive") out.push({ path: p, node: n });
+      if (n.children && depth < 6) walk(p, depth + 1);
+    }
+  };
+  walk(HOME, 0);
+  return out;
+}
+
+export function useSearch(q: string, files = false): Hit[] {
   const { t, lang } = useOS();
   return useMemo(() => {
     const s = q.trim().toLocaleLowerCase(lang);
     if (!s) return [];
     const has = (...xs: string[]) => xs.some((x) => x.toLocaleLowerCase(lang).includes(s));
     const hits: Hit[] = [];
-    for (const a of APPS) if (has(t(a.title), a.id)) hits.push({ id: `app:${a.id}`, title: t(a.title), sub: t("apps"), icon: a.icon, color: a.color, view: { kind: "app", app: a.id } });
+    for (const a of APPS)
+      if (!a.hidden && !(a.kind === "desktop" && !files) && has(t(a.title), a.id, a.exe ?? ""))
+        hits.push({ id: `app:${a.id}`, title: t(a.title), sub: a.kind === "desktop" ? t(a.cat === "accessories" ? "cat.accessories" : a.cat === "games" ? "cat.games" : "cat.system") : t("apps"), icon: a.icon, color: a.color, view: { kind: "app", app: a.id }, app: a.id });
+    if (files)
+      for (const f of findFiles(s, lang))
+        hits.push({ id: `f:${f.path}`, title: fs.label(f.node, lang), sub: f.path, icon: "file", color: "#4a4a4a", path: f.path, shell: nodeIcon(f.node, f.path) });
     for (const p of projects)
       if (has(p.title, pick(lang, p.tagline), pick(lang, p.description), ...p.tech, pick(lang, p.genre)))
         hits.push({ id: `p:${p.id}`, title: p.title, sub: pick(lang, p.tagline), icon: "projects", color: p.palette[1], view: { kind: "app", app: "projects", param: p.id }, art: { seed: p.id, motif: p.motif, palette: p.palette } });
@@ -258,14 +305,16 @@ export function useSearch(q: string): Hit[] {
     for (const e of profile.experience) if (has(e.company, pick(lang, e.role))) hits.push({ id: `e:${e.company}`, title: e.company, sub: pick(lang, e.role), icon: "profile", color: app("profile").color, view: { kind: "app", app: "profile" } });
     for (const so of socials) if (has(so.label, so.handle)) hits.push({ id: `s:${so.id}`, title: so.label, sub: so.handle, icon: socialIcon(so.id), color: "#333", url: so.url });
     return hits.slice(0, 24);
-  }, [q, t, lang]);
+    // fs.version keeps file results fresh
+  }, [q, t, lang, files, fs.version]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 function SearchPane() {
   const { t, open, setCharm, toast } = useOS();
   const [q, setQ] = useState("");
   const input = useRef<HTMLInputElement>(null);
-  const hits = useSearch(q);
+  const hits = useSearch(q, true);
+  const openPath = useOpenPath();
 
   useEffect(() => {
     input.current?.focus({ preventScroll: true });
@@ -276,7 +325,8 @@ function SearchPane() {
 
   const go = (h: Hit) => {
     sound.tap();
-    if (h.view) open(h.view);
+    if (h.path) openPath(h.path);
+    else if (h.view) open(h.view);
     else if (h.url && h.url !== "#") window.open(h.url, "_blank", "noopener,noreferrer");
     else toast({ title: t("placeholderLink"), body: h.title, color: "#555", icon: "link" });
     setCharm(null);
@@ -312,7 +362,7 @@ function SearchPane() {
         {hits.map((h) => (
           <button key={h.id} className="search-hit" onClick={() => go(h)}>
             <span className="search-hit-icon" style={{ background: h.color }}>
-              {h.art ? <CoverArt seed={h.art.seed} motif={h.art.motif} palette={h.art.palette} /> : <Icon name={h.icon} size={20} />}
+              {h.art ? <CoverArt seed={h.art.seed} motif={h.art.motif} palette={h.art.palette} /> : h.shell ? <ShellIcon name={h.shell} size={24} /> : h.app ? <AppIcon id={h.app} size={h.app && app(h.app).kind === "desktop" ? 24 : 20} /> : <Icon name={h.icon} size={20} />}
             </span>
             <span className="search-hit-text">
               <strong>{h.title}</strong>
@@ -513,6 +563,13 @@ function PatternThumb({ kind }: { kind: (typeof PATTERNS)[number] }) {
       {kind === "geo" && [0, 1, 2].map((i) => <polygon key={i} points={`${10 + i * 25},8 ${30 + i * 25},20 ${10 + i * 25},38`} fill="#fff" fillOpacity="0.15" />)}
       {kind === "circuit" && [0, 1, 2].map((i) => <path key={i} d={`M${6 + i * 24} ${12 + i * 9} h18 l6 6 v10`} fill="none" stroke="#fff" strokeOpacity="0.35" />)}
       {kind === "bubbles" && [0, 1, 2, 3, 4].map((i) => <circle key={i} cx={10 + i * 16} cy={14 + (i % 2) * 18} r={4 + (i % 3) * 4} fill="#fff" fillOpacity="0.15" />)}
+      {kind === "desktop" && (
+        <>
+          <rect width="80" height="50" fill="#1e4fa8" />
+          <path d="M0 38 Q20 30 40 36 T80 32 V50 H0Z" fill="#0b1a3a" />
+          <rect x="0" y="45" width="80" height="5" fill="#000" fillOpacity="0.5" />
+        </>
+      )}
     </svg>
   );
 }

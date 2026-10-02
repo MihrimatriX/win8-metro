@@ -3,42 +3,121 @@ import type { Key } from "./i18n";
 import type { L, Tier } from "./types";
 import { projects, socials } from "@/content/portfolio";
 
-export type AppId = "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings";
+export type MetroAppId =
+  | "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings"
+  | "weather" | "news" | "sports" | "finance" | "travel" | "maps" | "camera" | "alarms" | "soundrec" | "video" | "skydrive";
+export type DesktopAppId =
+  | "explorer" | "ie" | "notepad" | "wordpad" | "paint" | "calc" | "cmd" | "taskmgr" | "control" | "minesweeper" | "run" | "winver";
+export type AppId = MetroAppId | DesktopAppId;
 
 export type IconName =
   | "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings"
+  | "weather" | "news" | "sports" | "finance" | "travel" | "maps" | "camera" | "alarms" | "soundrec" | "video" | "skydrive" | "ie" | "calculator" | "help"
   | "search" | "share" | "start" | "devices" | "power" | "back" | "forward" | "down" | "up" | "play" | "pause" | "next" | "prev"
   | "github" | "linkedin" | "x" | "blog" | "cv" | "close" | "minus" | "plus" | "check" | "folder" | "file" | "image" | "pc"
   | "keyboard" | "mouse" | "touch" | "print" | "link" | "bell" | "globe" | "volume" | "mute" | "motion" | "brush" | "pin"
-  | "unpin" | "resize" | "lock" | "user" | "wifi" | "battery" | "star" | "new" | "send" | "reply" | "trash" | "maximize" | "restore" | "refresh";
+  | "unpin" | "resize" | "lock" | "user" | "wifi" | "battery" | "star" | "new" | "send" | "reply" | "trash" | "maximize" | "restore" | "refresh"
+  | "record" | "stop" | "location" | "camera-switch" | "timer" | "stopwatch" | "edit" | "save" | "list" | "grid" | "flag" | "ease";
 
-export type AppDef = { id: AppId; title: Key; color: string; icon: IconName; phone?: boolean };
+/** Colorful desktop (Win32) icon names, drawn in components/icons/ShellIcons.tsx. */
+export type ShellIconName =
+  | "folder" | "folder-open" | "folder-documents" | "folder-pictures" | "folder-music" | "folder-videos" | "folder-downloads" | "folder-desktop" | "folder-user"
+  | "thispc" | "drive" | "drive-system" | "dvd" | "network" | "recycle-empty" | "recycle-full" | "libraries" | "favorites" | "homegroup"
+  | "explorer" | "ie" | "notepad" | "wordpad" | "paint" | "calc" | "cmd" | "taskmgr" | "control" | "minesweeper" | "run" | "windows"
+  | "file" | "file-txt" | "file-rtf" | "file-img" | "file-url" | "file-exe" | "file-html" | "file-audio" | "file-video" | "file-lnk"
+  | "msg-info" | "msg-warning" | "msg-error" | "msg-question" | "shield" | "user" | "display" | "personalize" | "clock" | "programs" | "sound" | "mouse" | "keyboard" | "power" | "fonts" | "region" | "ease" | "devices" | "accounts" | "update";
+
+export type AppDef = {
+  id: AppId;
+  title: Key;
+  color: string;
+  icon: IconName;
+  /** Metro (full screen, Windows Store) apps run in AppHost; desktop apps open in a window on the desktop. */
+  kind: "metro" | "desktop";
+  /** Desktop apps draw a colorful Win32 icon instead of a Metro glyph. */
+  shell?: ShellIconName;
+  /** Program name for Run / Command Prompt / Task Manager. */
+  exe?: string;
+  phone?: boolean;
+  /** Not listed in the Apps view (dialogs such as Run). */
+  hidden?: boolean;
+  /** Apps view "by category" group. */
+  cat?: "apps" | "accessories" | "system" | "games";
+};
+
+const m = (id: MetroAppId, title: Key, color: string, icon: IconName, extra: Partial<AppDef> = {}): AppDef => ({ id, title, color, icon, kind: "metro", cat: "apps", ...extra });
+const d = (id: DesktopAppId, title: Key, color: string, shell: ShellIconName, exe: string, cat: AppDef["cat"], extra: Partial<AppDef> = {}): AppDef => ({
+  id,
+  title,
+  color,
+  icon: "desktop",
+  kind: "desktop",
+  shell,
+  exe,
+  cat,
+  phone: false,
+  ...extra,
+});
 
 export const APPS: AppDef[] = [
-  { id: "projects", title: "app.projects", color: "#00a300", icon: "projects" },
-  { id: "profile", title: "app.profile", color: "#d24726", icon: "profile" },
-  { id: "mail", title: "app.mail", color: "#0072c6", icon: "mail" },
-  { id: "reader", title: "app.reader", color: "#a20025", icon: "reader" },
-  { id: "photos", title: "app.photos", color: "#008299", icon: "photos" },
-  { id: "music", title: "app.music", color: "#e3008c", icon: "music" },
-  { id: "achievements", title: "app.achievements", color: "#1e7145", icon: "achievements" },
-  { id: "calendar", title: "app.calendar", color: "#5133ab", icon: "calendar" },
-  { id: "desktop", title: "app.desktop", color: "#2d89ef", icon: "desktop", phone: false },
-  { id: "settings", title: "app.settings", color: "var(--accent)", icon: "settings" },
+  m("mail", "app.mail", "#00a0b1", "mail"),
+  m("calendar", "app.calendar", "#5133ab", "calendar"),
+  m("profile", "app.profile", "#d24726", "profile"),
+  m("photos", "app.photos", "#008299", "photos"),
+  m("projects", "app.projects", "#00a300", "projects"),
+  m("weather", "app.weather", "#1ba1e2", "weather"),
+  m("news", "app.news", "#ac193d", "news"),
+  m("sports", "app.sports", "#603cba", "sports"),
+  m("finance", "app.finance", "#008a00", "finance"),
+  m("travel", "app.travel", "#00aba9", "travel"),
+  m("maps", "app.maps", "#9f00a7", "maps"),
+  m("skydrive", "app.skydrive", "#094ab2", "skydrive"),
+  m("music", "app.music", "#e56c19", "music"),
+  m("video", "app.video", "#b01e00", "video"),
+  m("achievements", "app.achievements", "#107c10", "achievements", { cat: "games" }),
+  m("camera", "app.camera", "#aa1e44", "camera"),
+  m("alarms", "app.alarms", "#da532c", "alarms"),
+  m("soundrec", "app.soundrec", "#b91d47", "soundrec"),
+  m("reader", "app.reader", "#a20025", "reader"),
+  m("desktop", "app.desktop", "#2d89ef", "desktop", { phone: false }),
+  m("settings", "app.settings", "var(--accent)", "settings"),
+  // IE is a desktop program here, but its Start tile is the Metro one: the blue "e" glyph.
+  d("ie", "app.ie", "#2672ec", "ie", "iexplore.exe", "apps", { icon: "ie" }),
+  d("explorer", "app.explorer", "#d39d09", "explorer", "explorer.exe", "system"),
+  d("notepad", "app.notepad", "#2d89ef", "notepad", "notepad.exe", "accessories"),
+  d("wordpad", "app.wordpad", "#2b5797", "wordpad", "write.exe", "accessories"),
+  d("paint", "app.paint", "#da532c", "paint", "mspaint.exe", "accessories"),
+  d("calc", "app.calc", "#4b4b4b", "calc", "calc.exe", "accessories"),
+  d("cmd", "app.cmd", "#1d1d1d", "cmd", "cmd.exe", "system"),
+  d("taskmgr", "app.taskmgr", "#00a300", "taskmgr", "taskmgr.exe", "system"),
+  d("control", "app.control", "#2d89ef", "control", "control.exe", "system"),
+  d("minesweeper", "app.minesweeper", "#1e7145", "minesweeper", "minesweeper.exe", "games"),
+  d("run", "app.run", "#2d89ef", "run", "run", "system"),
+  d("winver", "app.winver", "#2d89ef", "windows", "winver.exe", "system", { hidden: true }),
 ];
 
-export const app = (id: AppId) => APPS.find((a) => a.id === id)!;
+export const app = (id: AppId) => APPS.find((a) => a.id === id) ?? APPS[0];
+export const isDesktopApp = (id: string): id is DesktopAppId => APPS.some((a) => a.id === id && a.kind === "desktop");
+/** Find an app by its program name ("notepad", "notepad.exe", "mspaint"…), for Run and the Command Prompt. */
+export function appByExe(name: string): AppDef | undefined {
+  const n = name.trim().toLowerCase().replace(/^"|"$/g, "").split(/[\\/]/).pop() ?? "";
+  const base = n.replace(/\.exe$/, "");
+  const alias: Record<string, string> = { iexplore: "ie", mspaint: "paint", write: "wordpad", explorer: "explorer", control: "control", calc: "calc", taskmgr: "taskmgr" };
+  return APPS.find((a) => a.exe?.replace(/\.exe$/, "") === base || a.id === (alias[base] ?? base));
+}
 
 export type TileSize = "small" | "medium" | "wide" | "large";
 export const SPAN: Record<TileSize, [number, number]> = { small: [1, 1], medium: [2, 2], wide: [4, 2], large: [4, 4] };
 
 export type TileRef = { kind: "app"; id: AppId } | { kind: "project"; id: string } | { kind: "social"; id: string };
 export type TileState = { key: string; size: TileSize; live: boolean; pinned: boolean; group: GroupId };
-export type GroupId = "me" | "projects" | "read" | "links";
+export type GroupId = "main" | "info" | "projects" | "tools" | "links";
+/** Start groups. The first two are unnamed, like a fresh Windows 8.1 Start screen. */
 export const GROUPS: { id: GroupId; title: Key }[] = [
-  { id: "me", title: "group.me" },
+  { id: "main", title: "group.main" },
+  { id: "info", title: "group.info" },
   { id: "projects", title: "group.projects" },
-  { id: "read", title: "group.read" },
+  { id: "tools", title: "group.tools" },
   { id: "links", title: "group.links" },
 ];
 
@@ -47,12 +126,14 @@ export function parseKey(key: string): TileRef {
   return { kind, id } as TileRef;
 }
 
-/** Which sizes each tile supports (apps with rich live content allow large). */
+/** Which sizes each tile supports (apps with rich live content allow large; desktop programs only small and medium). */
 export function sizesFor(key: string): TileSize[] {
   const ref = parseKey(key);
   if (ref.kind === "social") return ["small", "medium"];
   if (ref.kind === "project") return ["small", "medium", "wide", "large"];
-  if (["profile", "photos", "reader", "desktop", "music", "projects"].includes(ref.id)) return ["small", "medium", "wide", "large"];
+  if (isDesktopApp(ref.id)) return ["small", "medium"];
+  if (["profile", "photos", "reader", "desktop", "music", "projects", "news", "weather", "travel", "calendar", "mail"].includes(ref.id)) return ["small", "medium", "wide", "large"];
+  if (["ie", "settings", "camera", "alarms", "soundrec"].includes(ref.id)) return ["small", "medium"];
   return ["small", "medium", "wide"];
 }
 
@@ -60,17 +141,39 @@ export function defaultTiles(): TileState[] {
   const t = (key: string, size: TileSize, group: GroupId): TileState => ({ key, size, group, live: true, pinned: true });
   const featured = projects.filter((p) => !p.sample).map((p) => p.id);
   return [
-    t("app:profile", "wide", "me"),
-    t("app:mail", "wide", "me"),
-    t("app:calendar", "medium", "me"),
-    t("app:achievements", "medium", "me"),
-    t("app:desktop", "wide", "me"),
-    t("app:settings", "small", "me"),
-    t("app:music", "medium", "me"),
+    // A Windows 8.1 Start screen, column by column (tiles flow top to bottom, then to the next column).
+    t("app:mail", "wide", "main"),
+    t("app:calendar", "medium", "main"),
+    t("app:profile", "medium", "main"),
+    t("app:ie", "medium", "main"),
+    t("app:projects", "medium", "main"),
+    t("app:weather", "wide", "main"),
+    t("app:photos", "wide", "main"),
+    t("app:desktop", "wide", "main"),
+    t("app:maps", "medium", "main"),
+    t("app:skydrive", "medium", "main"),
+    t("app:music", "medium", "main"),
+    t("app:video", "medium", "main"),
+    t("app:achievements", "medium", "main"),
+    t("app:camera", "medium", "main"),
+    t("app:news", "large", "info"),
+    t("app:finance", "wide", "info"),
+    t("app:travel", "wide", "info"),
+    t("app:sports", "wide", "info"),
+    t("app:reader", "medium", "info"),
+    t("app:alarms", "medium", "info"),
     ...projects.map((p, i) => t(`project:${p.id}`, i === 0 ? "large" : i < featured.length ? "wide" : "medium", "projects")),
-    t("app:projects", "wide", "projects"),
-    t("app:reader", "large", "read"),
-    t("app:photos", "wide", "read"),
+    t("app:explorer", "medium", "tools"),
+    t("app:control", "medium", "tools"),
+    t("app:settings", "medium", "tools"),
+    t("app:notepad", "medium", "tools"),
+    t("app:paint", "medium", "tools"),
+    t("app:cmd", "small", "tools"),
+    t("app:calc", "small", "tools"),
+    t("app:taskmgr", "small", "tools"),
+    t("app:soundrec", "small", "tools"),
+    t("app:minesweeper", "medium", "tools"),
+    t("app:wordpad", "medium", "tools"),
     ...socials.map((s) => t(`social:${s.id}`, s.id === "github" ? "medium" : "small", "links")),
   ];
 }
@@ -81,11 +184,32 @@ export type DropTarget = { key: string } | { group: GroupId };
 /**
  * Move the tile `key` to `to` and return the new list (Start renders each group's tiles in list order).
  * Called repeatedly while a tile is dragged, so the other tiles make room live.
+ * Over another tile: a tile coming from earlier in the same group lands after it, otherwise before it,
+ * so dragging across a neighbour always swaps the two. Over a group's empty space: it joins the end of that group.
  */
 export function moveTile(tiles: TileState[], key: string, to: DropTarget): TileState[] {
-  // TODO(human): take the dragged tile out, then put it back next to `to.key` (adopting that tile's group),
-  // or at the end of `to.group`. Decide whether it lands before or after the hovered tile.
-  return tiles;
+  const from = tiles.findIndex((x) => x.key === key);
+  if (from < 0) return tiles;
+  const item = tiles[from];
+  const rest = tiles.filter((x) => x.key !== key);
+  if ("key" in to) {
+    if (to.key === key) return tiles;
+    const at = rest.findIndex((x) => x.key === to.key);
+    if (at < 0) return tiles;
+    const target = rest[at];
+    const after = target.group === item.group && from < tiles.indexOf(target);
+    rest.splice(after ? at + 1 : at, 0, { ...item, group: target.group });
+    return rest;
+  }
+  let last = -1;
+  rest.forEach((x, i) => {
+    if (x.group === to.group) last = i;
+  });
+  if (item.group === to.group && last === from - 1) return tiles; // already the last one there
+  const moved = { ...item, group: to.group };
+  if (last < 0) rest.push(moved);
+  else rest.splice(last + 1, 0, moved);
+  return rest;
 }
 
 /** Win8-style pairs: Start background + accent. */
@@ -102,7 +226,8 @@ export const COLORS: { bg: string; accent: string }[] = [
   { bg: "#0b2a3d", accent: "#1ba1e2" },
 ];
 
-export const PATTERNS = ["none", "waves", "geo", "circuit", "bubbles"] as const;
+/** Start backgrounds; "desktop" shows the desktop wallpaper behind the tiles, like Windows 8.1. */
+export const PATTERNS = ["none", "waves", "geo", "circuit", "bubbles", "desktop"] as const;
 export type Pattern = (typeof PATTERNS)[number];
 
 export type VisitorAchievement = { id: string; name: L; detail: L; tier: Tier; points: number };

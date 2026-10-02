@@ -1,0 +1,181 @@
+/* Calculator (calc.exe), Windows 7/8 look: blue-grey body, glossy display, rounded keys with a gold hover glow. */
+
+.calc {
+  flex: none;
+  align-self: flex-start;
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  font-family: "Segoe UI", var(--font);
+  color: #000;
+}
+.calc-body {
+  padding: 11px 11px 12px;
+  background: linear-gradient(#d9e4f1, #e3ebf5 45%, #f0f4f9);
+}
+
+/* ----- display ----- */
+.calc-display {
+  position: relative;
+  height: 52px;
+  margin-bottom: 9px;
+  padding: 1px 5px 0;
+  border: 1px solid #8e9cb1;
+  border-radius: 3px;
+  background: linear-gradient(#e4ecf7, #f4f8fc 38%, #fff 70%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  text-align: right;
+  overflow: hidden;
+  user-select: text;
+  cursor: default;
+}
+.calc-hist {
+  height: 17px;
+  font-size: 11px;
+  line-height: 17px;
+  color: #3a4a60;
+  white-space: nowrap;
+  overflow: hidden;
+  /* long expressions keep their newest part visible */
+  direction: rtl;
+  unicode-bidi: plaintext;
+  text-overflow: clip;
+}
+.calc-main {
+  height: 30px;
+  line-height: 30px;
+  font-size: 23px;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+  color: #000;
+}
+.calc-ind {
+  position: absolute;
+  left: 5px;
+  bottom: 3px;
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  color: #000;
+  pointer-events: none;
+}
+
+/* ----- keypad ----- */
+.calc-pads {
+  display: flex;
+  gap: 10px;
+}
+.calc-keys {
+  display: grid;
+  grid-template-columns: repeat(5, 34px);
+  grid-auto-rows: 27px;
+  gap: 5px;
+}
+.calc-key {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 1px solid #8a9bb3;
+  border-radius: 3px;
+  background: linear-gradient(#eef3f9 0%, #e6edf6 49%, #d9e3ef 50%, #e3eaf3 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  color: #1e395b;
+  font: 12px/1 "Segoe UI", var(--font);
+  white-space: nowrap;
+  cursor: default;
+}
+.calc-key.num {
+  background: linear-gradient(#fbfcfe 0%, #f3f6fa 49%, #e8edf4 50%, #f0f3f8 100%);
+  font-size: 13px;
+}
+.calc-key.mem {
+  font-size: 11px;
+}
+.calc-key.eq {
+  grid-row: span 2;
+  font-size: 14px;
+}
+.calc-key.zero {
+  grid-column: span 2;
+}
+.calc-key:hover {
+  border-color: #e3b55d;
+  background: linear-gradient(#fff4d6 0%, #ffe8a6 49%, #ffd36b 50%, #ffe08f 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 252, 238, 0.75), 0 0 3px rgba(255, 196, 64, 0.55);
+}
+.calc-key:active,
+.calc-key.down {
+  border-color: #c2913c;
+  background: linear-gradient(#f9d9a0 0%, #f6c66e 49%, #f2b244 50%, #f6c86c 100%);
+  box-shadow: inset 1px 1px 2px rgba(130, 80, 0, 0.35);
+}
+.calc-key sup {
+  font-size: 8px;
+  line-height: 0;
+  vertical-align: 5px;
+  margin-left: 0.5px;
+}
+.calc-key i {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 13px;
+}
+.calc-key sup i {
+  font-size: 9px;
+}
+.calc-arrow {
+  font-size: 15px;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+/* Degrees / Radians / Grads */
+.calc-angles {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid #a3b2c7;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.35);
+  color: #000;
+  font-size: 12px;
+}
+.calc-angles label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.calc-radio {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid #8e8f8f;
+  background: radial-gradient(circle at 50% 35%, #fff, #e8e8e8 70%);
+  display: grid;
+  place-items: center;
+}
+.calc-angles label:hover .calc-radio {
+  border-color: #3c7fb1;
+  background: radial-gradient(circle at 50% 35%, #fff, #def0fc 70%);
+}
+.calc-angles label.on .calc-radio::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #8ad0ff, #1a5aa3);
+}
+
+/* The title doesn't fit centered in such a narrow frame; Windows slides it between the icon and the buttons. */
+.w8-win.app-calc .w8-titlebar-text {
+  left: 22px;
+  right: 96px;
+}
+.w8-win.app-calc:has(.calc-sci) .w8-titlebar-text {
+  left: 110px;
+  right: 110px;
+}

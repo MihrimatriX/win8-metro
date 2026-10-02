@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { OSProvider, useOS } from "@/lib/os";
 import { sound } from "@/lib/sound";
-import { Monogram } from "./Icons";
+import { WinLogo } from "./Icons";
+import { DesktopShell } from "./desktop/DesktopShell";
 import { LockScreen, Login, Welcome } from "./Lock";
 import { StartScreen } from "./Start";
 import { AppHost, AppsView } from "./AppHost";
@@ -88,7 +89,7 @@ function Boot() {
   }, [skip, setPhase]);
   return (
     <div className="boot" onClick={() => setSkip(true)}>
-      <Monogram size={96} className="boot-logo" />
+      <WinLogo size={110} className="boot-logo" />
       <Ring size={44} className="boot-ring" />
     </div>
   );
@@ -115,7 +116,9 @@ function Desktop() {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       const typing = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA");
-      if (e.key === "Escape" || (e.key === "Backspace" && !typing)) {
+      const onDesk = view.kind === "app" && view.app === "desktop";
+      // On the desktop, Esc and Backspace belong to the windows (Explorer uses Backspace for "back").
+      if ((e.key === "Escape" || (e.key === "Backspace" && !typing)) && !(onDesk && !charm)) {
         if (charm) setCharm(null);
         else if (view.kind === "apps") open({ kind: "start" });
         else if (canBack) back();
@@ -138,11 +141,19 @@ function Desktop() {
     return () => window.removeEventListener("keydown", onKey);
   }, [view, charm, setCharm, back, canBack, open, recent]);
 
+  const onDesktop = view.kind === "app" && view.app === "desktop";
+  // The desktop stays mounted after the first visit so its windows survive trips to Start.
+  const [deskMounted, setDeskMounted] = useState(false);
+  useEffect(() => {
+    if (onDesktop) setDeskMounted(true);
+  }, [onDesktop]);
+
   return (
     <div className="desk" data-view={view.kind}>
+      {(deskMounted || onDesktop) && <DesktopShell active={onDesktop} />}
       <StartScreen hidden={view.kind !== "start"} />
       {view.kind === "apps" && <AppsView />}
-      {view.kind === "app" && <AppHost key={`${view.app}`} view={view} />}
+      {view.kind === "app" && !onDesktop && <AppHost key={`${view.app}`} view={view} />}
       <Charms />
       <Toasts />
     </div>

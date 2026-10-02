@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AFU · Metro",
-  description: "AFU'nun projelerini canlı kutucuklarla dolu bir Metro Başlangıç ekranında sergileyen portfolyo. / AFU's portfolio on a Metro-style Start screen full of live tiles.",
+  title: "Windows 8.1 · AFU",
+  description:
+    "Tarayıcıda çalışan bir Windows 8.1 klonu: Başlangıç ekranı, canlı kutucuklar, charm çubuğu, gerçek pencereli masaüstü ve çalışan uygulamalar. / A Windows 8.1 clone that runs in the browser: Start screen, live tiles, charms, a real windowed desktop and working apps.",
 };
 
 export const viewport: Viewport = {
