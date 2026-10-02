@@ -20,8 +20,8 @@ Masaüstü ve tablette Windows 8.1, telefonda Windows Phone 8.1 düzeni açılı
 - **Pencere yöneticisi** (`lib/wm.ts`): odak, z-sırası, modal iletişim kutuları, "değişiklikleri kaydet?" kapatma koruması. Pencereler Başlangıç'a gidip gelince kaybolmaz.
 - **Windows 8 görünümü:** Windows logosu, Segoe UI Symbol tarzında yeniden çizilmiş Metro glifleri, Selawik yazı tipi (Segoe UI yoksa), Windows 8.1 varsayılan Başlangıç düzeni,
   çalışan kutucuk sürükleme, grup adlandırma, masaüstü arka planını Başlangıç'ta gösterme, kategoriye göre Uygulamalar görünümü, dosya ve program arayan Ara charm'ı.
-- Programlar: Not Defteri, Çalıştır, Windows Hakkında, Hesap Makinesi; diğer masaüstü ve Metro uygulamaları (Dosya Gezgini, Paint, Komut İstemi, IE, Hava Durumu, Haritalar…)
-  kayıtlı ve açılıyor, içerikleri sonraki adımda tamamlanacak.
+- Programlar: Not Defteri, Çalıştır, Windows Hakkında ve Hesap Makinesi'nin ilk sürümleri var ama yarım kaldı ve henüz test edilmedi.
+  Diğer masaüstü ve Metro uygulamaları (Dosya Gezgini, Paint, Komut İstemi, IE, Hava Durumu, Haritalar…) kayıtlı ve açılıyor, şimdilik içleri boş.
 
 Derin bağlantı: `?boot=1&open=notepad` açılışı, kilit ve oturum açmayı atlayıp doğrudan bir uygulamayı açar.
 
