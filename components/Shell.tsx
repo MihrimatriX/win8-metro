@@ -116,7 +116,9 @@ function Desktop() {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       const typing = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA");
-      if (e.key === "Escape" || (e.key === "Backspace" && !typing)) {
+      const onDesk = view.kind === "app" && view.app === "desktop";
+      // On the desktop, Esc and Backspace belong to the windows (Explorer uses Backspace for "back").
+      if ((e.key === "Escape" || (e.key === "Backspace" && !typing)) && !(onDesk && !charm)) {
         if (charm) setCharm(null);
         else if (view.kind === "apps") open({ kind: "start" });
         else if (canBack) back();

@@ -9,6 +9,8 @@ import { media, profile, projects, socials } from "@/content/portfolio";
 import { inbox } from "@/content/mailbox";
 import { CoverArt } from "./CoverArt";
 import { Icon } from "./Icons";
+import { ShellIcon } from "./icons/ShellIcons";
+import { Wallpaper } from "./desktop/DesktopShell";
 
 export type TileMeta = { title: string; color: string; icon: IconName; view?: View; url?: string; app?: AppId };
 
@@ -83,10 +85,17 @@ const IconFace = ({ icon, size }: { icon: IconName; size: TileSize }) => (
   </div>
 );
 
+/** Desktop programs on Start: their colorful icon centered on the tile, like Windows 8 does. */
+const ShellFace = ({ id, size }: { id: AppId; size: TileSize }) => {
+  const a = app(id);
+  return <div className="tile-icon tile-shell">{a.shell && <ShellIcon name={a.shell} size={size === "small" ? 32 : 48} />}</div>;
+};
+
 export function TileFace({ tileKey, size, live }: { tileKey: string; size: TileSize; live: boolean }) {
   const ref = parseKey(tileKey);
   if (ref.kind === "project") return <ProjectFace id={ref.id} size={size} live={live} />;
   if (ref.kind === "social") return <SocialFace id={ref.id} size={size} />;
+  if (app(ref.id).kind === "desktop" && app(ref.id).icon === "desktop") return <ShellFace id={ref.id} size={size} />;
   switch (ref.id) {
     case "profile":
       return <ProfileFace size={size} live={live} />;
@@ -265,13 +274,12 @@ function AchievementsFace({ size, live }: { size: TileSize; live: boolean }) {
   );
 }
 
-export const WALLPAPER = { seed: "wallpaper", motif: "dunes" as const, palette: ["#0b1a3a", "#1e4fa8", "#7dd3fc"] as [string, string, string] };
-
 function DesktopFace({ size }: { size: TileSize }) {
+  const { wallpaper } = useOS();
   if (size === "small") return <IconFace icon="desktop" size={size} />;
   return (
     <div className="tile-fill">
-      <CoverArt className="tile-art" {...WALLPAPER} />
+      <Wallpaper value={wallpaper} className="tile-art" />
       <div className="tile-taskbar" />
     </div>
   );

@@ -176,7 +176,8 @@ export function useLauncher(onLaunchStart?: () => void) {
 
 export function StartScreen({ hidden }: { hidden: boolean }) {
   const os = useOS();
-  const { t, tiles, setTiles, setCharm, user, power, earn, open } = os;
+  const { t, tiles, setTiles, setCharm, user, power, earn, open, groupNames, setPref } = os;
+  const [naming, setNaming] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const savedScroll = useRef(0);
@@ -359,15 +360,16 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
 
   return (
     <div
-      className={`start ${entering ? "entering" : ""} ${launching ? "launching" : ""} ${zoomed ? "zoomed" : ""} ${drag ? "customizing" : ""}`}
+      className={`start ${entering ? "entering" : ""} ${launching ? "launching" : ""} ${zoomed ? "zoomed" : ""} ${drag || naming ? "customizing" : ""}`}
       hidden={hidden}
       style={style}
       onContextMenu={(e) => {
         e.preventDefault();
         setBar((b) => !b);
       }}
-      onClick={() => {
+      onClick={(e) => {
         setPowerMenu(false);
+        if (naming && !(e.target as HTMLElement).closest("input")) setNaming(false);
       }}
     >
       <Pattern offset={scrollX} />
@@ -414,7 +416,18 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
                     : undefined
                 }
               >
-                <h2 className="group-title">{t(g.title)}</h2>
+                {naming ? (
+                  <input
+                    className="group-name-input"
+                    defaultValue={groupNames[g.id] ?? t(g.title)}
+                    placeholder={t("group.name")}
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
+                    onBlur={(e) => setPref("groupNames", { ...groupNames, [g.id]: e.currentTarget.value.trim() })}
+                  />
+                ) : (
+                  <h2 className="group-title">{groupNames[g.id] ?? t(g.title)}</h2>
+                )}
                 <div className="group-grid">
                   {list.map((tile) => (
                     <Tile
@@ -527,6 +540,15 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
               >
                 <Icon name="refresh" size={20} />
                 <span>{t("tile.reset")}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setNaming((n) => !n);
+                  setBar(false);
+                }}
+              >
+                <Icon name="edit" size={20} />
+                <span>{t(naming ? "group.done" : "group.customize")}</span>
               </button>
               <button onClick={() => { setBar(false); setCharm("personalize"); }}>
                 <Icon name="brush" size={20} />

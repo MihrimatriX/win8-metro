@@ -81,7 +81,8 @@ export const APPS: AppDef[] = [
   m("reader", "app.reader", "#a20025", "reader"),
   m("desktop", "app.desktop", "#2d89ef", "desktop", { phone: false }),
   m("settings", "app.settings", "var(--accent)", "settings"),
-  d("ie", "app.ie", "#2672ec", "ie", "iexplore.exe", "apps"),
+  // IE is a desktop program here, but its Start tile is the Metro one: the blue "e" glyph.
+  d("ie", "app.ie", "#2672ec", "ie", "iexplore.exe", "apps", { icon: "ie" }),
   d("explorer", "app.explorer", "#d39d09", "explorer", "explorer.exe", "system"),
   d("notepad", "app.notepad", "#2d89ef", "notepad", "notepad.exe", "accessories"),
   d("wordpad", "app.wordpad", "#2b5797", "wordpad", "write.exe", "accessories"),
@@ -110,11 +111,13 @@ export const SPAN: Record<TileSize, [number, number]> = { small: [1, 1], medium:
 
 export type TileRef = { kind: "app"; id: AppId } | { kind: "project"; id: string } | { kind: "social"; id: string };
 export type TileState = { key: string; size: TileSize; live: boolean; pinned: boolean; group: GroupId };
-export type GroupId = "me" | "projects" | "read" | "links";
+export type GroupId = "main" | "info" | "projects" | "tools" | "links";
+/** Start groups. The first two are unnamed, like a fresh Windows 8.1 Start screen. */
 export const GROUPS: { id: GroupId; title: Key }[] = [
-  { id: "me", title: "group.me" },
+  { id: "main", title: "group.main" },
+  { id: "info", title: "group.info" },
   { id: "projects", title: "group.projects" },
-  { id: "read", title: "group.read" },
+  { id: "tools", title: "group.tools" },
   { id: "links", title: "group.links" },
 ];
 
@@ -123,12 +126,14 @@ export function parseKey(key: string): TileRef {
   return { kind, id } as TileRef;
 }
 
-/** Which sizes each tile supports (apps with rich live content allow large). */
+/** Which sizes each tile supports (apps with rich live content allow large; desktop programs only small and medium). */
 export function sizesFor(key: string): TileSize[] {
   const ref = parseKey(key);
   if (ref.kind === "social") return ["small", "medium"];
   if (ref.kind === "project") return ["small", "medium", "wide", "large"];
-  if (["profile", "photos", "reader", "desktop", "music", "projects"].includes(ref.id)) return ["small", "medium", "wide", "large"];
+  if (isDesktopApp(ref.id)) return ["small", "medium"];
+  if (["profile", "photos", "reader", "desktop", "music", "projects", "news", "weather", "travel", "calendar", "mail"].includes(ref.id)) return ["small", "medium", "wide", "large"];
+  if (["ie", "settings", "camera", "alarms", "soundrec"].includes(ref.id)) return ["small", "medium"];
   return ["small", "medium", "wide"];
 }
 
@@ -136,17 +141,39 @@ export function defaultTiles(): TileState[] {
   const t = (key: string, size: TileSize, group: GroupId): TileState => ({ key, size, group, live: true, pinned: true });
   const featured = projects.filter((p) => !p.sample).map((p) => p.id);
   return [
-    t("app:profile", "wide", "me"),
-    t("app:mail", "wide", "me"),
-    t("app:calendar", "medium", "me"),
-    t("app:achievements", "medium", "me"),
-    t("app:desktop", "wide", "me"),
-    t("app:settings", "small", "me"),
-    t("app:music", "medium", "me"),
+    // A Windows 8.1 Start screen, column by column (tiles flow top to bottom, then to the next column).
+    t("app:mail", "wide", "main"),
+    t("app:calendar", "medium", "main"),
+    t("app:profile", "medium", "main"),
+    t("app:ie", "medium", "main"),
+    t("app:projects", "medium", "main"),
+    t("app:weather", "wide", "main"),
+    t("app:photos", "wide", "main"),
+    t("app:desktop", "wide", "main"),
+    t("app:maps", "medium", "main"),
+    t("app:skydrive", "medium", "main"),
+    t("app:music", "medium", "main"),
+    t("app:video", "medium", "main"),
+    t("app:achievements", "medium", "main"),
+    t("app:camera", "medium", "main"),
+    t("app:news", "large", "info"),
+    t("app:finance", "wide", "info"),
+    t("app:travel", "wide", "info"),
+    t("app:sports", "wide", "info"),
+    t("app:reader", "medium", "info"),
+    t("app:alarms", "medium", "info"),
     ...projects.map((p, i) => t(`project:${p.id}`, i === 0 ? "large" : i < featured.length ? "wide" : "medium", "projects")),
-    t("app:projects", "wide", "projects"),
-    t("app:reader", "large", "read"),
-    t("app:photos", "wide", "read"),
+    t("app:explorer", "medium", "tools"),
+    t("app:control", "medium", "tools"),
+    t("app:settings", "medium", "tools"),
+    t("app:notepad", "medium", "tools"),
+    t("app:paint", "medium", "tools"),
+    t("app:cmd", "small", "tools"),
+    t("app:calc", "small", "tools"),
+    t("app:taskmgr", "small", "tools"),
+    t("app:soundrec", "small", "tools"),
+    t("app:minesweeper", "medium", "tools"),
+    t("app:wordpad", "medium", "tools"),
     ...socials.map((s) => t(`social:${s.id}`, s.id === "github" ? "medium" : "small", "links")),
   ];
 }
@@ -157,11 +184,32 @@ export type DropTarget = { key: string } | { group: GroupId };
 /**
  * Move the tile `key` to `to` and return the new list (Start renders each group's tiles in list order).
  * Called repeatedly while a tile is dragged, so the other tiles make room live.
+ * Over another tile: a tile coming from earlier in the same group lands after it, otherwise before it,
+ * so dragging across a neighbour always swaps the two. Over a group's empty space: it joins the end of that group.
  */
 export function moveTile(tiles: TileState[], key: string, to: DropTarget): TileState[] {
-  // TODO(human): take the dragged tile out, then put it back next to `to.key` (adopting that tile's group),
-  // or at the end of `to.group`. Decide whether it lands before or after the hovered tile.
-  return tiles;
+  const from = tiles.findIndex((x) => x.key === key);
+  if (from < 0) return tiles;
+  const item = tiles[from];
+  const rest = tiles.filter((x) => x.key !== key);
+  if ("key" in to) {
+    if (to.key === key) return tiles;
+    const at = rest.findIndex((x) => x.key === to.key);
+    if (at < 0) return tiles;
+    const target = rest[at];
+    const after = target.group === item.group && from < tiles.indexOf(target);
+    rest.splice(after ? at + 1 : at, 0, { ...item, group: target.group });
+    return rest;
+  }
+  let last = -1;
+  rest.forEach((x, i) => {
+    if (x.group === to.group) last = i;
+  });
+  if (item.group === to.group && last === from - 1) return tiles; // already the last one there
+  const moved = { ...item, group: to.group };
+  if (last < 0) rest.push(moved);
+  else rest.splice(last + 1, 0, moved);
+  return rest;
 }
 
 /** Win8-style pairs: Start background + accent. */
@@ -178,7 +226,8 @@ export const COLORS: { bg: string; accent: string }[] = [
   { bg: "#0b2a3d", accent: "#1ba1e2" },
 ];
 
-export const PATTERNS = ["none", "waves", "geo", "circuit", "bubbles"] as const;
+/** Start backgrounds; "desktop" shows the desktop wallpaper behind the tiles, like Windows 8.1. */
+export const PATTERNS = ["none", "waves", "geo", "circuit", "bubbles", "desktop"] as const;
 export type Pattern = (typeof PATTERNS)[number];
 
 export type VisitorAchievement = { id: string; name: L; detail: L; tier: Tier; points: number };

@@ -8,6 +8,7 @@ import { media, profile, projects } from "@/content/portfolio";
 import { CoverArt } from "./CoverArt";
 import { Icon } from "./Icons";
 import { Ring } from "./Shell";
+import { Wallpaper } from "./desktop/DesktopShell";
 
 export function lockArt(id: string) {
   const p = projects.find((x) => x.id === id);
@@ -292,8 +293,14 @@ export function Welcome() {
 
 /** Decorative Start background pattern (also used on sign-in). `offset` gives the Start parallax. */
 export function Pattern({ offset = 0 }: { offset?: number }) {
-  const { pattern } = useOS();
+  const { pattern, wallpaper } = useOS();
   if (pattern === "none") return null;
+  if (pattern === "desktop")
+    return (
+      <div className="pattern pattern-desktop" aria-hidden="true" style={{ transform: `translate3d(${-offset * 0.05}px,0,0)` }}>
+        <Wallpaper value={wallpaper} className="pattern-wallpaper" />
+      </div>
+    );
   return (
     <div className="pattern" aria-hidden="true" style={{ transform: `translate3d(${-offset * 0.15}px,0,0)` }}>
       <svg viewBox="0 0 1600 400" preserveAspectRatio="xMinYMid slice">

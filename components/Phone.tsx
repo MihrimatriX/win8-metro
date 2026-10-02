@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useOS, useTick } from "@/lib/os";
 import { longDate, time } from "@/lib/i18n";
-import { APPS, sizesFor, type TileSize } from "@/lib/model";
+import { APPS, GROUPS, app, sizesFor, type AppId, type TileSize } from "@/lib/model";
 import { sound } from "@/lib/sound";
 import { projects, socials } from "@/content/portfolio";
 import { Icon } from "./Icons";
@@ -113,8 +113,9 @@ function PhoneStart() {
   }, []);
 
   // Phone Start is one long column: me, projects, reading, links.
-  const order = ["me", "projects", "read", "links"];
-  const list = [...tiles].filter((x) => x.pinned && x.key !== "app:desktop").sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group));
+  const order = GROUPS.map((g) => g.id as string);
+  // Desktop programs don't exist on the phone.
+  const list = [...tiles].filter((x) => x.pinned && !(x.key.startsWith("app:") && app(x.key.slice(4) as AppId).phone === false)).sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group));
   const sel = list.find((x) => x.key === selected);
 
   return (

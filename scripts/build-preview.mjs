@@ -4,7 +4,7 @@
  *   npm run preview
  */
 import { build } from "esbuild";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,10 +31,17 @@ const result = await build({
   define: { "process.env.NODE_ENV": '"production"' },
   logLevel: "warning",
   logOverride: { "unsupported-directive": "silent" },
+  // The Selawik fonts live in public/fonts for the Next app; the single-file preview inlines them below.
+  external: ["/fonts/*"],
 });
 
 const js = result.outputFiles.find((f) => f.path.endsWith(".js")).text;
-const css = result.outputFiles.find((f) => f.path.endsWith(".css")).text;
+const css = result.outputFiles
+  .find((f) => f.path.endsWith(".css"))
+  .text.replace(/url\(["']?\/fonts\/([\w.-]+\.woff2)["']?\)/g, (_, name) => {
+    const data = readFileSync(join(root, "public", "fonts", name)).toString("base64");
+    return `url(data:font/woff2;base64,${data})`;
+  });
 const fonts =
   "https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Bebas+Neue&family=Orbitron:wght@500;800&family=Playfair+Display:ital,wght@1,700&family=Righteous&family=Space+Grotesk:wght@500;700&display=swap";
 
@@ -44,7 +51,7 @@ const html = `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#1b0f4a" />
-<title>AFU Metro</title>
+<title>Windows 8.1 · AFU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="${fonts}" />

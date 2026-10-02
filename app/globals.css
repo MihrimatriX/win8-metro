@@ -5236,3 +5236,48 @@ html[data-motion="reduced"] *::after {
   background: #fff;
   color: #111;
 }
+
+/* Start: "show my desktop background on Start" */
+.pattern-desktop {
+  inset: 0 !important;
+  width: 100% !important;
+}
+.pattern-desktop .pattern-wallpaper {
+  position: absolute;
+  inset: 0 -60px 0 0;
+  width: calc(100% + 60px);
+  height: 100%;
+}
+.pattern-desktop .pattern-wallpaper svg,
+.pattern-desktop .pattern-wallpaper img {
+  width: 100%;
+  height: 100%;
+}
+.pattern-desktop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+.tile-shell {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+.group-name-input {
+  display: block;
+  width: calc(var(--tu) * 4);
+  height: 30px;
+  margin: -4px 0 8px;
+  padding: 0 8px;
+  font: 300 18px var(--font);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  outline: none;
+}
+.group-name-input:focus {
+  background: #fff;
+  color: #000;
+}
+.group-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}

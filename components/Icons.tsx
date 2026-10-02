@@ -1,4 +1,5 @@
 /** Original line icons in the flat Metro spirit (24×24, stroke = currentColor). No system glyph fonts are used. */
+import { useId } from "react";
 import type { IconName } from "@/lib/model";
 
 /** A Segoe-style gear: `teeth` square-ish teeth around a ring with a round hole (even-odd). */
@@ -23,7 +24,13 @@ export const WIN_PANES = [
   "45.5,52.4 100,52.4 100,100 45.5,93.5",
 ];
 
-const P: Record<IconName, React.ReactNode> = {
+// The base rectangles wind the same way as the circles (counterclockwise), so the union fills without holes.
+const CLOUD_FRONT = `${dot(10.8, 15.6, 3.6)}${dot(14.8, 12.6, 4.8)}${dot(19, 16, 3.2)}M10.8 15.6v3.6H19v-3.6z`;
+const CLOUD_BACK = `${dot(5.6, 12.4, 2.8)}${dot(9.4, 9.2, 4)}${dot(13.6, 10.4, 2.6)}M5.6 12.4v2.8h8v-2.8z`;
+const IE_E = "M6.6 12.6h10.9a5.45 5.45 0 1 0-1.6 3.86";
+
+/** Glyphs are drawings; the few that need a mask get a per-instance id prefix. */
+const P: Record<IconName, React.ReactNode | ((uid: string) => React.ReactNode)> = {
   // ---- App glyphs, drawn after Segoe UI Symbol: even strokes, square ends, solid fills. ----
   projects: (
     <>
@@ -160,16 +167,26 @@ const P: Record<IconName, React.ReactNode> = {
       <path d="M12 16.6v3.6M8.6 20.4h6.8" strokeWidth="1.5" />
     </>
   ),
-  skydrive: (
-    <path
-      {...F}
-      d={`${dot(15.2, 8.6, 2.5)}${dot(18.3, 7, 3)}${dot(20.4, 9.3, 2.1)}M15.2 8.6h5.2v2.8h-5.2z${dot(8, 15.1, 3.7)}${dot(12.4, 12.3, 4.7)}${dot(16.9, 15.3, 3.4)}M8 15.1h8.9v3.8H8z`}
-    />
-  ),
-  ie: (
+  // Two clouds; the back one is cut away around the front one so they read as separate shapes.
+  skydrive: (uid) => (
     <>
-      <path d="M6.6 12.6h10.9a5.45 5.45 0 1 0-1.6 3.86" strokeWidth="2.5" />
-      <path d="M7.55 18.51A10.5 4.2 -28 1 1 19.47 12.17" strokeWidth="1.5" />
+      <mask id={`${uid}sk`} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+        <rect width="24" height="24" fill="#fff" />
+        <path d={CLOUD_FRONT} fill="#000" stroke="#000" strokeWidth="2.6" />
+      </mask>
+      <path {...F} d={CLOUD_BACK} mask={`url(#${uid}sk)`} />
+      <path {...F} d={CLOUD_FRONT} />
+    </>
+  ),
+  // The "e" with its orbit; the ring is broken where it crosses the letter, like the monochrome IE glyph.
+  ie: (uid) => (
+    <>
+      <mask id={`${uid}ie`} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+        <rect width="24" height="24" fill="#fff" />
+        <path d={IE_E} fill="none" stroke="#000" strokeWidth="5" />
+      </mask>
+      <path d={IE_E} strokeWidth="2.6" />
+      <ellipse cx="12" cy="12.6" rx="10.6" ry="4.1" transform="rotate(-30 12 12.6)" strokeWidth="1.5" mask={`url(#${uid}ie)`} />
     </>
   ),
   calculator: (
@@ -194,9 +211,9 @@ const P: Record<IconName, React.ReactNode> = {
   ),
   share: (
     <>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7v10M7 12h10" transform="rotate(45 12 12)" />
-      <circle cx="12" cy="12" r="2" />
+      <path d="M18.4 7.6A7.8 7.8 0 1 0 19.8 12" strokeWidth="1.6" />
+      <path d="M14.6 7.2h4.2V3" strokeWidth="1.6" />
+      <path {...F} d={dot(12, 12, 2.1)} />
     </>
   ),
   start: (
@@ -464,6 +481,8 @@ const P: Record<IconName, React.ReactNode> = {
 };
 
 export function Icon({ name, size = 24, className, strokeWidth = 1.6 }: { name: IconName; size?: number | string; className?: string; strokeWidth?: number }) {
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  const glyph = P[name];
   return (
     <svg
       className={className}
@@ -477,7 +496,7 @@ export function Icon({ name, size = 24, className, strokeWidth = 1.6 }: { name: 
       strokeLinejoin="miter"
       aria-hidden="true"
     >
-      {P[name]}
+      {typeof glyph === "function" ? glyph(uid) : glyph}
     </svg>
   );
 }

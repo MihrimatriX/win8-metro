@@ -275,11 +275,16 @@ export function AppsView() {
   const [menu, setMenu] = useState<string | null>(null);
   const [sort, setSort] = useState<"name" | "category">("name");
 
+  const visibleApps = APPS.filter((a) => !a.hidden && !(phone && a.phone === false));
+  const byCat = (c: string) => visibleApps.filter((a) => a.cat === c).map((a) => `app:${a.id}`);
   const cats: { title: string; keys: string[] }[] = [
-    { title: t("apps"), keys: APPS.filter((a) => !(phone && a.phone === false)).map((a) => `app:${a.id}`) },
+    { title: t("apps"), keys: byCat("apps") },
+    { title: t("cat.games"), keys: byCat("games") },
+    { title: t("cat.accessories"), keys: byCat("accessories") },
+    { title: t("cat.system"), keys: byCat("system") },
     { title: t("group.projects"), keys: projects.map((p) => `project:${p.id}`) },
     { title: t("group.links"), keys: socials.map((s) => `social:${s.id}`) },
-  ];
+  ].filter((c) => c.keys.length);
   const ql = q.trim().toLocaleLowerCase(lang);
   // Windows 8.1 "by name" groups everything under letter headers; "by category" keeps the three kinds apart.
   const groups =
