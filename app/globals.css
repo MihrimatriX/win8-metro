@@ -5281,3 +5281,29 @@ html[data-motion="reduced"] *::after {
 .group-name-input::placeholder {
   color: rgba(255, 255, 255, 0.7);
 }
+.pcs-meter {
+  height: 10px;
+  max-width: 420px;
+  background: rgba(127, 127, 127, 0.3);
+  margin: 6px 0;
+}
+.pcs-meter i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.pcs-net {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 12px;
+  max-width: 420px;
+  background: rgba(127, 127, 127, 0.15);
+}
+.pcs-net div {
+  display: flex;
+  flex-direction: column;
+}
+.pcs-net small {
+  opacity: 0.75;
+}

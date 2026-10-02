@@ -1,8 +1,32 @@
-# AFU · Metro
+# Windows 8.1 · tarayıcıda
 
-Projelerimi Windows 8.1 tarzı bir Metro Başlangıç ekranında sergileyen portfolyo. Next.js + TypeScript, iki dilli (TR/EN).
-Masaüstü ve tablette Windows 8.1, telefonda Windows Phone 8.1 düzeni açılır. Hiçbir sistem logosu, yazı tipi dosyası ya da sesi
-yok: ikonlar özgün SVG, sesler Web Audio ile tarayıcıda sentezleniyor, görseller her projenin renk paletinden üretiliyor.
+Tarayıcıda çalışan bir Windows 8.1 klonu ve aynı zamanda AFU'nun portfolyosu. Next.js + TypeScript, iki dilli (TR/EN).
+Masaüstü ve tablette Windows 8.1, telefonda Windows Phone 8.1 düzeni açılır.
+
+![Başlangıç ekranı](docs/screenshots/start.png)
+
+| Charm çubuğu | Masaüstü |
+| --- | --- |
+| ![Charm çubuğu](docs/screenshots/charms.png) | ![Masaüstü](docs/screenshots/desktop.png) |
+
+![Metro uygulama simgeleri](docs/screenshots/icons.png)
+
+## Neler var
+
+- **Gerçek masaüstü:** Windows 8 pencere çerçevesi (ortalanmış başlık, küçült / büyüt / kırmızı kapat), Aero Snap, kenarlardan boyutlandırma,
+  görev çubuğu (Başlat düğmesi, sabitlenmiş ve çalışan programlar, önizleme, saat/takvim, ses, dil, İşlem Merkezi, Ağlar paneli, Masaüstünü göster),
+  Win+X menüsü, masaüstü simgeleri (sürükle-bırak, seçim dikdörtgeni, yeniden adlandırma, Geri Dönüşüm Kutusu), sağ tık menüleri, Özellikler penceresi.
+- **Sanal dosya sistemi** (`lib/fs.ts`): `C:\Users\AFU\Belgeler`, Resimler, Müzik… localStorage'da kalıcı; Aç / Farklı Kaydet iletişim kutuları, pano (kes/kopyala/yapıştır).
+- **Pencere yöneticisi** (`lib/wm.ts`): odak, z-sırası, modal iletişim kutuları, "değişiklikleri kaydet?" kapatma koruması. Pencereler Başlangıç'a gidip gelince kaybolmaz.
+- **Windows 8 görünümü:** Windows logosu, Segoe UI Symbol tarzında yeniden çizilmiş Metro glifleri, Selawik yazı tipi (Segoe UI yoksa), Windows 8.1 varsayılan Başlangıç düzeni,
+  çalışan kutucuk sürükleme, grup adlandırma, masaüstü arka planını Başlangıç'ta gösterme, kategoriye göre Uygulamalar görünümü, dosya ve program arayan Ara charm'ı.
+- Programlar: Not Defteri, Çalıştır, Windows Hakkında, Hesap Makinesi; diğer masaüstü ve Metro uygulamaları (Dosya Gezgini, Paint, Komut İstemi, IE, Hava Durumu, Haritalar…)
+  kayıtlı ve açılıyor, içerikleri sonraki adımda tamamlanacak.
+
+Derin bağlantı: `?boot=1&open=notepad` açılışı, kilit ve oturum açmayı atlayıp doğrudan bir uygulamayı açar.
+
+> Hayran yapımıdır, Microsoft ile bağlantılı değildir. Windows adı ve logosu Microsoft'un ticari markasıdır; tüm simgeler sıfırdan SVG olarak çizildi.
+> Selawik yazı tipi Microsoft tarafından SIL Open Font License ile yayımlanmıştır (`public/fonts/Selawik-OFL.txt`).
 
 ## Bölümler ve karşılıkları
 

@@ -1,0 +1,426 @@
+/* ==========================================================================
+   Notepad (np-*): menu bar, a borderless white edit control with both scroll bars, the grey status bar,
+   and the Win32 dialogs it shares with WordPad (task dialog, Find / Replace, Go To, Font, Page Setup).
+   ========================================================================== */
+.np {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+}
+.np-edit {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin: 0;
+  padding: 1px 2px 0 4px;
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+  outline: none;
+  resize: none;
+  background: #fff;
+  color: #000;
+  line-height: 1.2;
+  tab-size: 8;
+  white-space: pre;
+  overflow: scroll;
+  user-select: text;
+  cursor: text;
+}
+.np-edit.wrap {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.np-edit::selection {
+  background: #3399ff;
+  color: #fff;
+}
+
+/* status bar: an empty part and the "Ln, Col" part with a size grip */
+.np-status {
+  flex: none;
+  display: flex;
+  align-items: stretch;
+  height: 22px;
+  background: #f0f0f0;
+  border-top: 1px solid #d7d7d7;
+  color: #000;
+  font-size: 12px;
+  line-height: 21px;
+  position: relative;
+}
+.np-status-main {
+  flex: 1;
+}
+.np-status-pos {
+  width: 25%;
+  min-width: 140px;
+  padding-left: 6px;
+  border-left: 1px solid #d7d7d7;
+  white-space: nowrap;
+}
+.np-grip {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+}
+
+/* ---------- dialogs (shared with WordPad) ---------- */
+.np-dlg {
+  height: 100%;
+  background: #f0f0f0;
+  color: #000;
+  font-size: 12px;
+  padding: 10px 11px;
+  box-sizing: border-box;
+}
+.np-dlg .w8-input {
+  user-select: text;
+}
+.np-dlg-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+.np-group {
+  margin: 0;
+  padding: 2px 8px 6px;
+  border: 1px solid #dcdcdc;
+  min-width: 0;
+}
+.np-group legend {
+  padding: 0 2px;
+  margin-left: -2px;
+  color: #000;
+}
+.np-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  line-height: 18px;
+}
+.np-link {
+  color: #0066cc;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.np-link:hover {
+  color: #3399ff;
+  text-decoration: underline;
+}
+
+/* Win8 check boxes and radio buttons */
+.np-dlg input[type="checkbox"],
+.np-dlg input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  flex: none;
+  border: 1px solid #333;
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+.np-dlg input[type="radio"] {
+  border-radius: 50%;
+}
+.np-dlg input[type="checkbox"]:hover,
+.np-dlg input[type="radio"]:hover {
+  border-color: #3399ff;
+  background: #f3f9ff;
+}
+.np-dlg input[type="checkbox"]:checked::after {
+  content: "";
+  width: 7px;
+  height: 4px;
+  border: solid #333;
+  border-width: 0 0 2px 2px;
+  transform: translateY(-1px) rotate(-48deg);
+}
+.np-dlg input[type="radio"]:checked::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #333;
+}
+.np-dlg input:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: 2px;
+}
+
+/* "Do you want to save changes?" task dialog */
+.np-task {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+}
+.np-task-main {
+  flex: 1;
+  margin: 0;
+  padding: 18px 20px 14px;
+  color: #003399;
+  font-size: 16px;
+  line-height: 21px;
+  word-break: break-word;
+}
+.np-task-btns {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f0f0f0;
+  border-top: 1px solid #dfdfdf;
+}
+
+/* Find / Replace */
+.np-find {
+  display: flex;
+  gap: 10px;
+  padding-top: 9px;
+}
+.np-find-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.np-find-row {
+  display: flex;
+  align-items: center;
+}
+.np-find-row > span {
+  width: 72px;
+  flex: none;
+  white-space: nowrap;
+}
+.np-find-row .w8-input {
+  flex: 1;
+  min-width: 0;
+  height: 21px;
+}
+.np-find-opts {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+.np-find-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 2px;
+}
+.np-find-dir {
+  display: flex;
+  gap: 10px;
+  padding: 0 8px 5px;
+  margin-bottom: -2px;
+}
+.np-find-btns {
+  width: 96px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.np-find-btns .w8-btn {
+  width: 100%;
+  min-width: 0;
+  padding: 0 4px;
+}
+.np-find.is-replace .np-find-btns .w8-btn:last-child {
+  margin-top: 0;
+}
+
+/* Go To */
+.np-goto {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.np-goto label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Font */
+.np-font {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+.np-font-cols {
+  display: flex;
+  gap: 12px;
+}
+.np-font-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.np-font-col.fam {
+  width: 150px;
+}
+.np-font-col.sty {
+  width: 110px;
+}
+.np-font-col.siz {
+  width: 54px;
+}
+.np-font-col .w8-input {
+  height: 21px;
+  width: 100%;
+}
+.np-list {
+  height: 112px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #fff;
+  border: 1px solid #abadb3;
+  margin-top: -1px;
+}
+.np-list > div {
+  padding: 0 3px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.np-list > div.on {
+  background: #3399ff;
+  color: #fff;
+}
+.np-font-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 18px;
+  margin-left: auto;
+}
+.np-font-lower {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 162px;
+}
+.np-font-sample-col {
+  width: 188px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.np-font-sample {
+  height: 74px;
+}
+.np-font-sample > div {
+  height: 52px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.np-font-script {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.np-font .np-link {
+  position: absolute;
+  left: 11px;
+  bottom: 12px;
+}
+
+/* Page Setup */
+.np-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.np-page-top {
+  display: flex;
+  gap: 10px;
+}
+.np-page-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.np-page-row {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+.np-page-row > span {
+  width: 60px;
+}
+.np-page-row .w8-select {
+  flex: 1;
+}
+.np-page-mid {
+  display: flex;
+  gap: 8px;
+}
+.np-page-orient {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+}
+.np-page-margins {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  padding-top: 6px;
+}
+.np-page-margins label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.np-page-margins .w8-input {
+  width: 46px;
+}
+.np-page-preview {
+  width: 150px;
+  display: grid;
+  place-items: center;
+}
+.np-page-sheet {
+  position: relative;
+  background: #fff;
+  border: 1px solid #555;
+  box-shadow: 3px 3px 0 #9a9a9a;
+}
+.np-page-text {
+  position: absolute;
+  background: repeating-linear-gradient(#bdbdbd 0 1px, transparent 1px 4px);
+}
+.np-page-hf {
+  display: flex;
+  align-items: center;
+}
+.np-page-hf > span {
+  width: 70px;
+}
+.np-page-hf .w8-input {
+  width: 230px;
+}
+.np-page .np-dlg-btns {
+  margin-top: auto;
+}
