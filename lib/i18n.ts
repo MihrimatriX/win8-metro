@@ -1,0 +1,325 @@
+import type { L, Lang } from "./types";
+
+const dict = {
+  // Power, lock and sign-in
+  "boot.hint": { tr: "Açmak için tıkla ya da bir tuşa bas", en: "Click or press a key to power on" },
+  "off.title": { tr: "Bilgisayar kapalı", en: "The PC is off" },
+  "lock.hint": { tr: "Kilidi açmak için yukarı kaydır", en: "Swipe up to unlock" },
+  "lock.hintMouse": { tr: "Kilidi açmak için tıkla ve yukarı sürükle", en: "Click and drag up to unlock" },
+  "login.password": { tr: "Parola", en: "Password" },
+  "login.passwordHint": { tr: "Parola yok, okla giriş yap", en: "No password, sign in with the arrow" },
+  "login.guest": { tr: "Misafir", en: "Guest" },
+  "login.guestNote": { tr: "Ziyaretçi olarak gez", en: "Browse as a visitor" },
+  "login.recruiter": { tr: "İşe alım", en: "Recruiter" },
+  "login.recruiterNote": { tr: "Doğrudan özgeçmişe git", en: "Go straight to the CV" },
+  "login.owner": { tr: "Sahibin hesabı", en: "The owner's account" },
+  "login.switch": { tr: "Kullanıcı değiştir", en: "Switch user" },
+  "login.signIn": { tr: "Oturum aç", en: "Sign in" },
+  "welcome": { tr: "Hoş geldiniz", en: "Welcome" },
+  "hi.1": { tr: "Merhaba", en: "Hi" },
+  "hi.2": { tr: "Uygulamalarınızı hazırlıyoruz", en: "We're setting up your apps" },
+  "hi.3": { tr: "Gezinmenin yeni yolu: ekranın köşeleri", en: "A new way to get around: the corners of the screen" },
+  "hi.4": { tr: "Neredeyse hazır", en: "Almost ready" },
+  "hi.corner": {
+    tr: "Fareyi sağ üst köşeye götür ya da ekranın sağ kenarından içeri kaydır: Ara, Paylaş, Başlangıç, Cihazlar ve Ayarlar orada.",
+    en: "Move the mouse to the top-right corner or swipe in from the right edge: Search, Share, Start, Devices and Settings live there.",
+  },
+  "hi.skip": { tr: "Geçmek için tıkla", en: "Click to skip" },
+  "shutdown": { tr: "Kapatılıyor", en: "Shutting down" },
+  "restart": { tr: "Yeniden başlatılıyor", en: "Restarting" },
+  "signout": { tr: "Oturum kapatılıyor", en: "Signing out" },
+
+  // Start
+  "start": { tr: "Başlangıç", en: "Start" },
+  "apps": { tr: "Uygulamalar", en: "Apps" },
+  "apps.byName": { tr: "ada göre", en: "by name" },
+  "apps.byCategory": { tr: "kategoriye göre", en: "by category" },
+  "apps.search": { tr: "Uygulama ara", en: "Search apps" },
+  "group.me": { tr: "Ben", en: "Me" },
+  "group.projects": { tr: "Projeler", en: "Projects" },
+  "group.read": { tr: "Okuma köşesi", en: "Reading corner" },
+  "group.links": { tr: "Bağlantılar", en: "Links" },
+  "tile.unpin": { tr: "Başlangıç'tan kaldır", en: "Unpin from Start" },
+  "tile.pin": { tr: "Başlangıç'a sabitle", en: "Pin to Start" },
+  "tile.resize": { tr: "Yeniden boyutlandır", en: "Resize" },
+  "tile.live": { tr: "Canlı kutucuk", en: "Live tile" },
+  "tile.liveOn": { tr: "Canlı kutucuğu aç", en: "Turn live tile on" },
+  "tile.liveOff": { tr: "Canlı kutucuğu kapat", en: "Turn live tile off" },
+  "tile.clear": { tr: "Seçimi temizle", en: "Clear selection" },
+  "tile.reset": { tr: "Düzeni sıfırla", en: "Reset layout" },
+  "size.small": { tr: "Küçük", en: "Small" },
+  "size.medium": { tr: "Orta", en: "Medium" },
+  "size.wide": { tr: "Geniş", en: "Wide" },
+  "size.large": { tr: "Büyük", en: "Large" },
+  "zoom.out": { tr: "Uzaklaştır", en: "Zoom out" },
+  "allApps": { tr: "Tüm uygulamalar", en: "All apps" },
+
+  // Apps
+  "app.projects": { tr: "Projeler", en: "Projects" },
+  "app.profile": { tr: "Profil", en: "Profile" },
+  "app.mail": { tr: "Posta", en: "Mail" },
+  "app.reader": { tr: "Okuyucu", en: "Reader" },
+  "app.photos": { tr: "Fotoğraflar", en: "Photos" },
+  "app.music": { tr: "Müzik", en: "Music" },
+  "app.achievements": { tr: "Başarılar", en: "Achievements" },
+  "app.calendar": { tr: "Takvim", en: "Calendar" },
+  "app.desktop": { tr: "Masaüstü", en: "Desktop" },
+  "app.settings": { tr: "Bilgisayar ayarları", en: "PC settings" },
+  "app.settingsPhone": { tr: "Ayarlar", en: "Settings" },
+  "app.search": { tr: "Ara", en: "Search" },
+
+  // Charms
+  "charm.search": { tr: "Ara", en: "Search" },
+  "charm.share": { tr: "Paylaş", en: "Share" },
+  "charm.start": { tr: "Başlangıç", en: "Start" },
+  "charm.devices": { tr: "Cihazlar", en: "Devices" },
+  "charm.settings": { tr: "Ayarlar", en: "Settings" },
+  "search.everywhere": { tr: "Her yerde", en: "Everywhere" },
+  "search.placeholder": { tr: "Proje, yazı, uygulama…", en: "Projects, posts, apps…" },
+  "search.empty": { tr: "Sonuç bulunamadı", en: "No results" },
+  "search.suggest": { tr: "Şunları dene", en: "Try these" },
+  "share.title": { tr: "Bu sayfayı paylaş", en: "Share this page" },
+  "share.copy": { tr: "Bağlantıyı kopyala", en: "Copy link" },
+  "share.copied": { tr: "Bağlantı panoya kopyalandı", en: "Link copied to the clipboard" },
+  "share.mail": { tr: "E-postayla gönder", en: "Send by email" },
+  "share.native": { tr: "Cihazın paylaşım menüsü", en: "Device share menu" },
+  "devices.title": { tr: "Bu bilgisayarla kullanılanlar", en: "Used with this PC" },
+  "devices.keyboard": { tr: "Klavye", en: "Keyboard" },
+  "devices.keyboardNote": { tr: "Oklar gezinir, Esc geri gider, Enter açar", en: "Arrows move, Esc goes back, Enter opens" },
+  "devices.mouse": { tr: "Fare", en: "Mouse" },
+  "devices.mouseNote": { tr: "Köşeler: sağ üst charm, sol üst uygulamalar, sol alt Başlangıç", en: "Corners: top right charms, top left apps, bottom left Start" },
+  "devices.touch": { tr: "Dokunmatik", en: "Touch" },
+  "devices.touchNote": { tr: "Sağ kenardan charm, sol kenardan son uygulama", en: "Right edge for charms, left edge for the last app" },
+  "devices.print": { tr: "Özgeçmişi yazdır", en: "Print the CV" },
+  "settings.title": { tr: "Ayarlar", en: "Settings" },
+  "settings.personalize": { tr: "Kişiselleştir", en: "Personalize" },
+  "settings.tiles": { tr: "Kutucuklar", en: "Tiles" },
+  "settings.help": { tr: "Yardım", en: "Help" },
+  "settings.language": { tr: "Dil", en: "Language" },
+  "settings.sound": { tr: "Ses", en: "Sound" },
+  "settings.motion": { tr: "Animasyonlar", en: "Animations" },
+  "settings.power": { tr: "Güç", en: "Power" },
+  "settings.pcSettings": { tr: "Bilgisayar ayarlarını değiştir", en: "Change PC settings" },
+  "settings.background": { tr: "Arka plan", en: "Background" },
+  "settings.bgColor": { tr: "Arka plan rengi", en: "Background color" },
+  "settings.accent": { tr: "Vurgu rengi", en: "Accent color" },
+  "settings.lockImage": { tr: "Kilit ekranı resmi", en: "Lock screen picture" },
+  "settings.reset": { tr: "Başarıları sıfırla", en: "Reset achievements" },
+  "settings.resetDone": { tr: "Başarılar sıfırlandı", en: "Achievements were reset" },
+  "settings.about": { tr: "Bu bilgisayar hakkında", en: "About this PC" },
+  "settings.theme": { tr: "Tema", en: "Theme" },
+  "settings.dark": { tr: "Koyu", en: "Dark" },
+  "settings.light": { tr: "Açık", en: "Light" },
+  "power.sleep": { tr: "Uyku", en: "Sleep" },
+  "power.off": { tr: "Kapat", en: "Shut down" },
+  "power.restart": { tr: "Yeniden başlat", en: "Restart" },
+  "power.signout": { tr: "Oturumu kapat", en: "Sign out" },
+  "power.lock": { tr: "Kilitle", en: "Lock" },
+  "on": { tr: "Açık", en: "On" },
+  "off": { tr: "Kapalı", en: "Off" },
+  "full": { tr: "Tam", en: "Full" },
+  "reduced": { tr: "Azaltılmış", en: "Reduced" },
+
+  // Shared content words
+  "status.live": { tr: "Yayında", en: "Live" },
+  "status.dev": { tr: "Geliştiriliyor", en: "In development" },
+  "status.archived": { tr: "Arşivde", en: "Archived" },
+  "sample": { tr: "Örnek içerik", en: "Sample content" },
+  "demo": { tr: "Canlı demo", en: "Live demo" },
+  "source": { tr: "Kaynak kod", en: "Source code" },
+  "noLinks": { tr: "Bağlantılar yakında", en: "Links coming soon" },
+  "placeholderLink": { tr: "Bu bağlantı henüz eklenmedi", en: "This link hasn't been added yet" },
+  "leaving": { tr: "Yeni sekmede açılıyor", en: "Opening in a new tab" },
+  "back": { tr: "Geri", en: "Back" },
+  "all": { tr: "Tümü", en: "All" },
+  "minutes": { tr: "dk", en: "min" },
+  "hours": { tr: "saat", en: "hours" },
+  "kind.post": { tr: "Yazı", en: "Post" },
+  "kind.tutorial": { tr: "Eğitim", en: "Tutorial" },
+  "kind.video": { tr: "Video", en: "Video" },
+  "kind.talk": { tr: "Konuşma", en: "Talk" },
+  "kind.certificate": { tr: "Sertifika", en: "Certificate" },
+  "kind.award": { tr: "Ödül", en: "Award" },
+  "kind.milestone": { tr: "Kilometre taşı", en: "Milestone" },
+  "tier.bronze": { tr: "Bronz", en: "Bronze" },
+  "tier.silver": { tr: "Gümüş", en: "Silver" },
+  "tier.gold": { tr: "Altın", en: "Gold" },
+  "tier.platinum": { tr: "Platin", en: "Platinum" },
+
+  // Projects (store)
+  "projects.featured": { tr: "Öne çıkan", en: "Spotlight" },
+  "projects.live": { tr: "Yayında olanlar", en: "Live now" },
+  "projects.dev": { tr: "Yapım aşamasında", en: "In the works" },
+  "projects.archived": { tr: "Arşiv", en: "Archive" },
+  "projects.overview": { tr: "Genel bakış", en: "Overview" },
+  "projects.features": { tr: "Özellikler", en: "Features" },
+  "projects.screens": { tr: "Ekran görüntüleri", en: "Screenshots" },
+  "projects.details": { tr: "Ayrıntılar", en: "Details" },
+  "projects.milestones": { tr: "Kilometre taşları", en: "Milestones" },
+  "projects.tech": { tr: "Teknolojiler", en: "Tech stack" },
+  "projects.role": { tr: "Rolüm", en: "My role" },
+  "projects.year": { tr: "Yıl", en: "Year" },
+  "projects.genre": { tr: "Kategori", en: "Category" },
+  "projects.time": { tr: "Geliştirme süresi", en: "Build time" },
+  "projects.status": { tr: "Durum", en: "Status" },
+  "projects.open": { tr: "Aç", en: "Open" },
+  "projects.count": { tr: "proje", en: "projects" },
+
+  // Profile
+  "profile.whatsNew": { tr: "Hakkımda", en: "About me" },
+  "profile.experience": { tr: "Deneyim", en: "Experience" },
+  "profile.skills": { tr: "Yetenekler", en: "Skills" },
+  "profile.education": { tr: "Eğitim", en: "Education" },
+  "profile.languages": { tr: "Diller", en: "Languages" },
+  "profile.links": { tr: "Bağlantılar", en: "Connect" },
+  "profile.cv": { tr: "Özgeçmişi indir", en: "Download CV" },
+  "profile.contact": { tr: "E-posta gönder", en: "Send email" },
+  "profile.years": { tr: "yıl deneyim", en: "years of experience" },
+
+  // Mail
+  "mail.inbox": { tr: "Gelen Kutusu", en: "Inbox" },
+  "mail.accounts": { tr: "Hesaplar", en: "Accounts" },
+  "mail.new": { tr: "Yeni", en: "New" },
+  "mail.to": { tr: "Kime", en: "To" },
+  "mail.subject": { tr: "Konu", en: "Subject" },
+  "mail.subjectDefault": { tr: "Merhaba AFU", en: "Hello AFU" },
+  "mail.body": { tr: "İletiyi buraya yaz", en: "Write your message here" },
+  "mail.send": { tr: "Gönder", en: "Send" },
+  "mail.cancel": { tr: "Vazgeç", en: "Cancel" },
+  "mail.sent": { tr: "E-posta uygulaman açılıyor", en: "Opening your email app" },
+  "mail.reply": { tr: "Yanıtla", en: "Reply" },
+  "mail.from": { tr: "Kimden", en: "From" },
+  "mail.unread": { tr: "okunmamış", en: "unread" },
+
+  // Reader
+  "reader.top": { tr: "Manşet", en: "Top story" },
+  "reader.posts": { tr: "Yazılar", en: "Posts" },
+  "reader.tutorials": { tr: "Eğitimler", en: "Tutorials" },
+  "reader.talks": { tr: "Konuşmalar", en: "Talks" },
+  "reader.readOn": { tr: "Blogda oku", en: "Read on the blog" },
+  "reader.readTime": { tr: "okuma", en: "read" },
+
+  // Photos
+  "photos.projects": { tr: "Proje görselleri", en: "Project art" },
+  "photos.posts": { tr: "Yazı kapakları", en: "Post covers" },
+  "photos.slideshow": { tr: "Slayt gösterisi", en: "Slide show" },
+  "photos.setLock": { tr: "Kilit ekranı yap", en: "Set as lock screen" },
+  "photos.lockSet": { tr: "Kilit ekranı resmi değişti", en: "Lock screen picture changed" },
+
+  // Music
+  "music.nowPlaying": { tr: "Şimdi çalıyor", en: "Now playing" },
+  "music.collection": { tr: "Koleksiyon", en: "Collection" },
+  "music.play": { tr: "Çal", en: "Play" },
+  "music.pause": { tr: "Duraklat", en: "Pause" },
+  "music.note": { tr: "Her parça tarayıcıda anlık olarak sentezleniyor; ses dosyası yok.", en: "Every track is synthesized live in the browser; there are no audio files." },
+  "music.album": { tr: "Tarayıcı Seansları", en: "Browser Sessions" },
+  "music.idle": { tr: "Çalan bir şey yok", en: "Nothing playing" },
+
+  // Achievements
+  "ach.certs": { tr: "Sertifikalar ve ödüller", en: "Certificates and awards" },
+  "ach.visitor": { tr: "Ziyaretçi başarıları", en: "Visitor achievements" },
+  "ach.visitorNote": { tr: "Gezdikçe kazanılır", en: "Earned as you explore" },
+  "ach.unlocked": { tr: "Başarı kazanıldı", en: "Achievement unlocked" },
+  "ach.locked": { tr: "Kilitli", en: "Locked" },
+  "ach.progress": { tr: "İlerleme", en: "Progress" },
+  "ach.score": { tr: "puan", en: "points" },
+
+  // Calendar
+  "cal.agenda": { tr: "Ajanda", en: "Agenda" },
+  "cal.today": { tr: "Bugün", en: "Today" },
+  "cal.timeline": { tr: "Zaman çizelgesi", en: "Timeline" },
+  "cal.upcoming": { tr: "Yaklaşanlar", en: "Coming up" },
+  "cal.month": { tr: "Ay", en: "Month" },
+  "cal.noEvents": { tr: "Bu gün boş", en: "Nothing on this day" },
+
+  // Window / power-user menu
+  "win.minimize": { tr: "Simge durumuna küçült", en: "Minimize" },
+  "win.close": { tr: "Kapat", en: "Close" },
+  "winx.programs": { tr: "Programlar ve Özellikler", en: "Programs and Features" },
+  "winx.system": { tr: "Sistem", en: "System" },
+  "winx.control": { tr: "Denetim Masası", en: "Control Panel" },
+  "winx.explorer": { tr: "Dosya Gezgini", en: "File Explorer" },
+  "winx.search": { tr: "Ara", en: "Search" },
+  "winx.power": { tr: "Kapat veya oturumu kapat", en: "Shut down or sign out" },
+  "winx.desktop": { tr: "Masaüstü", en: "Desktop" },
+  "ctx.view": { tr: "Masaüstü simgelerini göster", en: "Show desktop icons" },
+  "ctx.refresh": { tr: "Yenile", en: "Refresh" },
+  "ctx.resolution": { tr: "Ekran çözünürlüğü", en: "Screen resolution" },
+  "ctx.personalize": { tr: "Kişiselleştir", en: "Personalize" },
+
+  // Desktop
+  "desk.recycle": { tr: "Geri Dönüşüm Kutusu", en: "Recycle Bin" },
+  "desk.explorer": { tr: "Dosya Gezgini", en: "File Explorer" },
+  "desk.thisPc": { tr: "Bu bilgisayar", en: "This PC" },
+  "desk.documents": { tr: "Belgeler", en: "Documents" },
+  "desk.pictures": { tr: "Resimler", en: "Pictures" },
+  "desk.projects": { tr: "Projeler", en: "Projects" },
+  "desk.notepad": { tr: "Not Defteri", en: "Notepad" },
+  "desk.readme": { tr: "beni-oku.txt", en: "readme.txt" },
+  "desk.items": { tr: "öğe", en: "items" },
+  "desk.folder": { tr: "Dosya klasörü", en: "File folder" },
+  "desk.textDoc": { tr: "Metin belgesi", en: "Text document" },
+  "desk.image": { tr: "Resim", en: "Image" },
+  "desk.name": { tr: "Ad", en: "Name" },
+  "desk.type": { tr: "Tür", en: "Type" },
+  "desk.modified": { tr: "Değiştirme tarihi", en: "Date modified" },
+  "desk.empty": { tr: "Bu klasör boş.", en: "This folder is empty." },
+  "desk.openInApp": { tr: "Projeler uygulamasında aç", en: "Open in the Projects app" },
+
+  // PC settings
+  "pc.personalize": { tr: "Kişiselleştir", en: "Personalize" },
+  "pc.accounts": { tr: "Hesaplar", en: "Accounts" },
+  "pc.time": { tr: "Saat ve dil", en: "Time and language" },
+  "pc.ease": { tr: "Erişim kolaylığı", en: "Ease of Access" },
+  "pc.update": { tr: "Güncelleştirme ve kurtarma", en: "Update and recovery" },
+  "pc.pcInfo": { tr: "Bilgisayar bilgisi", en: "PC info" },
+  "pc.edition": { tr: "Sürüm", en: "Edition" },
+  "pc.build": { tr: "Yapı", en: "Build" },
+  "pc.screen": { tr: "Ekran", en: "Screen" },
+  "pc.uptime": { tr: "Bu oturumda", en: "This session" },
+  "pc.upToDate": { tr: "Bilgisayarınız güncel", en: "Your PC is up to date" },
+  "pc.check": { tr: "Şimdi denetle", en: "Check now" },
+  "pc.checking": { tr: "Güncelleştirmeler denetleniyor…", en: "Checking for updates…" },
+  "pc.yourAccount": { tr: "Hesabınız", en: "Your account" },
+  "pc.signedInAs": { tr: "Oturum açan", en: "Signed in as" },
+
+  // Phone
+  "phone.actionCenter": { tr: "İşlem merkezi", en: "Action center" },
+  "phone.noNotifications": { tr: "Bildirim yok", en: "No notifications" },
+  "phone.clear": { tr: "Tümünü temizle", en: "Clear all" },
+  "phone.allSettings": { tr: "TÜM AYARLAR", en: "ALL SETTINGS" },
+} satisfies Record<string, L>;
+
+export type Key = keyof typeof dict;
+
+export function t(lang: Lang, key: Key): string {
+  return dict[key][lang];
+}
+
+export function pick(lang: Lang, value: L): string {
+  return value[lang];
+}
+
+const MONTHS: Record<Lang, string[]> = {
+  tr: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+};
+const DAYS: Record<Lang, string[]> = {
+  tr: ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"],
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+};
+
+export const monthName = (lang: Lang, m: number) => MONTHS[lang][m];
+export const dayName = (lang: Lang, d: number) => DAYS[lang][d];
+export const time = (d: Date) => `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
+export const longDate = (lang: Lang, d: Date) =>
+  lang === "tr" ? `${d.getDate()} ${MONTHS.tr[d.getMonth()]}, ${DAYS.tr[d.getDay()]}` : `${DAYS.en[d.getDay()]}, ${MONTHS.en[d.getMonth()]} ${d.getDate()}`;
+
+/** "2026-09-12" or "2025-11" → "12 Eylül 2026" / "November 2025". */
+export function formatDate(lang: Lang, iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!m) return String(y);
+  const month = MONTHS[lang][m - 1];
+  if (!d) return `${month} ${y}`;
+  return lang === "tr" ? `${d} ${month} ${y}` : `${month} ${d}, ${y}`;
+}
