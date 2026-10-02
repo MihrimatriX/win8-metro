@@ -3,14 +3,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useOS, useTick, type View } from "@/lib/os";
 import { dayName, monthName, pick } from "@/lib/i18n";
-import { VISITOR_ACHIEVEMENTS, app, parseKey, socialColor, socialIcon, type IconName, type TileSize } from "@/lib/model";
+import { VISITOR_ACHIEVEMENTS, app, parseKey, socialColor, socialIcon, type AppId, type IconName, type TileSize } from "@/lib/model";
 import { TRACKS } from "@/lib/sound";
 import { media, profile, projects, socials } from "@/content/portfolio";
 import { inbox } from "@/content/mailbox";
 import { CoverArt } from "./CoverArt";
 import { Icon } from "./Icons";
 
-export type TileMeta = { title: string; color: string; icon: IconName; view?: View; url?: string };
+export type TileMeta = { title: string; color: string; icon: IconName; view?: View; url?: string; app?: AppId };
 
 export function useTileMeta() {
   const { t, lang } = useOS();
@@ -18,7 +18,7 @@ export function useTileMeta() {
     const ref = parseKey(key);
     if (ref.kind === "app") {
       const a = app(ref.id);
-      return { title: t(a.title), color: a.color, icon: a.icon, view: { kind: "app", app: ref.id } };
+      return { title: t(a.title), color: a.color, icon: a.icon, view: { kind: "app", app: ref.id }, app: a.id };
     }
     if (ref.kind === "project") {
       const p = projects.find((x) => x.id === ref.id)!;

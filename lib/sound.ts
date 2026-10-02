@@ -22,6 +22,22 @@ class SoundEngine {
   private music: { stop: () => void } | null = null;
   analyser: AnalyserNode | null = null;
   sfx = true;
+  /** Master volume 0..1 (the taskbar's speaker flyout). */
+  volume = 0.7;
+  muted = false;
+  /** Lets media elements (Video, Sound Recorder) follow the system volume. */
+  onVolume = new Set<() => void>();
+
+  setVolume(v: number, muted = this.muted) {
+    this.volume = Math.max(0, Math.min(1, v));
+    this.muted = muted;
+    if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime, 0.02);
+    this.onVolume.forEach((f) => f());
+  }
+  /** The effective level for <audio>/<video> elements. */
+  get level() {
+    return this.muted ? 0 : this.volume;
+  }
 
   private ensure(): AudioContext | null {
     if (typeof window === "undefined") return null;
@@ -30,7 +46,7 @@ class SoundEngine {
       if (!Ctx) return null;
       const ctx = new Ctx();
       const master = ctx.createGain();
-      master.gain.value = 0.7;
+      master.gain.value = this.muted ? 0 : this.volume;
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 128;
       analyser.smoothingTimeConstant = 0.8;
@@ -130,6 +146,48 @@ class SoundEngine {
       [783.99, 587.33, 493.88, 392].map((f, i) => ({ type: "sine" as const, freq: f, at: i * 0.12, dur: 1.2, gain: 0.04 })),
       { wet: 1 },
     );
+  }
+
+  /** Desktop "Windows Ding": message boxes and invalid clicks. */
+  ding() {
+    this.play(
+      [
+        { type: "sine", freq: 1318.5, dur: 0.5, gain: 0.05 },
+        { type: "sine", freq: 987.77, at: 0.06, dur: 0.7, gain: 0.04 },
+      ],
+      { wet: 0.5 },
+    );
+  }
+
+  /** Desktop "Critical Stop". */
+  critical() {
+    this.play(
+      [
+        { type: "triangle", freq: 440, dur: 0.35, gain: 0.05 },
+        { type: "triangle", freq: 349.23, at: 0.12, dur: 0.5, gain: 0.05 },
+      ],
+      { wet: 0.4 },
+    );
+  }
+
+  /** Recycle Bin crumple: a short burst of filtered noise. */
+  recycle() {
+    if (!this.sfx) return;
+    const ctx = this.ensure();
+    if (!ctx || !this.master) return;
+    const len = Math.floor(ctx.sampleRate * 0.35);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2) * (Math.random() > 0.7 ? 1 : 0.3);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const f = ctx.createBiquadFilter();
+    f.type = "bandpass";
+    f.frequency.value = 2400;
+    const g = ctx.createGain();
+    g.gain.value = 0.18;
+    src.connect(f).connect(g).connect(this.master);
+    src.start();
   }
 
   error() {

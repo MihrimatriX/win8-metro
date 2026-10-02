@@ -2,9 +2,10 @@
 /** The whole "operating system" state: power phase, navigation, charms, toasts, preferences and achievements. */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { t, type Key } from "./i18n";
-import { APPS, COLORS, PATTERNS, VISITOR_ACHIEVEMENTS, app, defaultTiles, type AppId, type IconName, type Pattern, type TileState } from "./model";
+import { APPS, COLORS, PATTERNS, VISITOR_ACHIEVEMENTS, app, defaultTiles, isDesktopApp, type AppId, type IconName, type Pattern, type TileState } from "./model";
+import { wm } from "./wm";
 import { sound } from "./sound";
-import type { Lang } from "./types";
+import type { L, Lang } from "./types";
 import { projects } from "@/content/portfolio";
 
 export type Phase = "off" | "boot" | "lock" | "login" | "welcome" | "os" | "power";
@@ -23,6 +24,13 @@ type Prefs = {
   motion: "full" | "reduced";
   phoneTheme: "dark" | "light";
   tiles: TileState[];
+  /** Desktop background: a file path under C:\Windows\Web\Wallpaper, a picture path, or "color:#hex". */
+  wallpaper: string;
+  /** Window frame / taskbar color (Personalization → Color). */
+  winColor: string;
+  showDesktopIcons: boolean;
+  /** Group names on Start (empty means unnamed, like a fresh Windows 8). */
+  groupNames: Record<string, string>;
 };
 
 const DEFAULT_PREFS: Prefs = {
@@ -34,9 +42,13 @@ const DEFAULT_PREFS: Prefs = {
   motion: "full",
   phoneTheme: "dark",
   tiles: defaultTiles(),
+  wallpaper: "C:\\Windows\\Web\\Wallpaper\\Windows\\img0.jpg",
+  winColor: "#6aa9e9",
+  showDesktopIcons: true,
+  groupNames: {},
 };
 
-const STORE = "afu-metro:v1";
+const STORE = "afu-metro:v2";
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -129,6 +141,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
   const openedProjects = useRef(new Set<string>());
   const readArticles = useRef(new Set<string>());
   const toastId = useRef(1);
+  const deepLink = useRef<{ id: AppId; param?: string } | null>(null);
   const earnedRef = useRef(earned);
   earnedRef.current = earned;
 
@@ -140,6 +153,14 @@ export function OSProvider({ children }: { children: ReactNode }) {
     setEarned(load("earned", {}));
     setFirstRun(!load("seen", false));
     setReady(true);
+    // Deep links for demos and screenshots: ?boot=start skips boot, lock and sign-in; &open=paint launches an app.
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("boot")) {
+      setFirstRun(false);
+      setPhaseState("os");
+      const target = q.get("open");
+      if (target && APPS.some((a) => a.id === target)) deepLink.current = { id: target as AppId, param: q.get("arg") ?? undefined };
+    }
   }, []);
 
   useEffect(() => {
@@ -247,6 +268,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
           else setPhase("lock");
           setStack([{ kind: "start" }]);
           setRecent([]);
+          wm.closeAll();
         },
         a === "signout" ? 1600 : 2600,
       );
@@ -255,8 +277,14 @@ export function OSProvider({ children }: { children: ReactNode }) {
   );
 
   const open = useCallback(
-    (v: View) => {
+    (input: View) => {
       setCharmState(null);
+      let v = input;
+      // Desktop programs open in a window on the desktop.
+      if (v.kind === "app" && isDesktopApp(v.app)) {
+        wm.launch(v.app, { arg: v.param });
+        v = { kind: "app", app: "desktop" };
+      }
       if (v.kind === "app") {
         if (v.app === "projects" && v.param) {
           openedProjects.current.add(v.param);
@@ -318,6 +346,13 @@ export function OSProvider({ children }: { children: ReactNode }) {
     [earn],
   );
 
+  useEffect(() => {
+    if (!ready || !deepLink.current) return;
+    const { id, param } = deepLink.current;
+    deepLink.current = null;
+    window.setTimeout(() => open({ kind: "app", app: id, param }), 50);
+  }, [ready, open]);
+
   // Mark the first-run "Hi" sequence as seen once someone reaches Start.
   useEffect(() => {
     if (phase === "os" && firstRun) {
@@ -368,6 +403,12 @@ export function OSProvider({ children }: { children: ReactNode }) {
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+/** Pick the current language from an inline { tr, en } pair. */
+export function useL() {
+  const { lang } = useOS();
+  return useCallback((l: L) => l[lang], [lang]);
 }
 
 /** Re-render every `ms` (clocks, live tiles). */

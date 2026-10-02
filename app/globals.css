@@ -3,11 +3,43 @@
    Plain CSS. Colors come from --start-bg / --accent (set at runtime), apps set --app.
    ========================================================================== */
 
+/* Selawik: Microsoft's open-source (OFL) stand-in for Segoe UI, used when Segoe UI isn't installed. */
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawkl.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawksl.woff2") format("woff2");
+  font-weight: 350;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawk.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawksb.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Selawik";
+  src: url("/fonts/selawkb.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   --start-bg: #1b0f4a;
   --accent: #5b3bd1;
   --app: var(--accent);
-  --font: "Segoe UI", "Open Sans", "Selawik", system-ui, -apple-system, sans-serif;
+  --font: "Segoe UI", "Selawik", "Open Sans", system-ui, -apple-system, sans-serif;
   --ease: cubic-bezier(0.1, 0.9, 0.2, 1);
   --ease-in: cubic-bezier(0.7, 0, 1, 0.5);
   --tu: 70px;
@@ -5190,4 +5222,17 @@ html[data-motion="reduced"] *::after {
   to {
     stroke-dashoffset: -14;
   }
+}
+
+/* Metro app bar inside apps (components/metro/AppBar.tsx) */
+.metro-appbar {
+  position: fixed;
+  z-index: 40;
+}
+.metro-appbar button:disabled {
+  opacity: 0.4;
+}
+.metro-appbar button.on svg {
+  background: #fff;
+  color: #111;
 }

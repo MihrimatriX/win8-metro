@@ -17,10 +17,22 @@ import { PhotosApp } from "./apps/Photos";
 import { MusicApp } from "./apps/Music";
 import { AchievementsApp } from "./apps/Achievements";
 import { CalendarApp } from "./apps/Calendar";
-import { DesktopApp } from "./apps/Desktop";
 import { SettingsApp } from "./apps/Settings";
+import { WeatherApp } from "./metro/Weather";
+import { NewsApp } from "./metro/News";
+import { SportsApp } from "./metro/Sports";
+import { FinanceApp } from "./metro/Finance";
+import { TravelApp } from "./metro/Travel";
+import { MapsApp } from "./metro/Maps";
+import { CameraApp } from "./metro/Camera";
+import { AlarmsApp } from "./metro/Alarms";
+import { SoundRecorderApp } from "./metro/SoundRecorder";
+import { VideoApp } from "./metro/Video";
+import { SkyDriveApp } from "./metro/SkyDrive";
+import { AppIcon } from "./icons/AppIcon";
 
-const APP_COMPONENTS: Record<AppId, (p: { param?: string }) => ReactNode> = {
+/** Metro (Windows Store) apps. Desktop programs open in windows instead (components/desktop). */
+const APP_COMPONENTS: Partial<Record<AppId, (p: { param?: string }) => ReactNode>> = {
   projects: ProjectsApp,
   profile: ProfileApp,
   mail: MailApp,
@@ -29,8 +41,18 @@ const APP_COMPONENTS: Record<AppId, (p: { param?: string }) => ReactNode> = {
   music: MusicApp,
   achievements: AchievementsApp,
   calendar: CalendarApp,
-  desktop: DesktopApp,
   settings: SettingsApp,
+  weather: WeatherApp,
+  news: NewsApp,
+  sports: SportsApp,
+  finance: FinanceApp,
+  travel: TravelApp,
+  maps: MapsApp,
+  camera: CameraApp,
+  alarms: AlarmsApp,
+  soundrec: SoundRecorderApp,
+  video: VideoApp,
+  skydrive: SkyDriveApp,
 };
 
 export function AppHost({ view }: { view: Extract<View, { kind: "app" }> }) {
@@ -44,7 +66,7 @@ export function AppHost({ view }: { view: Extract<View, { kind: "app" }> }) {
     const id = window.setTimeout(() => setSplash(false), 950);
     return () => window.clearTimeout(id);
   }, [splash]);
-  const Comp = APP_COMPONENTS[view.app];
+  const Comp = APP_COMPONENTS[view.app] ?? (() => null);
   const s = pull ? Math.max(0.28, 1 - pull.dy / 260) : 1;
   return (
     <div
@@ -53,7 +75,7 @@ export function AppHost({ view }: { view: Extract<View, { kind: "app" }> }) {
     >
       {splash ? (
         <div className="splash" style={{ background: a.color }}>
-          <Icon name={a.icon} size={120} strokeWidth={1.1} />
+          <AppIcon id={a.id} size={120} strokeWidth={1.1} />
         </div>
       ) : (
         <div className="app-body" key={view.param ?? "root"}>
@@ -121,7 +143,7 @@ function TitleBar({ id, onPull }: { id: AppId; onPull: (p: { dx: number; dy: num
     >
       <div className="titlebar-bar">
         <span className="titlebar-icon" style={{ background: a.color }}>
-          <Icon name={a.icon} size={14} />
+          <AppIcon id={a.id} size={14} />
         </span>
         <span className="titlebar-name">{t(a.title)}</span>
         <button onClick={() => open({ kind: "start" })} aria-label={t("win.minimize")} title={t("win.minimize")}>
@@ -338,7 +360,7 @@ export function AppsView() {
                   data-nav
                 >
                   <span className="appsview-icon" style={{ background: m.color }}>
-                    <Icon name={m.icon} size={22} />
+                    {m.app ? <AppIcon id={m.app} size={22} /> : <Icon name={m.icon} size={22} />}
                   </span>
                   <span>{m.title}</span>
                 </button>

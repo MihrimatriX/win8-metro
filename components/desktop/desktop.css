@@ -1,0 +1,1383 @@
+/* ==========================================================================
+   Windows 8.1 desktop: windows, taskbar, desktop icons and the desktop UI kit (.w8-*).
+   --frame is the window color (Personalization → Color); --caption-ink is black or white for contrast.
+   ========================================================================== */
+
+.w8-desktop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font: 12px/1.4 var(--font);
+  color: #000;
+  --frame: #6aa9e9;
+  --sel-bg: #cce8ff;
+  --sel-border: #99d1ff;
+  --hover-bg: #e5f3ff;
+  cursor: default;
+  z-index: 1;
+}
+.w8-desktop[hidden] {
+  display: none;
+}
+.w8-wallpaper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.w8-wallpaper svg,
+.w8-wallpaper img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ----- desktop icons ----- */
+.w8-iconlayer {
+  position: absolute;
+  inset: 0;
+}
+.w8-dicon {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 2px 4px;
+  border: 1px solid transparent;
+  color: #fff;
+  text-align: center;
+}
+.w8-dicon:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.w8-dicon.sel {
+  background: rgba(51, 153, 255, 0.34);
+  border-color: rgba(120, 190, 255, 0.85);
+}
+.w8-dicon.cut {
+  opacity: 0.55;
+}
+.w8-dicon-img {
+  position: relative;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.w8-dicon.size-48 .w8-dicon-img {
+  width: 48px;
+  height: 48px;
+}
+.w8-dicon.size-96 .w8-dicon-img {
+  width: 96px;
+  height: 96px;
+}
+.w8-dicon.size-32 .w8-dicon-img {
+  width: 32px;
+  height: 32px;
+}
+.w8-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.w8-thumb svg,
+.w8-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.w8-lnk-arrow {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.w8-dicon-label {
+  font-size: 12px;
+  line-height: 15px;
+  max-width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-shadow:
+    0 0 2px rgba(0, 0, 0, 0.9),
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 5px rgba(0, 0, 0, 0.5);
+  word-break: break-word;
+}
+.w8-dicon.sel .w8-dicon-label {
+  -webkit-line-clamp: 5;
+}
+.w8-rename {
+  width: 100%;
+  min-height: 34px;
+  resize: none;
+  font: 12px/15px var(--font);
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  text-align: center;
+  padding: 1px;
+  outline: none;
+}
+.w8-band {
+  position: absolute;
+  border: 1px solid #3399ff;
+  background: rgba(51, 153, 255, 0.22);
+  pointer-events: none;
+}
+
+/* ----- windows ----- */
+.w8-winlayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.w8-winlayer > * {
+  pointer-events: auto;
+}
+.w8-win {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--frame);
+  border: 1px solid color-mix(in srgb, var(--frame) 55%, #000);
+  padding: 0 7px 7px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.38);
+  animation: w8-win-in 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+  transition:
+    opacity 0.18s,
+    transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1),
+    visibility 0.2s;
+  min-width: 140px;
+}
+.w8-win.inactive {
+  background: #ebebeb;
+  border-color: #a6a6a6;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.22);
+  --caption-ink: #6d6d6d !important;
+}
+.w8-win.maxed,
+.w8-win.docked {
+  padding: 0;
+  border-width: 0;
+  animation: none;
+}
+.w8-win.min {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(35%) scale(0.55);
+  pointer-events: none;
+}
+@keyframes w8-win-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+.w8-titlebar {
+  position: relative;
+  flex: none;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  color: var(--caption-ink);
+  touch-action: none;
+}
+.w8-win.maxed .w8-titlebar {
+  height: 23px;
+  padding-left: 6px;
+}
+.w8-titlebar-icon {
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  margin: 0 4px 0 1px;
+}
+.w8-titlebar-text {
+  position: absolute;
+  left: 110px;
+  right: 110px;
+  text-align: center;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.w8-win.dialog .w8-titlebar-text {
+  left: 30px;
+  right: 50px;
+  text-align: left;
+  font-size: 14px;
+}
+.w8-win.maxed .w8-titlebar-text {
+  font-size: 13px;
+}
+.w8-caption {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  display: flex;
+  z-index: 2;
+}
+.w8-win.maxed .w8-caption {
+  right: 2px;
+}
+.w8-cap {
+  width: 27px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--caption-ink);
+}
+.w8-cap:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.42);
+}
+.w8-cap:active:not(:disabled) {
+  background: rgba(0, 0, 0, 0.15);
+}
+.w8-cap:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.w8-cap-close {
+  width: 46px;
+  background: #c75050;
+  color: #fff;
+  margin-left: 1px;
+}
+.w8-win.inactive .w8-cap-close {
+  background: transparent;
+  color: var(--caption-ink);
+}
+.w8-cap-close:hover:not(:disabled),
+.w8-win.inactive .w8-cap-close:hover {
+  background: #e04343;
+  color: #fff;
+}
+.w8-cap-close:active:not(:disabled) {
+  background: #993d3d;
+}
+.w8-client {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--frame) 70%, #000);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+.w8-win.inactive .w8-client {
+  border-color: #c4c4c4;
+}
+.w8-win.maxed .w8-client {
+  border-width: 1px 0 0;
+}
+.w8-win.dialog .w8-client {
+  background: #f0f0f0;
+}
+.w8-modal-block {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+}
+.w8-win .rz {
+  position: absolute;
+  z-index: 3;
+  touch-action: none;
+}
+.w8-win .rz-n {
+  top: -4px;
+  left: 8px;
+  right: 8px;
+  height: 8px;
+  cursor: ns-resize;
+}
+.w8-win .rz-s {
+  bottom: -4px;
+  left: 8px;
+  right: 8px;
+  height: 10px;
+  cursor: ns-resize;
+}
+.w8-win .rz-e {
+  right: -4px;
+  top: 8px;
+  bottom: 8px;
+  width: 10px;
+  cursor: ew-resize;
+}
+.w8-win .rz-w {
+  left: -4px;
+  top: 8px;
+  bottom: 8px;
+  width: 10px;
+  cursor: ew-resize;
+}
+.w8-win .rz-ne,
+.w8-win .rz-nw,
+.w8-win .rz-se,
+.w8-win .rz-sw {
+  width: 14px;
+  height: 14px;
+}
+.w8-win .rz-ne {
+  top: -4px;
+  right: -4px;
+  cursor: nesw-resize;
+}
+.w8-win .rz-sw {
+  bottom: -4px;
+  left: -4px;
+  cursor: nesw-resize;
+}
+.w8-win .rz-nw {
+  top: -4px;
+  left: -4px;
+  cursor: nwse-resize;
+}
+.w8-win .rz-se {
+  bottom: -4px;
+  right: -4px;
+  cursor: nwse-resize;
+}
+.w8-desktop .snap-preview {
+  bottom: calc(40px + 8px);
+}
+
+/* ----- taskbar ----- */
+.w8-taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  display: flex;
+  align-items: stretch;
+  color: #fff;
+  background: color-mix(in srgb, color-mix(in srgb, var(--frame) 58%, #0a1622) 84%, transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  user-select: none;
+  z-index: 5000;
+}
+.w8-start {
+  width: 48px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.w8-start-logo {
+  transition:
+    color 0.15s,
+    filter 0.15s;
+}
+.w8-start:hover .w8-start-logo {
+  color: #5fcbff;
+  filter: drop-shadow(0 0 6px rgba(80, 200, 255, 0.9));
+}
+.w8-start:active .w8-start-logo {
+  color: #1ba1e2;
+}
+.w8-tasks {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 1px;
+}
+.w8-task-wrap {
+  position: relative;
+  display: flex;
+}
+.w8-task {
+  position: relative;
+  width: 60px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  margin: 1px 0;
+}
+.w8-task.running {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.w8-task.stacked::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  right: -4px;
+  width: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-left: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+.w8-task:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.w8-task.active {
+  background: rgba(255, 255, 255, 0.33);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.w8-peek {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: color-mix(in srgb, color-mix(in srgb, var(--frame) 58%, #0a1622) 92%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  z-index: 5;
+  animation: w8-fade 0.15s;
+}
+.w8-peek-item {
+  width: 180px;
+  padding: 4px 6px 8px;
+  border: 1px solid transparent;
+  cursor: default;
+}
+.w8-peek-item:hover,
+.w8-peek-item.on {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.w8-peek-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.w8-peek-head span {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.w8-peek-close {
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  visibility: hidden;
+}
+.w8-peek-item:hover .w8-peek-close {
+  visibility: visible;
+  background: #c75050;
+}
+.w8-peek-thumb {
+  height: 90px;
+  margin-top: 6px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.92);
+}
+.w8-tray {
+  display: flex;
+  align-items: stretch;
+  font-size: 12px;
+}
+.w8-tray-btn,
+.w8-tray-lang,
+.w8-clock {
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  margin: 1px 0;
+  color: #fff;
+}
+.w8-tray-btn {
+  min-width: 24px;
+}
+.w8-tray-btn:hover,
+.w8-tray-lang:hover,
+.w8-clock:hover,
+.w8-tray-btn.on,
+.w8-tray-lang.on,
+.w8-clock.on {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.w8-tray-lang {
+  padding: 0 7px;
+  font-size: 12px;
+}
+.w8-clock {
+  padding: 0 8px;
+  line-height: 15px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.w8-showdesk {
+  width: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.35);
+  margin-left: 4px;
+}
+.w8-showdesk:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ----- tray flyouts ----- */
+.w8-fly-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 9000;
+}
+.w8-fly {
+  position: absolute;
+  right: 8px;
+  bottom: 48px;
+  z-index: 9001;
+  background: #fff;
+  color: #000;
+  border: 1px solid color-mix(in srgb, var(--frame) 60%, #222);
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--frame) 70%, transparent),
+    0 2px 14px rgba(0, 0, 0, 0.45);
+  animation: w8-fly-in 0.18s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+@keyframes w8-fly-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes w8-fade {
+  from {
+    opacity: 0;
+  }
+}
+.w8-fly-link {
+  color: #0066cc;
+  padding: 6px 12px;
+  text-align: left;
+}
+.w8-fly-link:hover {
+  color: #3399ff;
+  text-decoration: underline;
+}
+.w8-fly-clock {
+  width: 396px;
+  padding: 6px 4px 4px;
+}
+.w8-clock-date {
+  font-size: 13px;
+}
+.w8-clock-body {
+  display: flex;
+  gap: 8px;
+  padding: 4px 12px 10px;
+  align-items: center;
+}
+.w8-cal {
+  flex: 1;
+}
+.w8-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0 6px;
+}
+.w8-cal-head button {
+  width: 22px;
+  height: 22px;
+  color: #444;
+  font-size: 10px;
+}
+.w8-cal-head button:hover {
+  background: var(--hover-bg);
+}
+.w8-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  row-gap: 2px;
+}
+.w8-cal-grid span {
+  padding: 3px 0;
+}
+.w8-cal-grid .dow {
+  color: #333;
+  font-weight: 600;
+  border-bottom: 1px solid #e1e1e1;
+  margin-bottom: 2px;
+}
+.w8-cal-grid .other {
+  color: #a0a0a0;
+}
+.w8-cal-grid .today {
+  border: 1px solid #3399ff;
+  background: #cce8ff;
+}
+.w8-analog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.w8-analog-time {
+  font-size: 13px;
+}
+.w8-clock-settings {
+  border-top: 1px solid #e5e5e5;
+  width: 100%;
+}
+.w8-fly-volume {
+  width: 96px;
+  right: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+}
+.w8-vol-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.w8-vol-label {
+  font-size: 12px;
+}
+.w8-vol-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  height: 150px;
+  width: 26px;
+  accent-color: #3399ff;
+}
+.w8-vol-num {
+  font-size: 12px;
+}
+.w8-vol-mute {
+  width: 34px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+}
+.w8-vol-mute:hover {
+  background: var(--hover-bg);
+  border-color: var(--sel-border);
+}
+.w8-fly-action {
+  width: 340px;
+  right: 170px;
+  padding: 12px 0 0;
+}
+.w8-fly-action-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 14px;
+}
+.w8-fly-action p {
+  padding: 6px 14px 10px 40px;
+  margin: 0;
+  color: #444;
+}
+.w8-fly-action .w8-fly-link {
+  border-top: 1px solid #e5e5e5;
+  width: 100%;
+}
+.w8-fly-hidden {
+  right: 220px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 120px;
+  padding: 6px;
+  gap: 4px;
+}
+.w8-fly-hidden > button:not(.w8-fly-link) {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: #1979ca;
+}
+.w8-fly-hidden > button:hover {
+  background: var(--hover-bg);
+}
+.w8-fly-lang {
+  right: 90px;
+  width: 270px;
+  padding: 6px 0 0;
+}
+.w8-fly-lang > button:not(.w8-fly-link) {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 14px;
+}
+.w8-fly-lang > button.on,
+.w8-fly-lang > button:not(.w8-fly-link):hover {
+  background: var(--sel-bg);
+}
+.w8-fly-lang strong {
+  width: 34px;
+  font-weight: 600;
+}
+.w8-fly-lang span {
+  display: flex;
+  flex-direction: column;
+}
+.w8-fly-lang small {
+  color: #555;
+}
+.w8-fly-lang .w8-fly-link {
+  border-top: 1px solid #e5e5e5;
+  width: 100%;
+  margin-top: 6px;
+}
+
+/* Networks charm pane (Metro, on the desktop) */
+.w8-netpane {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 346px;
+  z-index: 9100;
+  background: #1f1f1f;
+  color: #fff;
+  padding: 26px 30px;
+  animation: pane-in 0.35s var(--ease);
+  border-left: 1px solid #333;
+}
+.w8-netpane h2 {
+  font-weight: 300;
+  font-size: 28px;
+  margin: 0 0 24px;
+}
+.w8-netpane h3 {
+  font-weight: 400;
+  font-size: 15px;
+  margin: 26px 0 8px;
+}
+.w8-net-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+}
+.w8-net-row span {
+  flex: 1;
+}
+.w8-net-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 8px;
+  font-size: 15px;
+}
+.w8-net-item span {
+  display: flex;
+  flex-direction: column;
+}
+.w8-net-item small {
+  font-size: 12px;
+  opacity: 0.75;
+}
+.w8-net-item.on,
+.w8-net-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.w8-toggle {
+  width: 44px;
+  height: 20px;
+  border: 2px solid #fff;
+  position: relative;
+  background: transparent;
+}
+.w8-toggle i {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: -2px;
+  width: 12px;
+  background: #fff;
+  transition: left 0.15s;
+}
+.w8-toggle.on {
+  background: var(--accent);
+}
+.w8-toggle.on i {
+  left: 30px;
+}
+
+/* ----- menus ----- */
+.w8-ctx-layer {
+  position: fixed;
+  z-index: 100000;
+  font: 12px/1.4 var(--font);
+  color: #000;
+}
+.w8-menu {
+  position: relative;
+  min-width: 180px;
+  padding: 2px;
+  background: #f0f0f0;
+  border: 1px solid #979797;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.32);
+  user-select: none;
+  animation: w8-fade 0.1s;
+}
+.w8-menu::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 28px;
+  border-left: 1px solid #e2e3e3;
+  border-right: 1px solid #fff;
+  pointer-events: none;
+}
+.w8-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 22px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  cursor: default;
+}
+.w8-menu-item:hover:not(.disabled),
+.w8-menu-item.open {
+  background: linear-gradient(#e8f2fb, #d8e9f8);
+  border-color: #a8d2f5;
+}
+.w8-menu-item.disabled {
+  color: #6d6d6d;
+}
+.w8-menu-item.bold {
+  font-weight: 600;
+}
+.w8-menu-check {
+  width: 28px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.w8-menu-label {
+  flex: 1;
+  padding: 0 18px 0 6px;
+}
+.w8-menu-key {
+  padding-right: 10px;
+  min-width: 20px;
+  text-align: right;
+}
+.w8-menu-sep {
+  height: 1px;
+  margin: 3px 2px 3px 30px;
+  background: #e2e3e3;
+  border-bottom: 1px solid #fff;
+}
+.w8-submenu {
+  position: absolute;
+  left: calc(100% - 4px);
+  top: -3px;
+  z-index: 2;
+}
+.w8-menubar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  height: 21px;
+  flex: none;
+  position: relative;
+  z-index: 20;
+}
+.w8-menubar-item {
+  position: relative;
+}
+.w8-menubar-item > button {
+  padding: 0 8px;
+  height: 20px;
+  border: 1px solid transparent;
+}
+.w8-menubar-item > button:hover,
+.w8-menubar-item.open > button {
+  background: var(--hover-bg);
+  border-color: var(--sel-border);
+}
+.w8-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+/* ----- ribbon ----- */
+.w8-ribbon {
+  flex: none;
+  background: #fff;
+  border-bottom: 1px solid #dadbdc;
+}
+.w8-ribbon-tabs {
+  display: flex;
+  height: 24px;
+  align-items: stretch;
+  background: #fff;
+}
+.w8-ribbon-file {
+  padding: 0 14px;
+  color: #fff;
+  font-size: 12px;
+}
+.w8-ribbon-file:hover {
+  filter: brightness(1.12);
+}
+.w8-ribbon-tab {
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  color: #3c3c3c;
+}
+.w8-ribbon-tab:hover {
+  color: #2b579a;
+  border-color: #e1e1e1;
+}
+.w8-ribbon-tab.on {
+  background: #f5f6f7;
+  border-color: #dadbdc;
+  color: #000;
+  position: relative;
+  z-index: 1;
+  margin-bottom: -1px;
+}
+.w8-ribbon-spacer {
+  flex: 1;
+}
+.w8-ribbon-toggle {
+  width: 24px;
+  color: #555;
+}
+.w8-ribbon-body {
+  display: flex;
+  height: 92px;
+  background: #f5f6f7;
+  border-top: 1px solid #dadbdc;
+  padding: 2px 2px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.w8-ribbon-group {
+  display: flex;
+  flex-direction: column;
+  padding: 0 3px;
+  border-right: 1px solid #e2e3e4;
+  flex: none;
+}
+.w8-ribbon-items {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  max-height: 72px;
+}
+.w8-ribbon-glabel {
+  text-align: center;
+  color: #666;
+  font-size: 11px;
+  height: 16px;
+  line-height: 16px;
+}
+.w8-rb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid transparent;
+  color: #000;
+}
+.w8-rb:hover:not(:disabled) {
+  background: #e5f1fb;
+  border-color: #a8d1f4;
+}
+.w8-rb:active:not(:disabled),
+.w8-rb.active {
+  background: #cce4f7;
+  border-color: #7eb4ea;
+}
+.w8-rb:disabled {
+  opacity: 0.45;
+}
+.w8-rb.big {
+  flex-direction: column;
+  justify-content: flex-start;
+  width: auto;
+  min-width: 48px;
+  max-width: 76px;
+  height: 70px;
+  padding: 2px 3px;
+  text-align: center;
+  line-height: 13px;
+}
+.w8-rb.big .w8-rb-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+}
+.w8-rb.small {
+  height: 22px;
+  padding: 0 4px 0 2px;
+  white-space: nowrap;
+}
+.w8-rb.small .w8-rb-icon {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+}
+.w8-rb-label {
+  font-size: 12px;
+}
+
+/* ----- controls ----- */
+.w8-btn {
+  min-width: 75px;
+  height: 23px;
+  padding: 0 10px;
+  background: linear-gradient(#f0f0f0, #e5e5e5);
+  border: 1px solid #acacac;
+  color: #000;
+  text-align: center;
+  font-size: 12px;
+}
+.w8-btn:hover:not(:disabled) {
+  background: linear-gradient(#ecf4fc, #dcecfc);
+  border-color: #7eb4ea;
+}
+.w8-btn:active:not(:disabled) {
+  background: linear-gradient(#dbedfd, #c4e0fc);
+  border-color: #569de5;
+}
+.w8-btn.primary {
+  border-color: #3399ff;
+  box-shadow: inset 0 0 0 1px #3399ff;
+}
+.w8-btn:disabled {
+  color: #838383;
+  background: #f4f4f4;
+  border-color: #adb2b5;
+}
+.w8-btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+}
+.w8-input,
+.w8-select {
+  height: 23px;
+  border: 1px solid #abadb3;
+  background: #fff;
+  color: #000;
+  padding: 0 4px;
+  font-size: 12px;
+  outline: none;
+}
+.w8-input:hover,
+.w8-select:hover {
+  border-color: #7eb4ea;
+}
+.w8-input:focus,
+.w8-select:focus {
+  border-color: #3399ff;
+}
+.w8-status {
+  flex: none;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 10px;
+  font-size: 12px;
+  background: #fff;
+  color: #1e1e1e;
+  border-top: 1px solid #f0f0f0;
+}
+.w8-empty {
+  color: #6d6d6d;
+  text-align: center;
+  padding: 14px;
+}
+.w8-navbtn {
+  width: 24px;
+  height: 24px;
+  color: #333;
+  border-radius: 50%;
+}
+.w8-navbtn:hover:not(:disabled) {
+  background: var(--hover-bg);
+}
+.w8-navbtn:disabled {
+  color: #bbb;
+}
+
+/* ----- message box ----- */
+.w8-msgbox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.w8-msgbox-body {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 20px 16px 14px;
+  background: #fff;
+}
+.w8-msgbox-body p {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.5;
+  padding-top: 6px;
+  color: #000;
+}
+.w8-msgbox-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f0f0f0;
+  border-top: 1px solid #dfdfdf;
+}
+
+/* ----- Open / Save As ----- */
+.w8-filedlg {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f0f0f0;
+}
+.w8-filedlg-addr {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+}
+.w8-filedlg-crumbs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  padding: 0 4px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.w8-filedlg-crumbs button {
+  padding: 0 3px;
+}
+.w8-filedlg-crumbs button:hover {
+  background: var(--hover-bg);
+}
+.w8-filedlg-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 2px 8px 6px;
+}
+.w8-filedlg-toolbar button {
+  padding: 2px 8px;
+  border: 1px solid transparent;
+}
+.w8-filedlg-toolbar button:hover {
+  background: var(--hover-bg);
+  border-color: var(--sel-border);
+}
+.w8-filedlg-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9;
+}
+.w8-filedlg-nav {
+  width: 170px;
+  overflow: auto;
+  padding: 6px 0;
+  border-right: 1px solid #ececec;
+}
+.w8-filedlg-nav button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px 10px 3px 18px;
+  border: 1px solid transparent;
+}
+.w8-filedlg-nav button:hover {
+  background: var(--hover-bg);
+}
+.w8-filedlg-nav button.on {
+  background: var(--sel-bg);
+  border-color: var(--sel-border);
+}
+.w8-filedlg-navh {
+  padding: 3px 10px;
+  color: #1e3287;
+}
+.w8-filedlg-list {
+  flex: 1;
+  overflow: auto;
+}
+.w8-filedlg-cols,
+.w8-filedlg-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 2fr) 1.2fr 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 0 8px;
+}
+.w8-filedlg-cols {
+  height: 24px;
+  color: #4c607a;
+  border-bottom: 1px solid #ececec;
+  position: sticky;
+  top: 0;
+  background: #fff;
+}
+.w8-filedlg-row {
+  height: 22px;
+  width: 100%;
+  border: 1px solid transparent;
+  color: #000;
+}
+.w8-filedlg-row > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.w8-filedlg-row > span:not(:first-child) {
+  color: #6d6d6d;
+}
+.w8-filedlg-row:hover {
+  background: var(--hover-bg);
+}
+.w8-filedlg-row.on {
+  background: var(--sel-bg);
+  border-color: var(--sel-border);
+}
+.w8-filedlg-foot {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 8px 10px;
+}
+.w8-filedlg-foot label {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+}
+.w8-filedlg-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ----- Properties ----- */
+.w8-props {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px;
+}
+.w8-props-tabs {
+  display: flex;
+  gap: 0;
+}
+.w8-props-tabs span {
+  padding: 3px 8px;
+  border: 1px solid #d9d9d9;
+  border-bottom: 0;
+  background: #f0f0f0;
+  color: #333;
+}
+.w8-props-tabs span.on {
+  background: #fff;
+  position: relative;
+  top: 1px;
+}
+.w8-props-body {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  padding: 12px;
+  overflow: auto;
+}
+.w8-props-name {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.w8-props-name input {
+  flex: 1;
+}
+.w8-props-body hr {
+  border: 0;
+  border-top: 1px solid #e5e5e5;
+  margin: 10px 0;
+}
+.w8-props-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 6px;
+  padding: 3px 0;
+  word-break: break-all;
+}
+.w8-props-row label {
+  margin-right: 10px;
+}
+.w8-props-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+/* Desktop scrollbars: the classic light ones. */
+.w8-desktop ::-webkit-scrollbar {
+  width: 17px;
+  height: 17px;
+}
+.w8-desktop ::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+.w8-desktop ::-webkit-scrollbar-thumb {
+  background: #cdcdcd;
+  border: 4px solid #f0f0f0;
+}
+.w8-desktop ::-webkit-scrollbar-thumb:hover {
+  background: #a6a6a6;
+}
+.w8-desktop ::-webkit-scrollbar-corner {
+  background: #f0f0f0;
+}
+.w8-desktop * {
+  scrollbar-color: #cdcdcd #f0f0f0;
+}

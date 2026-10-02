@@ -3,31 +3,107 @@ import type { Key } from "./i18n";
 import type { L, Tier } from "./types";
 import { projects, socials } from "@/content/portfolio";
 
-export type AppId = "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings";
+export type MetroAppId =
+  | "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings"
+  | "weather" | "news" | "sports" | "finance" | "travel" | "maps" | "camera" | "alarms" | "soundrec" | "video" | "skydrive";
+export type DesktopAppId =
+  | "explorer" | "ie" | "notepad" | "wordpad" | "paint" | "calc" | "cmd" | "taskmgr" | "control" | "minesweeper" | "run" | "winver";
+export type AppId = MetroAppId | DesktopAppId;
 
 export type IconName =
   | "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings"
+  | "weather" | "news" | "sports" | "finance" | "travel" | "maps" | "camera" | "alarms" | "soundrec" | "video" | "skydrive" | "ie" | "calculator" | "help"
   | "search" | "share" | "start" | "devices" | "power" | "back" | "forward" | "down" | "up" | "play" | "pause" | "next" | "prev"
   | "github" | "linkedin" | "x" | "blog" | "cv" | "close" | "minus" | "plus" | "check" | "folder" | "file" | "image" | "pc"
   | "keyboard" | "mouse" | "touch" | "print" | "link" | "bell" | "globe" | "volume" | "mute" | "motion" | "brush" | "pin"
-  | "unpin" | "resize" | "lock" | "user" | "wifi" | "battery" | "star" | "new" | "send" | "reply" | "trash" | "maximize" | "restore" | "refresh";
+  | "unpin" | "resize" | "lock" | "user" | "wifi" | "battery" | "star" | "new" | "send" | "reply" | "trash" | "maximize" | "restore" | "refresh"
+  | "record" | "stop" | "location" | "camera-switch" | "timer" | "stopwatch" | "edit" | "save" | "list" | "grid" | "flag" | "ease";
 
-export type AppDef = { id: AppId; title: Key; color: string; icon: IconName; phone?: boolean };
+/** Colorful desktop (Win32) icon names, drawn in components/icons/ShellIcons.tsx. */
+export type ShellIconName =
+  | "folder" | "folder-open" | "folder-documents" | "folder-pictures" | "folder-music" | "folder-videos" | "folder-downloads" | "folder-desktop" | "folder-user"
+  | "thispc" | "drive" | "drive-system" | "dvd" | "network" | "recycle-empty" | "recycle-full" | "libraries" | "favorites" | "homegroup"
+  | "explorer" | "ie" | "notepad" | "wordpad" | "paint" | "calc" | "cmd" | "taskmgr" | "control" | "minesweeper" | "run" | "windows"
+  | "file" | "file-txt" | "file-rtf" | "file-img" | "file-url" | "file-exe" | "file-html" | "file-audio" | "file-video" | "file-lnk"
+  | "msg-info" | "msg-warning" | "msg-error" | "msg-question" | "shield" | "user" | "display" | "personalize" | "clock" | "programs" | "sound" | "mouse" | "keyboard" | "power" | "fonts" | "region" | "ease" | "devices" | "accounts" | "update";
+
+export type AppDef = {
+  id: AppId;
+  title: Key;
+  color: string;
+  icon: IconName;
+  /** Metro (full screen, Windows Store) apps run in AppHost; desktop apps open in a window on the desktop. */
+  kind: "metro" | "desktop";
+  /** Desktop apps draw a colorful Win32 icon instead of a Metro glyph. */
+  shell?: ShellIconName;
+  /** Program name for Run / Command Prompt / Task Manager. */
+  exe?: string;
+  phone?: boolean;
+  /** Not listed in the Apps view (dialogs such as Run). */
+  hidden?: boolean;
+  /** Apps view "by category" group. */
+  cat?: "apps" | "accessories" | "system" | "games";
+};
+
+const m = (id: MetroAppId, title: Key, color: string, icon: IconName, extra: Partial<AppDef> = {}): AppDef => ({ id, title, color, icon, kind: "metro", cat: "apps", ...extra });
+const d = (id: DesktopAppId, title: Key, color: string, shell: ShellIconName, exe: string, cat: AppDef["cat"], extra: Partial<AppDef> = {}): AppDef => ({
+  id,
+  title,
+  color,
+  icon: "desktop",
+  kind: "desktop",
+  shell,
+  exe,
+  cat,
+  phone: false,
+  ...extra,
+});
 
 export const APPS: AppDef[] = [
-  { id: "projects", title: "app.projects", color: "#00a300", icon: "projects" },
-  { id: "profile", title: "app.profile", color: "#d24726", icon: "profile" },
-  { id: "mail", title: "app.mail", color: "#0072c6", icon: "mail" },
-  { id: "reader", title: "app.reader", color: "#a20025", icon: "reader" },
-  { id: "photos", title: "app.photos", color: "#008299", icon: "photos" },
-  { id: "music", title: "app.music", color: "#e3008c", icon: "music" },
-  { id: "achievements", title: "app.achievements", color: "#1e7145", icon: "achievements" },
-  { id: "calendar", title: "app.calendar", color: "#5133ab", icon: "calendar" },
-  { id: "desktop", title: "app.desktop", color: "#2d89ef", icon: "desktop", phone: false },
-  { id: "settings", title: "app.settings", color: "var(--accent)", icon: "settings" },
+  m("mail", "app.mail", "#00a0b1", "mail"),
+  m("calendar", "app.calendar", "#5133ab", "calendar"),
+  m("profile", "app.profile", "#d24726", "profile"),
+  m("photos", "app.photos", "#008299", "photos"),
+  m("projects", "app.projects", "#00a300", "projects"),
+  m("weather", "app.weather", "#1ba1e2", "weather"),
+  m("news", "app.news", "#ac193d", "news"),
+  m("sports", "app.sports", "#603cba", "sports"),
+  m("finance", "app.finance", "#008a00", "finance"),
+  m("travel", "app.travel", "#00aba9", "travel"),
+  m("maps", "app.maps", "#9f00a7", "maps"),
+  m("skydrive", "app.skydrive", "#094ab2", "skydrive"),
+  m("music", "app.music", "#e56c19", "music"),
+  m("video", "app.video", "#b01e00", "video"),
+  m("achievements", "app.achievements", "#107c10", "achievements", { cat: "games" }),
+  m("camera", "app.camera", "#aa1e44", "camera"),
+  m("alarms", "app.alarms", "#da532c", "alarms"),
+  m("soundrec", "app.soundrec", "#b91d47", "soundrec"),
+  m("reader", "app.reader", "#a20025", "reader"),
+  m("desktop", "app.desktop", "#2d89ef", "desktop", { phone: false }),
+  m("settings", "app.settings", "var(--accent)", "settings"),
+  d("ie", "app.ie", "#2672ec", "ie", "iexplore.exe", "apps"),
+  d("explorer", "app.explorer", "#d39d09", "explorer", "explorer.exe", "system"),
+  d("notepad", "app.notepad", "#2d89ef", "notepad", "notepad.exe", "accessories"),
+  d("wordpad", "app.wordpad", "#2b5797", "wordpad", "write.exe", "accessories"),
+  d("paint", "app.paint", "#da532c", "paint", "mspaint.exe", "accessories"),
+  d("calc", "app.calc", "#4b4b4b", "calc", "calc.exe", "accessories"),
+  d("cmd", "app.cmd", "#1d1d1d", "cmd", "cmd.exe", "system"),
+  d("taskmgr", "app.taskmgr", "#00a300", "taskmgr", "taskmgr.exe", "system"),
+  d("control", "app.control", "#2d89ef", "control", "control.exe", "system"),
+  d("minesweeper", "app.minesweeper", "#1e7145", "minesweeper", "minesweeper.exe", "games"),
+  d("run", "app.run", "#2d89ef", "run", "run", "system"),
+  d("winver", "app.winver", "#2d89ef", "windows", "winver.exe", "system", { hidden: true }),
 ];
 
-export const app = (id: AppId) => APPS.find((a) => a.id === id)!;
+export const app = (id: AppId) => APPS.find((a) => a.id === id) ?? APPS[0];
+export const isDesktopApp = (id: string): id is DesktopAppId => APPS.some((a) => a.id === id && a.kind === "desktop");
+/** Find an app by its program name ("notepad", "notepad.exe", "mspaint"…), for Run and the Command Prompt. */
+export function appByExe(name: string): AppDef | undefined {
+  const n = name.trim().toLowerCase().replace(/^"|"$/g, "").split(/[\\/]/).pop() ?? "";
+  const base = n.replace(/\.exe$/, "");
+  const alias: Record<string, string> = { iexplore: "ie", mspaint: "paint", write: "wordpad", explorer: "explorer", control: "control", calc: "calc", taskmgr: "taskmgr" };
+  return APPS.find((a) => a.exe?.replace(/\.exe$/, "") === base || a.id === (alias[base] ?? base));
+}
 
 export type TileSize = "small" | "medium" | "wide" | "large";
 export const SPAN: Record<TileSize, [number, number]> = { small: [1, 1], medium: [2, 2], wide: [4, 2], large: [4, 4] };
