@@ -2,7 +2,18 @@
 /** The Start screen: groups of live tiles on a horizontal strip, semantic zoom, tile app bar and the Apps view entry. */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useOS, type View } from "@/lib/os";
-import { GROUPS, SPAN, defaultTiles, isDesktopApp, moveTile, sizesFor, type DesktopAppId, type GroupId, type TileSize, type TileState } from "@/lib/model";
+import {
+  GROUPS,
+  SPAN,
+  defaultTiles,
+  isDesktopApp,
+  moveTile,
+  sizesFor,
+  type DesktopAppId,
+  type GroupId,
+  type TileSize,
+  type TileState,
+} from "@/lib/model";
 import { taskbarPins } from "./desktop/Taskbar";
 import { sound } from "@/lib/sound";
 import { profile } from "@/content/portfolio";
@@ -31,7 +42,14 @@ export function spatialMove(root: HTMLElement | null, dir: "up" | "down" | "left
     const by = b.top + b.height / 2;
     const dx = bx - ax;
     const dy = by - ay;
-    const ok = dir === "right" ? b.left >= a.right - 4 : dir === "left" ? b.right <= a.left + 4 : dir === "down" ? b.top >= a.bottom - 4 : b.bottom <= a.top + 4;
+    const ok =
+      dir === "right"
+        ? b.left >= a.right - 4
+        : dir === "left"
+          ? b.right <= a.left + 4
+          : dir === "down"
+            ? b.top >= a.bottom - 4
+            : b.bottom <= a.top + 4;
     if (!ok) continue;
     const main = dir === "left" || dir === "right" ? Math.abs(dx) : Math.abs(dy);
     const cross = dir === "left" || dir === "right" ? Math.abs(dy) : Math.abs(dx);
@@ -192,7 +210,15 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
   const [launching, setLaunching] = useState(false);
   const [entering, setEntering] = useState(true);
   const [grid, setGrid] = useState({ u: 70, g: 8, rows: 8 });
-  const [drag, setDrag] = useState<{ key: string; ox: number; oy: number; w: number; h: number; x: number; y: number } | null>(null);
+  const [drag, setDrag] = useState<{
+    key: string;
+    ox: number;
+    oy: number;
+    w: number;
+    h: number;
+    x: number;
+    y: number;
+  } | null>(null);
   const ghost = useRef<HTMLDivElement>(null);
   const tileMeta = useTileMeta();
 
@@ -211,15 +237,19 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  // Replay the fly-in every time Start comes back.
+  // Replay the fly-in every time Start comes back: drop the classes during render, re-add them a frame later.
+  const [wasHidden, setWasHidden] = useState(hidden);
+  if (hidden !== wasHidden) {
+    setWasHidden(hidden);
+    if (hidden) setLaunching(false);
+    else setEntering(false);
+  }
   useEffect(() => {
     if (hidden) {
       savedScroll.current = scroller.current?.scrollLeft ?? 0;
-      setLaunching(false);
       return;
     }
     if (scroller.current) scroller.current.scrollLeft = savedScroll.current;
-    setEntering(false);
     const raf = requestAnimationFrame(() => setEntering(true));
     const id = window.setTimeout(() => setEntering(false), 1400);
     return () => {
@@ -255,7 +285,9 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
       if (os.charm) return;
-      const dir = ({ ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" } as const)[e.key as "ArrowUp"];
+      const dir = ({ ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" } as const)[
+        e.key as "ArrowUp"
+      ];
       if (dir) {
         e.preventDefault();
         spatialMove(strip.current, dir);
@@ -315,11 +347,19 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
     const r = e.currentTarget.getBoundingClientRect();
     setSelected([]);
     setBar(false);
-    setDrag({ key, ox: e.clientX - r.left, oy: e.clientY - r.top, w: r.width, h: r.height, x: e.clientX, y: e.clientY });
+    setDrag({
+      key,
+      ox: e.clientX - r.left,
+      oy: e.clientY - r.top,
+      w: r.width,
+      h: r.height,
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
   const dragTile = drag && tiles.find((x) => x.key === drag.key);
 
-  const zoomOut = () => {
+  function zoomOut() {
     const el = strip.current;
     const sc = scroller.current;
     if (!el || !sc) return;
@@ -329,7 +369,7 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
     setSelected([]);
     setBar(false);
     earn("zoom");
-  };
+  }
 
   const zoomInto = (group: string) => {
     setZoomed(false);
@@ -354,8 +394,10 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
   const sel = tiles.filter((x) => selected.includes(x.key));
   const one = sel.length === 1 ? sel[0] : null;
   // Desktop programs get the Windows 8.1 desktop commands instead of "live tile".
-  const oneDesktop = one && one.key.startsWith("app:") && isDesktopApp(one.key.slice(4)) ? (one.key.slice(4) as DesktopAppId) : null;
-  const update = (fn: (t: TileState) => TileState) => setTiles((all) => all.map((x) => (selected.includes(x.key) ? fn(x) : x)));
+  const oneDesktop =
+    one && one.key.startsWith("app:") && isDesktopApp(one.key.slice(4)) ? (one.key.slice(4) as DesktopAppId) : null;
+  const update = (fn: (t: TileState) => TileState) =>
+    setTiles((all) => all.map((x) => (selected.includes(x.key) ? fn(x) : x)));
 
   let idx = 0;
   const style = { "--tu": `${grid.u}px`, "--tg": `${grid.g}px`, "--rows": grid.rows } as React.CSSProperties;
@@ -383,10 +425,20 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
             <strong>{userName}</strong>
           </span>
           <Avatar user={user} size={40} />
-          <button className="icon-btn" onClick={() => setPowerMenu((m) => !m)} aria-label={t("settings.power")} title={t("settings.power")}>
+          <button
+            className="icon-btn"
+            onClick={() => setPowerMenu((m) => !m)}
+            aria-label={t("settings.power")}
+            title={t("settings.power")}
+          >
             <Icon name="power" size={20} />
           </button>
-          <button className="icon-btn" onClick={() => setCharm("search")} aria-label={t("charm.search")} title={t("charm.search")}>
+          <button
+            className="icon-btn"
+            onClick={() => setCharm("search")}
+            aria-label={t("charm.search")}
+            title={t("charm.search")}
+          >
             <Icon name="search" size={20} />
           </button>
           {powerMenu && (
@@ -458,7 +510,14 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
           className={`tile tile-ghost size-${dragTile.size}`}
           data-ox={drag.ox}
           data-oy={drag.oy}
-          style={{ width: drag.w, height: drag.h, translate: `${drag.x - drag.ox}px ${drag.y - drag.oy}px`, "--c": tileMeta(drag.key).color } as React.CSSProperties}
+          style={
+            {
+              width: drag.w,
+              height: drag.h,
+              translate: `${drag.x - drag.ox}px ${drag.y - drag.oy}px`,
+              "--c": tileMeta(drag.key).color,
+            } as React.CSSProperties
+          }
         >
           <div className="tile-body">
             <TileFace tileKey={drag.key} size={dragTile.size} live={false} />
@@ -467,18 +526,37 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
         </div>
       )}
 
-      <button className="start-allapps" onClick={() => open({ kind: "apps" })} aria-label={t("allApps")} title={t("allApps")}>
+      <button
+        className="start-allapps"
+        onClick={() => open({ kind: "apps" })}
+        aria-label={t("allApps")}
+        title={t("allApps")}
+      >
         <Icon name="down" size={20} />
       </button>
-      <button className="start-zoom" onClick={() => (zoomed ? setZoomed(false) : zoomOut())} aria-label={t("zoom.out")} title={t("zoom.out")}>
+      <button
+        className="start-zoom"
+        onClick={() => (zoomed ? setZoomed(false) : zoomOut())}
+        aria-label={t("zoom.out")}
+        title={t("zoom.out")}
+      >
         <Icon name={zoomed ? "plus" : "minus"} size={18} />
       </button>
 
-      <div className={`appbar ${bar ? "open" : ""}`} onClick={(e) => e.stopPropagation()} onContextMenu={(e) => e.stopPropagation()}>
+      <div
+        className={`appbar ${bar ? "open" : ""}`}
+        onClick={(e) => e.stopPropagation()}
+        onContextMenu={(e) => e.stopPropagation()}
+      >
         {sel.length > 0 ? (
           <>
             <div className="appbar-left">
-              <button onClick={() => { setSelected([]); setBar(false); }}>
+              <button
+                onClick={() => {
+                  setSelected([]);
+                  setBar(false);
+                }}
+              >
                 <Icon name="close" size={20} />
                 <span>{t("tile.clear")}</span>
               </button>
@@ -536,7 +614,15 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
                     <Icon name="new" size={20} />
                     <span>{t("tile.newWindow")}</span>
                   </button>
-                  <button onClick={() => open({ kind: "app", app: "explorer", param: oneDesktop === "ie" ? "C:\\Program Files\\Internet Explorer" : "C:\\Windows\\System32" })}>
+                  <button
+                    onClick={() =>
+                      open({
+                        kind: "app",
+                        app: "explorer",
+                        param: oneDesktop === "ie" ? "C:\\Program Files\\Internet Explorer" : "C:\\Windows\\System32",
+                      })
+                    }
+                  >
                     <Icon name="folder" size={20} />
                     <span>{t("tile.fileLocation")}</span>
                   </button>
@@ -576,7 +662,12 @@ export function StartScreen({ hidden }: { hidden: boolean }) {
                 <Icon name="edit" size={20} />
                 <span>{t(naming ? "group.done" : "group.customize")}</span>
               </button>
-              <button onClick={() => { setBar(false); setCharm("personalize"); }}>
+              <button
+                onClick={() => {
+                  setBar(false);
+                  setCharm("personalize");
+                }}
+              >
                 <Icon name="brush" size={20} />
                 <span>{t("settings.personalize")}</span>
               </button>

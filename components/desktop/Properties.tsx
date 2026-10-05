@@ -13,20 +13,31 @@ function Sheet({ path, lang, close }: { path: string; lang: Lang; close: () => v
   const tr = lang === "tr";
   if (!n) return null;
   const isDir = n.kind === "dir" || n.kind === "drive";
-  const count = (x: typeof n): [number, number] => (x.children ?? []).reduce<[number, number]>((acc, c) => {
-    if (c.children) {
-      const [f, d] = count(c);
-      return [acc[0] + f, acc[1] + d + 1];
-    }
-    return [acc[0] + 1, acc[1]];
-  }, [0, 0]);
+  const count = (x: typeof n): [number, number] =>
+    (x.children ?? []).reduce<[number, number]>(
+      (acc, c) => {
+        if (c.children) {
+          const [f, d] = count(c);
+          return [acc[0] + f, acc[1] + d + 1];
+        }
+        return [acc[0] + 1, acc[1]];
+      },
+      [0, 0],
+    );
   const [files, dirs] = isDir ? count(n) : [0, 0];
   const bytes = fs.size(n);
   const rows: [string, string][] = [
     [tr ? "Dosya türü:" : "Type of file:", typeLabel(n, lang)],
     [tr ? "Konum:" : "Location:", dirname(path)],
-    [tr ? "Boyut:" : "Size:", `${formatSize(bytes, lang)} (${bytes.toLocaleString(tr ? "tr-TR" : "en-US")} ${tr ? "bayt" : "bytes"})`],
-    ...(isDir ? ([[tr ? "İçerik:" : "Contains:", tr ? `${files} Dosya, ${dirs} Klasör` : `${files} Files, ${dirs} Folders`]] as [string, string][]) : []),
+    [
+      tr ? "Boyut:" : "Size:",
+      `${formatSize(bytes, lang)} (${bytes.toLocaleString(tr ? "tr-TR" : "en-US")} ${tr ? "bayt" : "bytes"})`,
+    ],
+    ...(isDir
+      ? ([
+          [tr ? "İçerik:" : "Contains:", tr ? `${files} Dosya, ${dirs} Klasör` : `${files} Files, ${dirs} Folders`],
+        ] as [string, string][])
+      : []),
     [tr ? "Oluşturulma:" : "Created:", formatStamp(n.created, lang)],
     [tr ? "Değiştirilme:" : "Modified:", formatStamp(n.modified, lang)],
   ];

@@ -5,7 +5,19 @@
  */
 import { useMemo, useState, type ReactNode } from "react";
 import { wm } from "@/lib/wm";
-import { fs, join, normalize, splitPath, useFS, extname, KNOWN, HOME, typeLabel, formatStamp, type FNode } from "@/lib/fs";
+import {
+  fs,
+  join,
+  normalize,
+  splitPath,
+  useFS,
+  extname,
+  KNOWN,
+  HOME,
+  typeLabel,
+  formatStamp,
+  type FNode,
+} from "@/lib/fs";
 import { sound } from "@/lib/sound";
 import { useOS } from "@/lib/os";
 import type { ShellIconName } from "@/lib/model";
@@ -21,7 +33,14 @@ let n = 0;
 export function openDialog(owner: string | null, spec: Spec & { w: number; h: number }): string {
   const token = `dlg${++n}`;
   specs.set(token, spec);
-  return wm.launch("dialog", { arg: token, owner: owner ?? undefined, w: spec.w, h: spec.h, fixed: true, title: spec.title });
+  return wm.launch("dialog", {
+    arg: token,
+    owner: owner ?? undefined,
+    w: spec.w,
+    h: spec.h,
+    fixed: true,
+    title: spec.title,
+  });
 }
 
 /** The "dialog" app: renders the spec registered for this window. */
@@ -29,16 +48,23 @@ export function DialogHost() {
   const { win, close } = useWindow();
   const spec = specs.get(win.arg ?? "");
   if (!spec) return null;
-  return <>{spec.render(() => {
-    specs.delete(win.arg ?? "");
-    close();
-  })}</>;
+  return (
+    <>
+      {spec.render(() => {
+        specs.delete(win.arg ?? "");
+        close();
+      })}
+    </>
+  );
 }
 
 export type MsgIcon = "info" | "warning" | "error" | "question";
 
 /** A Windows message box. Resolves with the index of the clicked button (-1 when closed with X). */
-export function msgBox(owner: string | null, opts: { title: string; text: string; icon?: MsgIcon; buttons?: string[] }): Promise<number> {
+export function msgBox(
+  owner: string | null,
+  opts: { title: string; text: string; icon?: MsgIcon; buttons?: string[] },
+): Promise<number> {
   const buttons = opts.buttons ?? ["Tamam"];
   if (opts.icon === "error") sound.critical();
   else sound.ding();
@@ -89,7 +115,14 @@ export type FileFilter = { label: string; exts: string[] };
 /** Open / Save As. Resolves with the chosen path, or null when cancelled. */
 export function fileDialog(
   owner: string | null,
-  opts: { mode: "open" | "save"; title?: string; filters?: FileFilter[]; name?: string; dir?: string; lang: "tr" | "en" },
+  opts: {
+    mode: "open" | "save";
+    title?: string;
+    filters?: FileFilter[];
+    name?: string;
+    dir?: string;
+    lang: "tr" | "en";
+  },
 ): Promise<string | null> {
   return new Promise((resolve) => {
     let done = false;
@@ -118,7 +151,19 @@ export function fileDialog(
   });
 }
 
-function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save"; filters?: FileFilter[]; name?: string; dir?: string; onDone: (p: string | null) => void }) {
+function FilePicker({
+  mode,
+  filters,
+  name,
+  dir,
+  onDone,
+}: {
+  mode: "open" | "save";
+  filters?: FileFilter[];
+  name?: string;
+  dir?: string;
+  onDone: (p: string | null) => void;
+}) {
   useFS();
   const { lang } = useOS();
   const { id } = useWindow();
@@ -128,7 +173,11 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
   const [filter, setFilter] = useState(0);
   const [sel, setSel] = useState<string | null>(null);
   const f = filters?.[filter];
-  const items = fs.list(cwd).filter((x) => x.kind === "dir" || x.kind === "drive" || !f || f.exts.includes("*") || f.exts.includes(extname(x.name)));
+  const items = fs
+    .list(cwd)
+    .filter(
+      (x) => x.kind === "dir" || x.kind === "drive" || !f || f.exts.includes("*") || f.exts.includes(extname(x.name)),
+    );
   const crumbs = splitPath(cwd);
 
   const places: { label: string; path: string; icon: ShellIconName }[] = useMemo(
@@ -155,7 +204,12 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
     }
     if (mode === "open") {
       if (!fs.exists(target)) {
-        await msgBox(id, { title: tr ? "Aç" : "Open", text: `${nameIn}\n${tr ? "Dosya bulunamadı. Dosya adını denetleyip yeniden deneyin." : "File not found. Check the file name and try again."}`, icon: "warning", buttons: [tr ? "Tamam" : "OK"] });
+        await msgBox(id, {
+          title: tr ? "Aç" : "Open",
+          text: `${nameIn}\n${tr ? "Dosya bulunamadı. Dosya adını denetleyip yeniden deneyin." : "File not found. Check the file name and try again."}`,
+          icon: "warning",
+          buttons: [tr ? "Tamam" : "OK"],
+        });
         return;
       }
       onDone(target);
@@ -169,7 +223,9 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
     if (fs.exists(finalPath)) {
       const r = await msgBox(id, {
         title: tr ? "Farklı Kaydetmeyi Onayla" : "Confirm Save As",
-        text: tr ? `${nameIn} zaten var.\nDeğiştirmek istiyor musunuz?` : `${nameIn} already exists.\nDo you want to replace it?`,
+        text: tr
+          ? `${nameIn} zaten var.\nDeğiştirmek istiyor musunuz?`
+          : `${nameIn} already exists.\nDo you want to replace it?`,
         icon: "warning",
         buttons: [tr ? "Evet" : "Yes", tr ? "Hayır" : "No"],
       });
@@ -181,14 +237,25 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
   return (
     <div className="w8-filedlg">
       <div className="w8-filedlg-addr">
-        <button className="w8-navbtn" disabled={crumbs.length < 2} onClick={() => setCwd(normalize(crumbs.slice(0, -1).join("\\")))} aria-label="up">
+        <button
+          className="w8-navbtn"
+          disabled={crumbs.length < 2}
+          onClick={() => setCwd(normalize(crumbs.slice(0, -1).join("\\")))}
+          aria-label="up"
+        >
           ↑
         </button>
         <div className="w8-filedlg-crumbs">
           <ShellIcon name="thispc" size={16} />
           {crumbs.map((c, i) => (
             <button key={i} onClick={() => setCwd(normalize(crumbs.slice(0, i + 1).join("\\")))}>
-              {i === 0 ? fs.label(fs.get(c) ?? { name: c, kind: "drive", created: 0, modified: 0 }, lang) : fs.label(fs.get(crumbs.slice(0, i + 1).join("\\")) ?? { name: c, kind: "dir", created: 0, modified: 0 }, lang)} ›
+              {i === 0
+                ? fs.label(fs.get(c) ?? { name: c, kind: "drive", created: 0, modified: 0 }, lang)
+                : fs.label(
+                    fs.get(crumbs.slice(0, i + 1).join("\\")) ?? { name: c, kind: "dir", created: 0, modified: 0 },
+                    lang,
+                  )}{" "}
+              ›
             </button>
           ))}
         </div>
@@ -207,7 +274,11 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
         <nav className="w8-filedlg-nav">
           <div className="w8-filedlg-navh">★ {tr ? "Sık Kullanılanlar" : "Favorites"}</div>
           {places.map((p) => (
-            <button key={p.path} className={normalize(p.path).toLowerCase() === cwd.toLowerCase() ? "on" : ""} onClick={() => setCwd(normalize(p.path))}>
+            <button
+              key={p.path}
+              className={normalize(p.path).toLowerCase() === cwd.toLowerCase() ? "on" : ""}
+              onClick={() => setCwd(normalize(p.path))}
+            >
               <ShellIcon name={p.icon} size={16} /> {p.label}
             </button>
           ))}
@@ -221,7 +292,9 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
             <span>{tr ? "Değiştirme tarihi" : "Date modified"}</span>
             <span>{tr ? "Tür" : "Type"}</span>
           </div>
-          {!items.length && <p className="w8-empty">{tr ? "Arama ölçütlerinizle eşleşen öğe yok." : "No items match your search."}</p>}
+          {!items.length && (
+            <p className="w8-empty">{tr ? "Arama ölçütlerinizle eşleşen öğe yok." : "No items match your search."}</p>
+          )}
           {items.map((x: FNode) => {
             const p = join(cwd, x.name);
             const isDir = x.kind === "dir" || x.kind === "drive";
@@ -257,7 +330,12 @@ function FilePicker({ mode, filters, name, dir, onDone }: { mode: "open" | "save
       <div className="w8-filedlg-foot">
         <label>
           {tr ? "Dosya adı:" : "File name:"}
-          <TextBox value={file} onChange={(e) => setFile(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void accept()} autoFocus />
+          <TextBox
+            value={file}
+            onChange={(e) => setFile(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && void accept()}
+            autoFocus
+          />
         </label>
         {filters && (
           <label>

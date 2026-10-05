@@ -8,7 +8,7 @@ import { media, profile, projects } from "@/content/portfolio";
 import { CoverArt } from "./CoverArt";
 import { Icon } from "./Icons";
 import { Ring } from "./Shell";
-import { Wallpaper } from "./desktop/DesktopShell";
+import { Wallpaper } from "./desktop/Wallpaper";
 
 export function lockArt(id: string) {
   const p = projects.find((x) => x.id === id);
@@ -186,7 +186,14 @@ export function Login() {
           <h1>{u.name}</h1>
           <p className="login-note">{u.note}</p>
           <div className="login-pw">
-            <input ref={input} type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder={t("login.password")} aria-label={t("login.password")} />
+            <input
+              ref={input}
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder={t("login.password")}
+              aria-label={t("login.password")}
+            />
             <button type="submit" aria-label={t("login.signIn")}>
               <Icon name="forward" size={20} />
             </button>
@@ -197,7 +204,12 @@ export function Login() {
 
       <div className="login-bottom-left">
         {!list && (
-          <button className="circle-btn" onClick={() => setList(true)} aria-label={t("login.switch")} title={t("login.switch")}>
+          <button
+            className="circle-btn"
+            onClick={() => setList(true)}
+            aria-label={t("login.switch")}
+            title={t("login.switch")}
+          >
             <Icon name="back" size={22} />
           </button>
         )}
@@ -233,10 +245,13 @@ export function Welcome() {
       const id = window.setTimeout(() => setPhase("os"), 1500);
       return () => window.clearTimeout(id);
     }
-    const id = window.setTimeout(() => {
-      if (step < steps.length - 1) setStep(step + 1);
-      else setPhase("os");
-    }, step === 2 ? 5200 : 2400);
+    const id = window.setTimeout(
+      () => {
+        if (step < steps.length - 1) setStep(step + 1);
+        else setPhase("os");
+      },
+      step === 2 ? 5200 : 2400,
+    );
     return () => window.clearTimeout(id);
   }, [step, steps, setPhase]);
 
@@ -260,11 +275,7 @@ export function Welcome() {
   // The first-run sequence slowly cycles through the Start colors, like the real setup screens.
   const hue = COLORS[(color + step * 3) % COLORS.length];
   return (
-    <div
-      className="hi"
-      style={{ background: hue.bg }}
-      onClick={() => setPhase("os")}
-    >
+    <div className="hi" style={{ background: hue.bg }} onClick={() => setPhase("os")}>
       <div key={step} className="hi-text">
         {t(steps[step])}
       </div>
@@ -297,7 +308,11 @@ export function Pattern({ offset = 0 }: { offset?: number }) {
   if (pattern === "none") return null;
   if (pattern === "desktop")
     return (
-      <div className="pattern pattern-desktop" aria-hidden="true" style={{ transform: `translate3d(${-offset * 0.05}px,0,0)` }}>
+      <div
+        className="pattern pattern-desktop"
+        aria-hidden="true"
+        style={{ transform: `translate3d(${-offset * 0.05}px,0,0)` }}
+      >
         <Wallpaper value={wallpaper} className="pattern-wallpaper" />
       </div>
     );
@@ -307,15 +322,25 @@ export function Pattern({ offset = 0 }: { offset?: number }) {
         {pattern === "waves" &&
           Array.from({ length: 18 }, (_, i) => {
             let d = `M0 ${120 + i * 9}`;
-            for (let x = 0; x <= 1600; x += 20) d += ` L${x} ${(120 + i * 9 + Math.sin(x / 140 + i * 0.35) * (40 + i * 2) + Math.sin(x / 47) * 6).toFixed(1)}`;
-            return <path key={i} d={d} fill="none" stroke="#fff" strokeOpacity={0.05 + (i % 5) * 0.012} strokeWidth="1.2" />;
+            for (let x = 0; x <= 1600; x += 20)
+              d += ` L${x} ${(120 + i * 9 + Math.sin(x / 140 + i * 0.35) * (40 + i * 2) + Math.sin(x / 47) * 6).toFixed(1)}`;
+            return (
+              <path key={i} d={d} fill="none" stroke="#fff" strokeOpacity={0.05 + (i % 5) * 0.012} strokeWidth="1.2" />
+            );
           })}
         {pattern === "geo" &&
           Array.from({ length: 40 }, (_, i) => {
             const x = (i * 97) % 1600;
             const y = (i * 53) % 400;
             const s = 30 + ((i * 37) % 90);
-            return <polygon key={i} points={`${x},${y} ${x + s},${y + s * 0.5} ${x},${y + s}`} fill="#fff" fillOpacity={0.025 + (i % 4) * 0.012} />;
+            return (
+              <polygon
+                key={i}
+                points={`${x},${y} ${x + s},${y + s * 0.5} ${x},${y + s}`}
+                fill="#fff"
+                fillOpacity={0.025 + (i % 4) * 0.012}
+              />
+            );
           })}
         {pattern === "circuit" &&
           Array.from({ length: 34 }, (_, i) => {
@@ -331,7 +356,14 @@ export function Pattern({ offset = 0 }: { offset?: number }) {
           })}
         {pattern === "bubbles" &&
           Array.from({ length: 46 }, (_, i) => (
-            <circle key={i} cx={(i * 113) % 1600} cy={(i * 61) % 400} r={8 + ((i * 17) % 60)} fill="#fff" fillOpacity={0.02 + (i % 5) * 0.01} />
+            <circle
+              key={i}
+              cx={(i * 113) % 1600}
+              cy={(i * 61) % 400}
+              r={8 + ((i * 17) % 60)}
+              fill="#fff"
+              fillOpacity={0.02 + (i % 5) * 0.01}
+            />
           ))}
       </svg>
     </div>

@@ -26,12 +26,25 @@ export async function confirmDelete(paths: string[], { lang, owner }: { lang: La
   const name = n ? (n.orig ? basename(n.orig) : fs.label(n, lang)) : "";
   const text = inBin
     ? paths.length > 1
-      ? tr ? `Bu ${paths.length} öğeyi kalıcı olarak silmek istediğinizden emin misiniz?` : `Are you sure you want to permanently delete these ${paths.length} items?`
-      : tr ? `'${name}' kalıcı olarak silinsin mi?` : `Are you sure you want to permanently delete '${name}'?`
+      ? tr
+        ? `Bu ${paths.length} öğeyi kalıcı olarak silmek istediğinizden emin misiniz?`
+        : `Are you sure you want to permanently delete these ${paths.length} items?`
+      : tr
+        ? `'${name}' kalıcı olarak silinsin mi?`
+        : `Are you sure you want to permanently delete '${name}'?`
     : paths.length > 1
-      ? tr ? `Bu ${paths.length} öğeyi Geri Dönüşüm Kutusu'na taşımak istediğinizden emin misiniz?` : `Are you sure you want to move these ${paths.length} items to the Recycle Bin?`
-      : tr ? `'${name}' öğesini Geri Dönüşüm Kutusu'na taşımak istediğinizden emin misiniz?` : `Are you sure you want to move '${name}' to the Recycle Bin?`;
-  const r = await msgBox(owner, { title: inBin ? (tr ? "Dosyayı Sil" : "Delete File") : tr ? "Öğeyi Sil" : "Delete Item", text, icon: "warning", buttons: [tr ? "Evet" : "Yes", tr ? "Hayır" : "No"] });
+      ? tr
+        ? `Bu ${paths.length} öğeyi Geri Dönüşüm Kutusu'na taşımak istediğinizden emin misiniz?`
+        : `Are you sure you want to move these ${paths.length} items to the Recycle Bin?`
+      : tr
+        ? `'${name}' öğesini Geri Dönüşüm Kutusu'na taşımak istediğinizden emin misiniz?`
+        : `Are you sure you want to move '${name}' to the Recycle Bin?`;
+  const r = await msgBox(owner, {
+    title: inBin ? (tr ? "Dosyayı Sil" : "Delete File") : tr ? "Öğeyi Sil" : "Delete Item",
+    text,
+    icon: "warning",
+    buttons: [tr ? "Evet" : "Yes", tr ? "Hayır" : "No"],
+  });
   if (r !== 0) return;
   for (const p of paths) {
     try {
@@ -51,7 +64,11 @@ export function itemMenu(paths: string[], c: Ctx): MenuItem[] {
   const inBin = first.toLowerCase().startsWith(RECYCLE.toLowerCase());
   if (inBin) {
     return [
-      { label: tr ? "Geri yükle" : "Restore", bold: true, onClick: () => paths.forEach((p) => fs.restore(basename(p))) },
+      {
+        label: tr ? "Geri yükle" : "Restore",
+        bold: true,
+        onClick: () => paths.forEach((p) => fs.restore(basename(p))),
+      },
       { sep: true },
       { label: tr ? "Kes" : "Cut", disabled: true },
       { sep: true },
@@ -65,8 +82,17 @@ export function itemMenu(paths: string[], c: Ctx): MenuItem[] {
   const ext = extname(n.name);
   return [
     { label: tr ? "Aç" : "Open", bold: true, onClick: () => c.openPath(first) },
-    ...(isDir ? [{ label: tr ? "Yeni pencerede aç" : "Open in new window", onClick: () => c.open({ kind: "app", app: "explorer", param: first }) }] : []),
-    ...(n.kind === "txt" || n.kind === "img" ? [{ label: tr ? "Düzenle" : "Edit", onClick: n.kind === "img" ? openWith("paint") : openWith("notepad") }] : []),
+    ...(isDir
+      ? [
+          {
+            label: tr ? "Yeni pencerede aç" : "Open in new window",
+            onClick: () => c.open({ kind: "app", app: "explorer", param: first }),
+          },
+        ]
+      : []),
+    ...(n.kind === "txt" || n.kind === "img"
+      ? [{ label: tr ? "Düzenle" : "Edit", onClick: n.kind === "img" ? openWith("paint") : openWith("notepad") }]
+      : []),
     ...(!isDir && n.kind !== "exe" && n.kind !== "lnk"
       ? [
           {
@@ -75,19 +101,42 @@ export function itemMenu(paths: string[], c: Ctx): MenuItem[] {
               { label: tr ? "Not Defteri" : "Notepad", onClick: openWith("notepad") },
               { label: "WordPad", onClick: openWith("wordpad") },
               { label: "Paint", onClick: openWith("paint"), disabled: n.kind !== "img" },
-              { label: "Internet Explorer", onClick: openWith("ie"), disabled: !["html", "htm", "txt", "url"].includes(ext) && n.kind !== "url" },
+              {
+                label: "Internet Explorer",
+                onClick: openWith("ie"),
+                disabled: !["html", "htm", "txt", "url"].includes(ext) && n.kind !== "url",
+              },
             ] as MenuItem[],
           },
         ]
       : []),
-    ...(n.kind === "img" ? [{ label: tr ? "Masaüstü arka planı olarak ayarla" : "Set as desktop background", onClick: () => window.dispatchEvent(new CustomEvent("w8:wallpaper", { detail: first })) }] : []),
+    ...(n.kind === "img"
+      ? [
+          {
+            label: tr ? "Masaüstü arka planı olarak ayarla" : "Set as desktop background",
+            onClick: () => window.dispatchEvent(new CustomEvent("w8:wallpaper", { detail: first })),
+          },
+        ]
+      : []),
     { sep: true },
-    { label: tr ? "Gönder" : "Send to", sub: [{ label: tr ? "Masaüstü (kısayol oluştur)" : "Desktop (create shortcut)", onClick: () => makeShortcut(first, KNOWN.desktop, c.lang) }, { label: tr ? "Belgeler" : "Documents", onClick: () => fs.copy(first, KNOWN.documents) }] },
+    {
+      label: tr ? "Gönder" : "Send to",
+      sub: [
+        {
+          label: tr ? "Masaüstü (kısayol oluştur)" : "Desktop (create shortcut)",
+          onClick: () => makeShortcut(first, KNOWN.desktop, c.lang),
+        },
+        { label: tr ? "Belgeler" : "Documents", onClick: () => fs.copy(first, KNOWN.documents) },
+      ],
+    },
     { sep: true },
     { label: tr ? "Kes" : "Cut", onClick: () => shellClipboard.set(paths, true) },
     { label: tr ? "Kopyala" : "Copy", onClick: () => shellClipboard.set(paths, false) },
     { sep: true },
-    { label: tr ? "Kısayol oluştur" : "Create shortcut", onClick: () => makeShortcut(first, join(first, ".."), c.lang) },
+    {
+      label: tr ? "Kısayol oluştur" : "Create shortcut",
+      onClick: () => makeShortcut(first, join(first, ".."), c.lang),
+    },
     { label: tr ? "Sil" : "Delete", onClick: () => void confirmDelete(paths, c) },
     { label: tr ? "Yeniden adlandır" : "Rename", onClick: () => c.rename(first), disabled: paths.length > 1 },
     { sep: true },
@@ -116,11 +165,23 @@ export function newMenu(dir: string, lang: Lang, created: (p: string) => void): 
     label: tr ? "Yeni" : "New",
     sub: [
       { label: tr ? "Klasör" : "Folder", onClick: make(tr ? "Yeni klasör" : "New folder", "dir") },
-      { label: tr ? "Kısayol" : "Shortcut", onClick: make(tr ? "Yeni kısayol.lnk" : "New shortcut.lnk", { kind: "lnk", target: "app:ie", size: 1024 }) },
+      {
+        label: tr ? "Kısayol" : "Shortcut",
+        onClick: make(tr ? "Yeni kısayol.lnk" : "New shortcut.lnk", { kind: "lnk", target: "app:ie", size: 1024 }),
+      },
       { sep: true },
-      { label: tr ? "Bit Eşlem Resmi" : "Bitmap image", onClick: make(tr ? "Yeni Bit Eşlem Resmi.bmp" : "New Bitmap Image.bmp", { kind: "img" }) },
-      { label: tr ? "Zengin Metin Belgesi" : "Rich Text Document", onClick: make(tr ? "Yeni Zengin Metin Belgesi.rtf" : "New Rich Text Document.rtf", { kind: "rtf", text: "" }) },
-      { label: tr ? "Metin Belgesi" : "Text Document", onClick: make(tr ? "Yeni Metin Belgesi.txt" : "New Text Document.txt", { kind: "txt", text: "" }) },
+      {
+        label: tr ? "Bit Eşlem Resmi" : "Bitmap image",
+        onClick: make(tr ? "Yeni Bit Eşlem Resmi.bmp" : "New Bitmap Image.bmp", { kind: "img" }),
+      },
+      {
+        label: tr ? "Zengin Metin Belgesi" : "Rich Text Document",
+        onClick: make(tr ? "Yeni Zengin Metin Belgesi.rtf" : "New Rich Text Document.rtf", { kind: "rtf", text: "" }),
+      },
+      {
+        label: tr ? "Metin Belgesi" : "Text Document",
+        onClick: make(tr ? "Yeni Metin Belgesi.txt" : "New Text Document.txt", { kind: "txt", text: "" }),
+      },
     ],
   };
 }

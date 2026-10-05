@@ -44,7 +44,10 @@ function Spectrum({ on }: { on: boolean }) {
 export function MusicApp() {
   const { t, track, trackStarted, playTrack } = useOS();
   const now = useTick(500);
-  const idx = Math.max(0, TRACKS.findIndex((x) => x.id === track));
+  const idx = Math.max(
+    0,
+    TRACKS.findIndex((x) => x.id === track),
+  );
   const cur = TRACKS[idx];
   const playing = !!track;
   const elapsed = playing ? ((now - trackStarted) / 1000) % cur.seconds : 0;
@@ -71,13 +74,25 @@ export function MusicApp() {
             <span>{mmss(cur.seconds)}</span>
           </div>
           <div className="music-controls">
-            <button className="circle-btn" onClick={() => playTrack(TRACKS[(idx + TRACKS.length - 1) % TRACKS.length].id)} aria-label="prev">
+            <button
+              className="circle-btn"
+              onClick={() => playTrack(TRACKS[(idx + TRACKS.length - 1) % TRACKS.length].id)}
+              aria-label="prev"
+            >
               <Icon name="prev" size={20} />
             </button>
-            <button className="circle-btn big" onClick={() => playTrack(playing ? null : cur.id)} aria-label={playing ? t("music.pause") : t("music.play")}>
+            <button
+              className="circle-btn big"
+              onClick={() => playTrack(playing ? null : cur.id)}
+              aria-label={playing ? t("music.pause") : t("music.play")}
+            >
               <Icon name={playing ? "pause" : "play"} size={26} />
             </button>
-            <button className="circle-btn" onClick={() => playTrack(TRACKS[(idx + 1) % TRACKS.length].id)} aria-label="next">
+            <button
+              className="circle-btn"
+              onClick={() => playTrack(TRACKS[(idx + 1) % TRACKS.length].id)}
+              aria-label="next"
+            >
               <Icon name="next" size={20} />
             </button>
           </div>
@@ -98,7 +113,12 @@ export function MusicApp() {
           content: (
             <div className="tracks">
               {TRACKS.map((x, i) => (
-                <button key={x.id} className={`track ${track === x.id ? "on" : ""}`} onClick={() => playTrack(track === x.id ? null : x.id)} data-nav>
+                <button
+                  key={x.id}
+                  className={`track ${track === x.id ? "on" : ""}`}
+                  onClick={() => playTrack(track === x.id ? null : x.id)}
+                  data-nav
+                >
                   <span className="track-art">
                     <CoverArt seed={x.id} motif="rings" palette={x.palette} />
                     <Icon name={track === x.id ? "pause" : "play"} size={18} />

@@ -4,28 +4,195 @@ import type { L, Tier } from "./types";
 import { projects, socials } from "@/content/portfolio";
 
 export type MetroAppId =
-  | "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings"
-  | "weather" | "news" | "sports" | "finance" | "travel" | "maps" | "camera" | "alarms" | "soundrec" | "video" | "skydrive";
+  | "projects"
+  | "profile"
+  | "mail"
+  | "reader"
+  | "photos"
+  | "music"
+  | "achievements"
+  | "calendar"
+  | "desktop"
+  | "settings"
+  | "weather"
+  | "news"
+  | "sports"
+  | "finance"
+  | "travel"
+  | "maps"
+  | "camera"
+  | "alarms"
+  | "soundrec"
+  | "video"
+  | "skydrive";
 export type DesktopAppId =
-  | "explorer" | "ie" | "notepad" | "wordpad" | "paint" | "calc" | "cmd" | "taskmgr" | "control" | "minesweeper" | "run" | "winver";
+  | "explorer"
+  | "ie"
+  | "notepad"
+  | "wordpad"
+  | "paint"
+  | "calc"
+  | "cmd"
+  | "taskmgr"
+  | "control"
+  | "minesweeper"
+  | "run"
+  | "winver";
 export type AppId = MetroAppId | DesktopAppId;
 
 export type IconName =
-  | "projects" | "profile" | "mail" | "reader" | "photos" | "music" | "achievements" | "calendar" | "desktop" | "settings"
-  | "weather" | "news" | "sports" | "finance" | "travel" | "maps" | "camera" | "alarms" | "soundrec" | "video" | "skydrive" | "ie" | "calculator" | "help"
-  | "search" | "share" | "start" | "devices" | "power" | "back" | "forward" | "down" | "up" | "play" | "pause" | "next" | "prev"
-  | "github" | "linkedin" | "x" | "blog" | "cv" | "close" | "minus" | "plus" | "check" | "folder" | "file" | "image" | "pc"
-  | "keyboard" | "mouse" | "touch" | "print" | "link" | "bell" | "globe" | "volume" | "mute" | "motion" | "brush" | "pin"
-  | "unpin" | "resize" | "lock" | "user" | "wifi" | "battery" | "star" | "new" | "send" | "reply" | "trash" | "maximize" | "restore" | "refresh"
-  | "record" | "stop" | "location" | "camera-switch" | "timer" | "stopwatch" | "edit" | "save" | "list" | "grid" | "flag" | "ease";
+  | "projects"
+  | "profile"
+  | "mail"
+  | "reader"
+  | "photos"
+  | "music"
+  | "achievements"
+  | "calendar"
+  | "desktop"
+  | "settings"
+  | "weather"
+  | "news"
+  | "sports"
+  | "finance"
+  | "travel"
+  | "maps"
+  | "camera"
+  | "alarms"
+  | "soundrec"
+  | "video"
+  | "skydrive"
+  | "ie"
+  | "calculator"
+  | "help"
+  | "search"
+  | "share"
+  | "start"
+  | "devices"
+  | "power"
+  | "back"
+  | "forward"
+  | "down"
+  | "up"
+  | "play"
+  | "pause"
+  | "next"
+  | "prev"
+  | "github"
+  | "linkedin"
+  | "x"
+  | "blog"
+  | "cv"
+  | "close"
+  | "minus"
+  | "plus"
+  | "check"
+  | "folder"
+  | "file"
+  | "image"
+  | "pc"
+  | "keyboard"
+  | "mouse"
+  | "touch"
+  | "print"
+  | "link"
+  | "bell"
+  | "globe"
+  | "volume"
+  | "mute"
+  | "motion"
+  | "brush"
+  | "pin"
+  | "unpin"
+  | "resize"
+  | "lock"
+  | "user"
+  | "wifi"
+  | "battery"
+  | "star"
+  | "new"
+  | "send"
+  | "reply"
+  | "trash"
+  | "maximize"
+  | "restore"
+  | "refresh"
+  | "record"
+  | "stop"
+  | "location"
+  | "camera-switch"
+  | "timer"
+  | "stopwatch"
+  | "edit"
+  | "save"
+  | "list"
+  | "grid"
+  | "flag"
+  | "ease";
 
 /** Colorful desktop (Win32) icon names, drawn in components/icons/ShellIcons.tsx. */
 export type ShellIconName =
-  | "folder" | "folder-open" | "folder-documents" | "folder-pictures" | "folder-music" | "folder-videos" | "folder-downloads" | "folder-desktop" | "folder-user"
-  | "thispc" | "drive" | "drive-system" | "dvd" | "network" | "recycle-empty" | "recycle-full" | "libraries" | "favorites" | "homegroup"
-  | "explorer" | "ie" | "notepad" | "wordpad" | "paint" | "calc" | "cmd" | "taskmgr" | "control" | "minesweeper" | "run" | "windows"
-  | "file" | "file-txt" | "file-rtf" | "file-img" | "file-url" | "file-exe" | "file-html" | "file-audio" | "file-video" | "file-lnk"
-  | "msg-info" | "msg-warning" | "msg-error" | "msg-question" | "shield" | "user" | "display" | "personalize" | "clock" | "programs" | "sound" | "mouse" | "keyboard" | "power" | "fonts" | "region" | "ease" | "devices" | "accounts" | "update";
+  | "folder"
+  | "folder-open"
+  | "folder-documents"
+  | "folder-pictures"
+  | "folder-music"
+  | "folder-videos"
+  | "folder-downloads"
+  | "folder-desktop"
+  | "folder-user"
+  | "thispc"
+  | "drive"
+  | "drive-system"
+  | "dvd"
+  | "network"
+  | "recycle-empty"
+  | "recycle-full"
+  | "libraries"
+  | "favorites"
+  | "homegroup"
+  | "explorer"
+  | "ie"
+  | "notepad"
+  | "wordpad"
+  | "paint"
+  | "calc"
+  | "cmd"
+  | "taskmgr"
+  | "control"
+  | "minesweeper"
+  | "run"
+  | "windows"
+  | "file"
+  | "file-txt"
+  | "file-rtf"
+  | "file-img"
+  | "file-url"
+  | "file-exe"
+  | "file-html"
+  | "file-audio"
+  | "file-video"
+  | "file-lnk"
+  | "msg-info"
+  | "msg-warning"
+  | "msg-error"
+  | "msg-question"
+  | "shield"
+  | "user"
+  | "display"
+  | "personalize"
+  | "clock"
+  | "programs"
+  | "sound"
+  | "mouse"
+  | "keyboard"
+  | "power"
+  | "fonts"
+  | "region"
+  | "ease"
+  | "devices"
+  | "accounts"
+  | "update";
 
 export type AppDef = {
   id: AppId;
@@ -45,8 +212,24 @@ export type AppDef = {
   cat?: "apps" | "accessories" | "system" | "games";
 };
 
-const m = (id: MetroAppId, title: Key, color: string, icon: IconName, extra: Partial<AppDef> = {}): AppDef => ({ id, title, color, icon, kind: "metro", cat: "apps", ...extra });
-const d = (id: DesktopAppId, title: Key, color: string, shell: ShellIconName, exe: string, cat: AppDef["cat"], extra: Partial<AppDef> = {}): AppDef => ({
+const m = (id: MetroAppId, title: Key, color: string, icon: IconName, extra: Partial<AppDef> = {}): AppDef => ({
+  id,
+  title,
+  color,
+  icon,
+  kind: "metro",
+  cat: "apps",
+  ...extra,
+});
+const d = (
+  id: DesktopAppId,
+  title: Key,
+  color: string,
+  shell: ShellIconName,
+  exe: string,
+  cat: AppDef["cat"],
+  extra: Partial<AppDef> = {},
+): AppDef => ({
   id,
   title,
   color,
@@ -102,7 +285,15 @@ export const isDesktopApp = (id: string): id is DesktopAppId => APPS.some((a) =>
 export function appByExe(name: string): AppDef | undefined {
   const n = name.trim().toLowerCase().replace(/^"|"$/g, "").split(/[\\/]/).pop() ?? "";
   const base = n.replace(/\.exe$/, "");
-  const alias: Record<string, string> = { iexplore: "ie", mspaint: "paint", write: "wordpad", explorer: "explorer", control: "control", calc: "calc", taskmgr: "taskmgr" };
+  const alias: Record<string, string> = {
+    iexplore: "ie",
+    mspaint: "paint",
+    write: "wordpad",
+    explorer: "explorer",
+    control: "control",
+    calc: "calc",
+    taskmgr: "taskmgr",
+  };
   return APPS.find((a) => a.exe?.replace(/\.exe$/, "") === base || a.id === (alias[base] ?? base));
 }
 
@@ -132,13 +323,34 @@ export function sizesFor(key: string): TileSize[] {
   if (ref.kind === "social") return ["small", "medium"];
   if (ref.kind === "project") return ["small", "medium", "wide", "large"];
   if (isDesktopApp(ref.id)) return ["small", "medium"];
-  if (["profile", "photos", "reader", "desktop", "music", "projects", "news", "weather", "travel", "calendar", "mail"].includes(ref.id)) return ["small", "medium", "wide", "large"];
+  if (
+    [
+      "profile",
+      "photos",
+      "reader",
+      "desktop",
+      "music",
+      "projects",
+      "news",
+      "weather",
+      "travel",
+      "calendar",
+      "mail",
+    ].includes(ref.id)
+  )
+    return ["small", "medium", "wide", "large"];
   if (["ie", "settings", "camera", "alarms", "soundrec"].includes(ref.id)) return ["small", "medium"];
   return ["small", "medium", "wide"];
 }
 
 export function defaultTiles(): TileState[] {
-  const t = (key: string, size: TileSize, group: GroupId): TileState => ({ key, size, group, live: true, pinned: true });
+  const t = (key: string, size: TileSize, group: GroupId): TileState => ({
+    key,
+    size,
+    group,
+    live: true,
+    pinned: true,
+  });
   const featured = projects.filter((p) => !p.sample).map((p) => p.id);
   return [
     // A Windows 8.1 Start screen, column by column (tiles flow top to bottom, then to the next column).
@@ -162,7 +374,9 @@ export function defaultTiles(): TileState[] {
     t("app:sports", "wide", "info"),
     t("app:reader", "medium", "info"),
     t("app:alarms", "medium", "info"),
-    ...projects.map((p, i) => t(`project:${p.id}`, i === 0 ? "large" : i < featured.length ? "wide" : "medium", "projects")),
+    ...projects.map((p, i) =>
+      t(`project:${p.id}`, i === 0 ? "large" : i < featured.length ? "wide" : "medium", "projects"),
+    ),
     t("app:explorer", "medium", "tools"),
     t("app:control", "medium", "tools"),
     t("app:settings", "medium", "tools"),
@@ -232,24 +446,115 @@ export type Pattern = (typeof PATTERNS)[number];
 
 export type VisitorAchievement = { id: string; name: L; detail: L; tier: Tier; points: number };
 export const VISITOR_ACHIEVEMENTS: VisitorAchievement[] = [
-  { id: "signin", name: { tr: "Merhaba", en: "Hello" }, detail: { tr: "İlk kez oturum aç", en: "Sign in for the first time" }, tier: "bronze", points: 10 },
-  { id: "unlock", name: { tr: "Perdeyi kaldır", en: "Raise the curtain" }, detail: { tr: "Kilit ekranını sürükleyerek aç", en: "Drag the lock screen open" }, tier: "bronze", points: 10 },
-  { id: "charms", name: { tr: "Köşe avcısı", en: "Corner hunter" }, detail: { tr: "Charm çubuğunu aç", en: "Open the charms bar" }, tier: "silver", points: 20 },
-  { id: "explorer", name: { tr: "Kâşif", en: "Explorer" }, detail: { tr: "Üç farklı proje aç", en: "Open three different projects" }, tier: "silver", points: 20 },
-  { id: "zoom", name: { tr: "Kuş bakışı", en: "Bird's eye" }, detail: { tr: "Başlangıç ekranını uzaklaştır", en: "Zoom out the Start screen" }, tier: "bronze", points: 10 },
-  { id: "painter", name: { tr: "Ressam", en: "Painter" }, detail: { tr: "Renkleri ya da deseni değiştir", en: "Change the colors or the pattern" }, tier: "bronze", points: 10 },
-  { id: "architect", name: { tr: "Mimar", en: "Architect" }, detail: { tr: "Bir kutucuğu yeniden boyutlandır", en: "Resize a tile" }, tier: "silver", points: 20 },
-  { id: "desktop", name: { tr: "Eski dostlar", en: "Old friends" }, detail: { tr: "Masaüstüne geç", en: "Visit the desktop" }, tier: "bronze", points: 10 },
-  { id: "dj", name: { tr: "DJ", en: "DJ" }, detail: { tr: "Bir parça çal", en: "Play a track" }, tier: "bronze", points: 10 },
-  { id: "letter", name: { tr: "Mektup arkadaşı", en: "Pen pal" }, detail: { tr: "Yeni bir e-posta başlat", en: "Start a new email" }, tier: "silver", points: 20 },
-  { id: "bookworm", name: { tr: "Kitap kurdu", en: "Bookworm" }, detail: { tr: "İki yazı aç", en: "Open two articles" }, tier: "silver", points: 20 },
-  { id: "completionist", name: { tr: "Tamamlayıcı", en: "Completionist" }, detail: { tr: "Diğer tüm başarıları kazan", en: "Earn every other achievement" }, tier: "platinum", points: 100 },
+  {
+    id: "signin",
+    name: { tr: "Merhaba", en: "Hello" },
+    detail: { tr: "İlk kez oturum aç", en: "Sign in for the first time" },
+    tier: "bronze",
+    points: 10,
+  },
+  {
+    id: "unlock",
+    name: { tr: "Perdeyi kaldır", en: "Raise the curtain" },
+    detail: { tr: "Kilit ekranını sürükleyerek aç", en: "Drag the lock screen open" },
+    tier: "bronze",
+    points: 10,
+  },
+  {
+    id: "charms",
+    name: { tr: "Köşe avcısı", en: "Corner hunter" },
+    detail: { tr: "Charm çubuğunu aç", en: "Open the charms bar" },
+    tier: "silver",
+    points: 20,
+  },
+  {
+    id: "explorer",
+    name: { tr: "Kâşif", en: "Explorer" },
+    detail: { tr: "Üç farklı proje aç", en: "Open three different projects" },
+    tier: "silver",
+    points: 20,
+  },
+  {
+    id: "zoom",
+    name: { tr: "Kuş bakışı", en: "Bird's eye" },
+    detail: { tr: "Başlangıç ekranını uzaklaştır", en: "Zoom out the Start screen" },
+    tier: "bronze",
+    points: 10,
+  },
+  {
+    id: "painter",
+    name: { tr: "Ressam", en: "Painter" },
+    detail: { tr: "Renkleri ya da deseni değiştir", en: "Change the colors or the pattern" },
+    tier: "bronze",
+    points: 10,
+  },
+  {
+    id: "architect",
+    name: { tr: "Mimar", en: "Architect" },
+    detail: { tr: "Bir kutucuğu yeniden boyutlandır", en: "Resize a tile" },
+    tier: "silver",
+    points: 20,
+  },
+  {
+    id: "desktop",
+    name: { tr: "Eski dostlar", en: "Old friends" },
+    detail: { tr: "Masaüstüne geç", en: "Visit the desktop" },
+    tier: "bronze",
+    points: 10,
+  },
+  {
+    id: "dj",
+    name: { tr: "DJ", en: "DJ" },
+    detail: { tr: "Bir parça çal", en: "Play a track" },
+    tier: "bronze",
+    points: 10,
+  },
+  {
+    id: "letter",
+    name: { tr: "Mektup arkadaşı", en: "Pen pal" },
+    detail: { tr: "Yeni bir e-posta başlat", en: "Start a new email" },
+    tier: "silver",
+    points: 20,
+  },
+  {
+    id: "bookworm",
+    name: { tr: "Kitap kurdu", en: "Bookworm" },
+    detail: { tr: "İki yazı aç", en: "Open two articles" },
+    tier: "silver",
+    points: 20,
+  },
+  {
+    id: "completionist",
+    name: { tr: "Tamamlayıcı", en: "Completionist" },
+    detail: { tr: "Diğer tüm başarıları kazan", en: "Earn every other achievement" },
+    tier: "platinum",
+    points: 100,
+  },
 ];
 
-export const TIER_COLOR: Record<Tier, string> = { bronze: "#c8834a", silver: "#c9d1d9", gold: "#f4c542", platinum: "#9fd8ff" };
+export const TIER_COLOR: Record<Tier, string> = {
+  bronze: "#c8834a",
+  silver: "#c9d1d9",
+  gold: "#f4c542",
+  platinum: "#9fd8ff",
+};
 
 export const socialIcon = (id: string): IconName =>
-  (({ github: "github", linkedin: "linkedin", mail: "mail", x: "x", blog: "blog", cv: "cv" }) as Record<string, IconName>)[id] ?? "link";
+  (
+    ({ github: "github", linkedin: "linkedin", mail: "mail", x: "x", blog: "blog", cv: "cv" }) as Record<
+      string,
+      IconName
+    >
+  )[id] ?? "link";
 
 export const socialColor = (id: string) =>
-  (({ github: "#24292f", linkedin: "#0a66c2", mail: "#0072c6", x: "#333333", blog: "#a20025", cv: "#d24726" }) as Record<string, string>)[id] ?? "#555";
+  (
+    ({
+      github: "#24292f",
+      linkedin: "#0a66c2",
+      mail: "#0072c6",
+      x: "#333333",
+      blog: "#a20025",
+      cv: "#d24726",
+    }) as Record<string, string>
+  )[id] ?? "#555";

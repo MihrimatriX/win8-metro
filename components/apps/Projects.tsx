@@ -10,13 +10,39 @@ import { CoverArt } from "../CoverArt";
 import { Icon } from "../Icons";
 import { Hub, type Section } from "../AppHost";
 
-export function ProjectArt({ p, variant = 0, animated, className }: { p: Project; variant?: number; animated?: boolean; className?: string }) {
-  return <CoverArt className={className ?? "fill-art"} seed={p.id} motif={p.motif} palette={p.palette} variant={variant} animated={animated} />;
+export function ProjectArt({
+  p,
+  variant = 0,
+  animated,
+  className,
+}: {
+  p: Project;
+  variant?: number;
+  animated?: boolean;
+  className?: string;
+}) {
+  return (
+    <CoverArt
+      className={className ?? "fill-art"}
+      seed={p.id}
+      motif={p.motif}
+      palette={p.palette}
+      variant={variant}
+      animated={animated}
+    />
+  );
 }
 
 export function Logo({ p, className }: { p: Project; className?: string }) {
   return (
-    <div className={`p-logo font-${p.logo.font} ${className ?? ""}`} style={p.logo.gradient ? { backgroundImage: `linear-gradient(90deg, ${p.logo.gradient[0]}, ${p.logo.gradient[1]})` } : undefined}>
+    <div
+      className={`p-logo font-${p.logo.font} ${className ?? ""}`}
+      style={
+        p.logo.gradient
+          ? { backgroundImage: `linear-gradient(90deg, ${p.logo.gradient[0]}, ${p.logo.gradient[1]})` }
+          : undefined
+      }
+    >
       <span className={p.logo.caps ? "caps" : undefined}>{p.title}</span>
     </div>
   );
@@ -243,10 +269,24 @@ function ProjectPage({ p }: { p: Project }) {
       {shot !== null && (
         <div className="viewer" onClick={() => setShot(null)}>
           <ProjectArt p={p} variant={shot} animated className="viewer-art" />
-          <button className="viewer-nav prev" onClick={(e) => { e.stopPropagation(); setShot(((shot + 2) % 4) + 1); }} aria-label="prev">
+          <button
+            className="viewer-nav prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShot(((shot + 2) % 4) + 1);
+            }}
+            aria-label="prev"
+          >
             <Icon name="back" size={22} />
           </button>
-          <button className="viewer-nav next" onClick={(e) => { e.stopPropagation(); setShot((shot % 4) + 1); }} aria-label="next">
+          <button
+            className="viewer-nav next"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShot((shot % 4) + 1);
+            }}
+            aria-label="next"
+          >
             <Icon name="forward" size={22} />
           </button>
           <span className="viewer-caption">

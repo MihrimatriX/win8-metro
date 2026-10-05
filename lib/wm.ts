@@ -32,7 +32,17 @@ export type Win = {
   seq: number;
 };
 
-export type LaunchOpts = { arg?: string; w?: number; h?: number; x?: number; y?: number; fixed?: boolean; owner?: string; max?: boolean; title?: string };
+export type LaunchOpts = {
+  arg?: string;
+  w?: number;
+  h?: number;
+  x?: number;
+  y?: number;
+  fixed?: boolean;
+  owner?: string;
+  max?: boolean;
+  title?: string;
+};
 
 type State = { wins: Win[]; order: string[]; focus: string | null };
 
@@ -50,7 +60,7 @@ const SIZES: Partial<Record<WinApp, [number, number]>> = {
   ie: [1000, 640],
   notepad: [640, 460],
   wordpad: [820, 560],
-  paint: [900, 600],
+  paint: [1100, 640],
   calc: [228, 322],
   cmd: [680, 400],
   taskmgr: [560, 520],
@@ -97,7 +107,9 @@ export const wm = {
     const cascade = (state.wins.filter((x) => !x.owner).length % 8) * 26;
     const owner = opts.owner ? state.wins.find((x) => x.id === opts.owner) : undefined;
     const x = opts.x ?? (owner ? owner.x + (owner.w - w) / 2 : Math.max(8, Math.round((vw - w) / 2 - 90 + cascade)));
-    const y = opts.y ?? (owner ? owner.y + Math.max(30, (owner.h - h) / 3) : Math.max(8, Math.round((vh - h) / 2 - 50 + cascade)));
+    const y =
+      opts.y ??
+      (owner ? owner.y + Math.max(30, (owner.h - h) / 3) : Math.max(8, Math.round((vh - h) / 2 - 50 + cascade)));
     const id = `${app}-${seq}`;
     const win: Win = {
       id,
@@ -141,7 +153,11 @@ export const wm = {
     let grew = true;
     while (grew) {
       grew = false;
-      for (const w of state.wins) if (w.owner && doomed.has(w.owner) && !doomed.has(w.id)) (doomed.add(w.id), (grew = true));
+      for (const w of state.wins)
+        if (w.owner && doomed.has(w.owner) && !doomed.has(w.id)) {
+          doomed.add(w.id);
+          grew = true;
+        }
     }
     const wins = state.wins.filter((w) => !doomed.has(w.id));
     const order = state.order.filter((o) => !doomed.has(o));
@@ -190,7 +206,10 @@ export const wm = {
   /** Show desktop: minimize everything (or restore if all are minimized). */
   showDesktop() {
     const all = state.wins.every((w) => w.min);
-    set({ wins: state.wins.map((w) => ({ ...w, min: !all })), focus: all ? (state.order[state.order.length - 1] ?? null) : null });
+    set({
+      wins: state.wins.map((w) => ({ ...w, min: !all })),
+      focus: all ? (state.order[state.order.length - 1] ?? null) : null,
+    });
   },
   closeAll() {
     guards.clear();

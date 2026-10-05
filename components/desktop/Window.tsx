@@ -32,11 +32,27 @@ const Body = memo(function Body({ Comp }: { Comp: ComponentType }) {
   return <Comp />;
 });
 
-export function Window({ win, z, focused, modal, Comp }: { win: Win; z: number; focused: boolean; modal: boolean; Comp: ComponentType }) {
+export function Window({
+  win,
+  z,
+  focused,
+  modal,
+  Comp,
+}: {
+  win: Win;
+  z: number;
+  focused: boolean;
+  modal: boolean;
+  Comp: ComponentType;
+}) {
   const { t, winColor } = useOS();
   const el = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ dx: number; dy: number; sx: number; sy: number; moved: boolean; x: number; y: number } | null>(null);
-  const size = useRef<{ dir: string; x: number; y: number; r: { x: number; y: number; w: number; h: number } } | null>(null);
+  const drag = useRef<{ dx: number; dy: number; sx: number; sy: number; moved: boolean; x: number; y: number } | null>(
+    null,
+  );
+  const size = useRef<{ dir: string; x: number; y: number; r: { x: number; y: number; w: number; h: number } } | null>(
+    null,
+  );
   const [zone, setZone] = useState<Zone>(null);
   const docked = win.max || !!win.snap;
   const def = win.app === "dialog" ? null : appDef(win.app);
@@ -61,8 +77,17 @@ export function Window({ win, z, focused, modal, Comp }: { win: Win; z: number; 
     e.currentTarget.setPointerCapture(e.pointerId);
     // A docked window comes loose under the pointer at its normal size, like Aero Snap.
     const r = el.current?.getBoundingClientRect();
-    const dx = docked && r ? Math.min(win.w - 60, Math.max(60, ((e.clientX - r.left) / r.width) * win.w)) : e.clientX - win.x;
-    drag.current = { dx, dy: docked ? 12 : e.clientY - win.y, sx: e.clientX, sy: e.clientY, moved: false, x: win.x, y: win.y };
+    const dx =
+      docked && r ? Math.min(win.w - 60, Math.max(60, ((e.clientX - r.left) / r.width) * win.w)) : e.clientX - win.x;
+    drag.current = {
+      dx,
+      dy: docked ? 12 : e.clientY - win.y,
+      sx: e.clientX,
+      sy: e.clientY,
+      moved: false,
+      x: win.x,
+      y: win.y,
+    };
   };
   const onMove = (e: React.PointerEvent) => {
     const d = drag.current;
@@ -100,7 +125,12 @@ export function Window({ win, z, focused, modal, Comp }: { win: Win; z: number; 
     const dy = e.clientY - s.y;
     const nw = Math.max(260, s.r.w + (s.dir.includes("e") ? dx : s.dir.includes("w") ? -dx : 0));
     const nh = Math.max(160, s.r.h + (s.dir.includes("s") ? dy : s.dir.includes("n") ? -dy : 0));
-    wm.patch(win.id, { w: nw, h: nh, x: s.dir.includes("w") ? s.r.x + s.r.w - nw : s.r.x, y: s.dir.includes("n") ? Math.max(0, s.r.y + s.r.h - nh) : s.r.y });
+    wm.patch(win.id, {
+      w: nw,
+      h: nh,
+      x: s.dir.includes("w") ? s.r.x + s.r.w - nw : s.r.x,
+      y: s.dir.includes("n") ? Math.max(0, s.r.y + s.r.h - nh) : s.r.y,
+    });
   };
 
   const full = { top: 0, height: `calc(100% - ${TASKBAR_H}px)` };
@@ -108,7 +138,11 @@ export function Window({ win, z, focused, modal, Comp }: { win: Win; z: number; 
     zIndex: z,
     "--frame": winColor,
     "--caption-ink": captionInk(winColor),
-    ...(win.max ? { ...full, left: 0, width: "100%" } : win.snap ? { ...full, left: win.snap === "left" ? 0 : "50%", width: "50%" } : { left: win.x, top: win.y, width: win.w, height: win.h }),
+    ...(win.max
+      ? { ...full, left: 0, width: "100%" }
+      : win.snap
+        ? { ...full, left: win.snap === "left" ? 0 : "50%", width: "50%" }
+        : { left: win.x, top: win.y, width: win.w, height: win.h }),
   } as unknown as React.CSSProperties;
 
   return (
@@ -125,21 +159,45 @@ export function Window({ win, z, focused, modal, Comp }: { win: Win; z: number; 
         {!docked &&
           !win.fixed &&
           ["n", "s", "e", "w", "ne", "nw", "se", "sw"].map((d) => (
-            <div key={d} className={`rz rz-${d}`} onPointerDown={startSize(d)} onPointerMove={onSize} onPointerUp={() => (size.current = null)} />
+            <div
+              key={d}
+              className={`rz rz-${d}`}
+              onPointerDown={startSize(d)}
+              onPointerMove={onSize}
+              onPointerUp={() => (size.current = null)}
+            />
           ))}
-        <div className="w8-titlebar" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onDoubleClick={() => wm.toggleMax(win.id)}>
+        <div
+          className="w8-titlebar"
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onDoubleClick={() => wm.toggleMax(win.id)}
+        >
           <span className="w8-titlebar-icon">{def && <AppIcon id={def.id} size={16} />}</span>
-          <span className="w8-titlebar-text">{title}</span>
+          <span className="w8-titlebar-text">
+            <span>{title}</span>
+          </span>
           <div className="w8-caption">
             {!isDialog && (
-              <button className="w8-cap" onClick={() => wm.minimize(win.id)} aria-label={t("win.minimize")} title={t("win.minimize")}>
+              <button
+                className="w8-cap"
+                onClick={() => wm.minimize(win.id)}
+                aria-label={t("win.minimize")}
+                title={t("win.minimize")}
+              >
                 <svg width="10" height="10" viewBox="0 0 10 10">
                   <path d="M0 8.5h10" stroke="currentColor" strokeWidth="1.6" />
                 </svg>
               </button>
             )}
             {!isDialog && (
-              <button className="w8-cap" disabled={win.fixed} onClick={() => wm.toggleMax(win.id)} aria-label="maximize">
+              <button
+                className="w8-cap"
+                disabled={win.fixed}
+                onClick={() => wm.toggleMax(win.id)}
+                aria-label="maximize"
+              >
                 {docked ? (
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor">
                     <rect x="0.5" y="2.5" width="7" height="7" />
@@ -153,7 +211,12 @@ export function Window({ win, z, focused, modal, Comp }: { win: Win; z: number; 
                 )}
               </button>
             )}
-            <button className="w8-cap w8-cap-close" onClick={() => void wm.requestClose(win.id)} aria-label={t("win.close")} title={t("win.close")}>
+            <button
+              className="w8-cap w8-cap-close"
+              onClick={() => void wm.requestClose(win.id)}
+              aria-label={t("win.close")}
+              title={t("win.close")}
+            >
               <svg width="10" height="10" viewBox="0 0 10 10">
                 <path d="M1 1l8 8M9 1 1 9" stroke="currentColor" strokeWidth="1.6" />
               </svg>

@@ -17,6 +17,7 @@ const ABOUT_TITLES: Record<string, { tr: string; en: string }> = {
   wordpad: { tr: "WordPad Hakkında", en: "About WordPad" },
   paint: { tr: "Paint Hakkında", en: "About Paint" },
   calc: { tr: "Hesap Makinesi Hakkında", en: "About Calculator" },
+  minesweeper: { tr: "Mayın Tarlası Hakkında", en: "About Minesweeper" },
 };
 
 const LICENSE_URL = "https://www.microsoft.com/useterms";
@@ -47,7 +48,9 @@ export default function WinverApp() {
           <br />
           {tr ? "Sürüm 6.3 (Derleme 9600)" : "Version 6.3 (Build 9600)"}
           <br />
-          {tr ? "© 2013 Microsoft Corporation. Tüm hakları saklıdır." : "© 2013 Microsoft Corporation. All rights reserved."}
+          {tr
+            ? "© 2013 Microsoft Corporation. Tüm hakları saklıdır."
+            : "© 2013 Microsoft Corporation. All rights reserved."}
         </p>
         <p>
           {tr

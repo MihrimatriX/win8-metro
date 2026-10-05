@@ -9,11 +9,17 @@ function gear(cx: number, cy: number, rOut: number, rIn: number, teeth: number, 
   const at = (r: number, a: number) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
   for (let k = 0; k < teeth; k++) {
     const a = k * pitch - Math.PI / 2;
-    pts.push(at(rIn, a - pitch * 0.34), at(rOut, a - pitch * 0.2), at(rOut, a + pitch * 0.2), at(rIn, a + pitch * 0.34));
+    pts.push(
+      at(rIn, a - pitch * 0.34),
+      at(rOut, a - pitch * 0.2),
+      at(rOut, a + pitch * 0.2),
+      at(rIn, a + pitch * 0.34),
+    );
   }
   return `M${pts.join("L")}Z M${cx - hole} ${cy}a${hole} ${hole} 0 1 0 ${hole * 2} 0a${hole} ${hole} 0 1 0 ${-hole * 2} 0Z`;
 }
-const dot = (cx: number, cy: number, r: number) => `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0Z`;
+const dot = (cx: number, cy: number, r: number) =>
+  `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0Z`;
 const F = { fill: "currentColor", stroke: "none" } as const;
 
 /** The Windows 8 logo: a four-pane window seen in perspective. */
@@ -34,7 +40,11 @@ const P: Record<IconName, React.ReactNode | ((uid: string) => React.ReactNode)> 
   // ---- App glyphs, drawn after Segoe UI Symbol: even strokes, square ends, solid fills. ----
   projects: (
     <>
-      <path {...F} fillRule="evenodd" d="M4.5 8.5h15l-1 12.5h-13zM9.3 12.3h2.4v2.4H9.3zM12.3 12.3h2.4v2.4h-2.4zM9.3 15.3h2.4v2.4H9.3zM12.3 15.3h2.4v2.4h-2.4z" />
+      <path
+        {...F}
+        fillRule="evenodd"
+        d="M4.5 8.5h15l-1 12.5h-13zM9.3 12.3h2.4v2.4H9.3zM12.3 12.3h2.4v2.4h-2.4zM9.3 15.3h2.4v2.4H9.3zM12.3 15.3h2.4v2.4h-2.4z"
+      />
       <path d="M8.6 8.5V7a3.4 3.4 0 0 1 6.8 0v1.5" strokeWidth="1.5" />
     </>
   ),
@@ -106,7 +116,10 @@ const P: Record<IconName, React.ReactNode | ((uid: string) => React.ReactNode)> 
   weather: (
     <>
       <path {...F} d={dot(12, 12, 4.2)} />
-      <path d="M12 2.3v3M12 18.7v3M2.3 12h3M18.7 12h3M5.1 5.1l2.1 2.1M16.8 16.8l2.1 2.1M18.9 5.1l-2.1 2.1M7.2 16.8l-2.1 2.1" strokeWidth="1.8" />
+      <path
+        d="M12 2.3v3M12 18.7v3M2.3 12h3M18.7 12h3M5.1 5.1l2.1 2.1M16.8 16.8l2.1 2.1M18.9 5.1l-2.1 2.1M7.2 16.8l-2.1 2.1"
+        strokeWidth="1.8"
+      />
     </>
   ),
   news: (
@@ -186,14 +199,25 @@ const P: Record<IconName, React.ReactNode | ((uid: string) => React.ReactNode)> 
         <path d={IE_E} fill="none" stroke="#000" strokeWidth="5" />
       </mask>
       <path d={IE_E} strokeWidth="2.6" />
-      <ellipse cx="12" cy="12.6" rx="10.6" ry="4.1" transform="rotate(-30 12 12.6)" strokeWidth="1.5" mask={`url(#${uid}ie)`} />
+      <ellipse
+        cx="12"
+        cy="12.6"
+        rx="10.6"
+        ry="4.1"
+        transform="rotate(-30 12 12.6)"
+        strokeWidth="1.5"
+        mask={`url(#${uid}ie)`}
+      />
     </>
   ),
   calculator: (
     <>
       <rect x="5.5" y="3" width="13" height="18" rx="0.8" strokeWidth="1.5" />
       <rect {...F} x="7.8" y="5.3" width="8.4" height="3" />
-      <path {...F} d="M8 10.6h1.8v1.8H8zM11.1 10.6h1.8v1.8h-1.8zM14.2 10.6H16v1.8h-1.8zM8 13.6h1.8v1.8H8zM11.1 13.6h1.8v1.8h-1.8zM14.2 13.6H16v1.8h-1.8zM8 16.6h1.8v1.8H8zM11.1 16.6h1.8v1.8h-1.8zM14.2 16.6H16v1.8h-1.8z" />
+      <path
+        {...F}
+        d="M8 10.6h1.8v1.8H8zM11.1 10.6h1.8v1.8h-1.8zM14.2 10.6H16v1.8h-1.8zM8 13.6h1.8v1.8H8zM11.1 13.6h1.8v1.8h-1.8zM14.2 13.6H16v1.8h-1.8zM8 16.6h1.8v1.8H8zM11.1 16.6h1.8v1.8h-1.8zM14.2 16.6H16v1.8h-1.8z"
+      />
     </>
   ),
   help: (
@@ -480,7 +504,17 @@ const P: Record<IconName, React.ReactNode | ((uid: string) => React.ReactNode)> 
   ),
 };
 
-export function Icon({ name, size = 24, className, strokeWidth = 1.6 }: { name: IconName; size?: number | string; className?: string; strokeWidth?: number }) {
+export function Icon({
+  name,
+  size = 24,
+  className,
+  strokeWidth = 1.6,
+}: {
+  name: IconName;
+  size?: number | string;
+  className?: string;
+  strokeWidth?: number;
+}) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const glyph = P[name];
   return (
@@ -502,7 +536,15 @@ export function Icon({ name, size = 24, className, strokeWidth = 1.6 }: { name: 
 }
 
 /** The Windows 8 logo (boot screen, Start button, charms). */
-export function WinLogo({ size = 64, className, color = "currentColor" }: { size?: number; className?: string; color?: string }) {
+export function WinLogo({
+  size = 64,
+  className,
+  color = "currentColor",
+}: {
+  size?: number;
+  className?: string;
+  color?: string;
+}) {
   return (
     <svg className={className} width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
       {WIN_PANES.map((pts) => (

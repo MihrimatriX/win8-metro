@@ -121,7 +121,9 @@ function findPath(name: string): string | null {
   const n = name.trim().replace(/^"|"$/g, "");
   if (!n) return null;
   if (/^[a-z]:$/i.test(n)) return fs.exists(`${n}\\`) ? normalize(`${n}\\`) : null;
-  const candidates = /^[a-z]:|^\\/i.test(n) ? [resolve(HOME, n)] : [resolve(HOME, n), resolve("C:\\Windows\\System32", n), resolve("C:\\Windows", n)];
+  const candidates = /^[a-z]:|^\\/i.test(n)
+    ? [resolve(HOME, n)]
+    : [resolve(HOME, n), resolve("C:\\Windows\\System32", n), resolve("C:\\Windows", n)];
   for (const c of candidates) {
     if (fs.exists(c)) return c;
     // "notepad" finds notepad.exe in the Windows folders.
@@ -135,19 +137,16 @@ export default function RunApp() {
   const { lang, open } = useOS();
   const openPath = useOpenPath();
   const tr = lang === "tr";
-  const [mru, setMru] = useState<string[]>([]);
-  const [value, setValue] = useState("");
+  // Start with the last command, selected — like the real dialog.
+  const [mru, setMru] = useState(loadMru);
+  const [value, setValue] = useState(() => mru[0] ?? "");
   const [list, setList] = useState(false);
   const [hot, setHot] = useState(-1);
   const input = useRef<HTMLInputElement>(null);
   const busy = useRef(false);
   const fieldId = useId();
 
-  // Start with the last command, selected — like the real dialog.
   useEffect(() => {
-    const m = loadMru();
-    setMru(m);
-    if (m[0]) setValue(m[0]);
     window.setTimeout(() => {
       input.current?.focus();
       input.current?.select();
@@ -200,7 +199,9 @@ export default function RunApp() {
     const [prog, args] = splitCommand(cmd);
     const progLow = prog.toLowerCase().replace(/\.exe$/, "");
     if (progLow === "control") {
-      const page = args ? CONTROL[args.toLowerCase().replace(/^\/name\s+microsoft\./, "")] ?? args.toLowerCase() : undefined;
+      const page = args
+        ? (CONTROL[args.toLowerCase().replace(/^\/name\s+microsoft\./, "")] ?? args.toLowerCase())
+        : undefined;
       launch("control", page);
       return true;
     }
@@ -285,7 +286,11 @@ export default function RunApp() {
       <div className="run-main">
         <div className="run-head">
           <ShellIcon name="run" size={32} />
-          <p>{tr ? "Bir program, klasör, belge veya İnternet kaynağının adını yazın; Windows sizin için açsın." : "Type the name of a program, folder, document, or Internet resource, and Windows will open it for you."}</p>
+          <p>
+            {tr
+              ? "Bir program, klasör, belge veya İnternet kaynağının adını yazın; Windows sizin için açsın."
+              : "Type the name of a program, folder, document, or Internet resource, and Windows will open it for you."}
+          </p>
         </div>
         <div className="run-row">
           <label htmlFor={fieldId}>

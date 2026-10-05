@@ -1,11 +1,40 @@
 import type { Metadata, Viewport } from "next";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Windows 8.1 · AFU",
-  description:
-    "Tarayıcıda çalışan bir Windows 8.1 klonu: Başlangıç ekranı, canlı kutucuklar, charm çubuğu, gerçek pencereli masaüstü ve çalışan uygulamalar. / A Windows 8.1 clone that runs in the browser: Start screen, live tiles, charms, a real windowed desktop and working apps.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: "Ahmet Faruk Uzunkaya", url: "https://github.com/MihrimatriX" }],
+  keywords: ["Windows 8.1", "Metro UI", "Windows 8 web", "React", "Next.js", "portfolyo", "Ahmet Faruk Uzunkaya"],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    locale: "tr_TR",
+    alternateLocale: "en_US",
+  },
+  twitter: { card: "summary_large_image", title: SITE_NAME, description: SITE_DESCRIPTION },
 };
+
+// schema.org data for rich results; the whole site is one browser app.
+const JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  applicationCategory: "EntertainmentApplication",
+  operatingSystem: "Web",
+  inLanguage: "tr",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "TRY" },
+  author: { "@type": "Person", name: "Ahmet Faruk Uzunkaya", url: "https://github.com/MihrimatriX" },
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -23,8 +52,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link rel="stylesheet" href={FONTS} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON_LD }} />
       </head>
       <body>{children}</body>
     </html>

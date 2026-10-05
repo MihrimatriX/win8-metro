@@ -76,7 +76,9 @@ function ReaderHub() {
 function Article({ m }: { m: MediaItem }) {
   const { t, lang, phone } = useOS();
   const link = useOpenLink();
-  const more = sorted().filter((x) => x.id !== m.id).slice(0, 3);
+  const more = sorted()
+    .filter((x) => x.id !== m.id)
+    .slice(0, 3);
   return (
     <div className="article">
       {!phone && (
@@ -92,7 +94,8 @@ function Article({ m }: { m: MediaItem }) {
         <div className="article-text">
           {phone && <BackButton />}
           <small className="accent-text">
-            {t(`kind.${m.kind}`).toLocaleUpperCase(lang)} · {formatDate(lang, m.date)} · {m.minutes} {t("minutes")} {t("reader.readTime")}
+            {t(`kind.${m.kind}`).toLocaleUpperCase(lang)} · {formatDate(lang, m.date)} · {m.minutes} {t("minutes")}{" "}
+            {t("reader.readTime")}
           </small>
           <h1>{pick(lang, m.title)}</h1>
           {m.sample && <span className="sample-badge">{t("sample")}</span>}

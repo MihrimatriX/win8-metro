@@ -9,6 +9,8 @@
   overflow: hidden;
   font: 12px/1.4 var(--font);
   color: #000;
+  /* Win32 is light: native inputs, selects and scrollbars must not inherit Metro's dark scheme. */
+  color-scheme: light;
   --frame: #6aa9e9;
   --sel-bg: #cce8ff;
   --sel-border: #99d1ff;
@@ -199,22 +201,39 @@
   height: 16px;
   margin: 0 4px 0 1px;
 }
+/* Centered on the window like Windows 8; when it can't fit, it slides left into the space between icon and buttons.
+   ::before carries the 78px (104 - 26) centering offset and gives it up first (huge flex-shrink). */
 .w8-titlebar-text {
   position: absolute;
-  left: 110px;
-  right: 110px;
-  text-align: center;
+  left: 26px;
+  right: 104px;
+  display: flex;
   font-size: 15px;
   white-space: nowrap;
+  pointer-events: none;
+}
+.w8-titlebar-text::before {
+  content: "";
+  flex: 1 1000 78px;
+}
+.w8-titlebar-text::after {
+  content: "";
+  flex: 1 1 0;
+}
+/* Never shrinks (even a fractional shrink would show "…"); only truly long titles hit the cap and ellipsize. */
+.w8-titlebar-text > span {
+  flex-shrink: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  pointer-events: none;
 }
 .w8-win.dialog .w8-titlebar-text {
   left: 30px;
   right: 50px;
-  text-align: left;
   font-size: 14px;
+}
+.w8-win.dialog .w8-titlebar-text::before {
+  display: none;
 }
 .w8-win.maxed .w8-titlebar-text {
   font-size: 13px;

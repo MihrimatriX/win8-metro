@@ -144,9 +144,7 @@ function Desktop() {
   const onDesktop = view.kind === "app" && view.app === "desktop";
   // The desktop stays mounted after the first visit so its windows survive trips to Start.
   const [deskMounted, setDeskMounted] = useState(false);
-  useEffect(() => {
-    if (onDesktop) setDeskMounted(true);
-  }, [onDesktop]);
+  if (onDesktop && !deskMounted) setDeskMounted(true);
 
   return (
     <div className="desk" data-view={view.kind}>

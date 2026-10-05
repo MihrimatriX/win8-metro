@@ -1,0 +1,377 @@
+/* ==========================================================================
+   Paint (pt-*): ribbon extras (tool grid, shape gallery, color palette), the blue-grey workspace with the
+   bitmap and its drag handles, the status bar with the zoom slider, and the Properties / Resize dialogs.
+   ========================================================================== */
+.pt {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+}
+.pt-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  left: -9999px;
+}
+
+/* quick access: undo / redo */
+.pt-qat {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-right: 4px;
+}
+.pt-qat button {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+}
+.pt-qat button:hover:not(:disabled) {
+  background: #e5f3ff;
+  border-color: #cde6f7;
+}
+.pt-qat button:disabled {
+  opacity: 0.4;
+}
+
+/* small square ribbon buttons: tools, shapes, font styles */
+.pt-tb {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  color: #000;
+}
+.pt-tb:hover {
+  background: #e5f3ff;
+  border-color: #cde6f7;
+}
+.pt-tb:active,
+.pt-tb.on {
+  background: #c4e0f7;
+  border-color: #92c0e0;
+}
+.pt-tools {
+  display: grid;
+  grid-template-columns: repeat(3, 22px);
+  gap: 2px;
+  padding: 8px 2px 0;
+}
+.pt-gallery {
+  display: grid;
+  grid-template-columns: repeat(6, 20px);
+  grid-auto-rows: 20px;
+  height: 66px;
+  margin: 2px 4px 0 0;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #dadbdc;
+}
+.pt-gallery .pt-tb {
+  width: 20px;
+  height: 20px;
+}
+
+/* colors */
+.pt-colors {
+  display: flex;
+  gap: 2px;
+  height: 70px;
+}
+.pt-cbig {
+  width: 44px;
+  height: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding-top: 3px;
+  border: 1px solid transparent;
+  line-height: 13px;
+  text-align: center;
+  color: #000;
+}
+.pt-cbig:hover {
+  background: #e5f3ff;
+  border-color: #cde6f7;
+}
+.pt-cbig.on {
+  background: #c4e0f7;
+  border-color: #92c0e0;
+}
+.pt-cbig-sw {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #808080;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.pt-pal {
+  display: grid;
+  grid-template-columns: repeat(10, 21px);
+  grid-auto-rows: 21px;
+  padding: 2px 4px 0;
+}
+.pt-sw {
+  width: 17px;
+  height: 17px;
+  margin: 2px;
+  border: 1px solid #a0a0a0;
+  box-shadow: inset 0 0 0 1px #fff;
+}
+.pt-sw:hover:not(:disabled) {
+  outline: 1px solid #92c0e0;
+  outline-offset: 1px;
+}
+.pt-sw:disabled {
+  border-color: #d5d5d5;
+}
+
+/* view tab checkboxes, text tab font row */
+.pt-chk {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 6px 0 2px;
+  white-space: nowrap;
+}
+.pt-font {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 4px 0;
+}
+.pt-font > div {
+  display: flex;
+  gap: 3px;
+}
+.pt-font-fam {
+  width: 140px;
+}
+.pt-fs-bold {
+  font-weight: 700;
+}
+.pt-fs-italic {
+  font-style: italic;
+  font-family: "Times New Roman", serif;
+  font-size: 14px;
+}
+.pt-fs-underline {
+  text-decoration: underline;
+}
+
+/* workspace */
+.pt-work {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: #cbd5e4;
+}
+.pt-pad {
+  width: max-content;
+  padding: 5px 12px 12px 5px;
+}
+.pt-page {
+  position: relative;
+  box-shadow: 1px 1px 3px rgba(60, 80, 110, 0.35);
+  cursor: crosshair;
+  touch-action: none;
+}
+.pt-page canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+.pt-page.px canvas {
+  image-rendering: pixelated;
+}
+.pt-page.cur-text {
+  cursor: text;
+}
+.pt-page.cur-zoom {
+  cursor: zoom-in;
+}
+.pt-page.cur-eraser {
+  cursor: none;
+}
+.pt-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 1px, transparent 1px);
+}
+.pt-marq {
+  position: absolute;
+  pointer-events: none;
+  outline: 1px dashed #3a62a7;
+}
+.pt-marq.sel {
+  pointer-events: auto;
+  cursor: move;
+}
+.pt-text {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 1px dashed #3a62a7;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  cursor: text;
+}
+.pt-ecur {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid #000;
+  background: rgba(255, 255, 255, 0.6);
+}
+.pt-ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  outline: 1px dashed #000;
+}
+.pt-h {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  border: 1px solid #556;
+}
+.pt-h.e {
+  left: 100%;
+  top: calc(50% - 3px);
+  margin-left: 1px;
+  cursor: ew-resize;
+}
+.pt-h.s {
+  top: 100%;
+  left: calc(50% - 3px);
+  margin-top: 1px;
+  cursor: ns-resize;
+}
+.pt-h.se {
+  left: 100%;
+  top: 100%;
+  margin: 1px 0 0 1px;
+  cursor: nwse-resize;
+}
+
+/* status bar */
+.pt-status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background: #f0f0f0;
+  border-top: 1px solid #dadbdc;
+  color: #000;
+}
+.pt-st {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 140px;
+  height: 100%;
+  padding: 0 6px;
+  border-right: 1px solid #dadbdc;
+  white-space: nowrap;
+}
+.pt-st-fill {
+  flex: 1;
+}
+.pt-zoom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px 0 6px;
+}
+.pt-zoom-pct {
+  min-width: 42px;
+  text-align: right;
+}
+.pt-zoom button {
+  width: 16px;
+  height: 16px;
+  line-height: 14px;
+  color: #444;
+}
+.pt-zoom input {
+  width: 110px;
+}
+
+/* full screen */
+.pt-full {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: grid;
+  place-items: center;
+  background: #000;
+  cursor: default;
+}
+.pt-full img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* dialogs */
+.pt-dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 12px;
+  background: #f0f0f0;
+  color: #000;
+  font-size: 12px;
+}
+.pt-group {
+  border: 1px solid #dcdcdc;
+  padding: 6px 10px 10px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pt-group legend {
+  padding: 0 3px;
+}
+.pt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pt-row > span {
+  width: 72px;
+}
+.pt-row .w8-input {
+  width: 80px;
+}
+.pt-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pt-dlg-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: auto;
+}

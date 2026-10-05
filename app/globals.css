@@ -4451,7 +4451,17 @@ html[data-phone-theme="light"] .phone {
 .sig {
   width: 16px;
   height: 11px;
-  background: linear-gradient(90deg, currentColor 3px, transparent 3px 4px, currentColor 4px 7px, transparent 7px 8px, currentColor 8px 11px, transparent 11px 12px, currentColor 12px 15px, transparent 15px);
+  background: linear-gradient(
+    90deg,
+    currentColor 3px,
+    transparent 3px 4px,
+    currentColor 4px 7px,
+    transparent 7px 8px,
+    currentColor 8px 11px,
+    transparent 11px 12px,
+    currentColor 12px 15px,
+    transparent 15px
+  );
   clip-path: polygon(0 100%, 100% 0, 100% 100%);
 }
 .phone-main {

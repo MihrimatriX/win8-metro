@@ -51,7 +51,12 @@ export function MailApp({ param }: { param?: string }) {
             <button className="icon-btn" onClick={send} aria-label={t("mail.send")} title={t("mail.send")}>
               <Icon name="send" size={22} />
             </button>
-            <button className="icon-btn" onClick={() => (param === "compose" ? os.back() : setCompose(false))} aria-label={t("mail.cancel")} title={t("mail.cancel")}>
+            <button
+              className="icon-btn"
+              onClick={() => (param === "compose" ? os.back() : setCompose(false))}
+              aria-label={t("mail.cancel")}
+              title={t("mail.cancel")}
+            >
               <Icon name="close" size={22} />
             </button>
           </div>
@@ -63,8 +68,20 @@ export function MailApp({ param }: { param?: string }) {
               {profile.name} &lt;{to}&gt;
             </span>
           </label>
-          <input className="mail-subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t("mail.subjectDefault")} aria-label={t("mail.subject")} />
-          <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder={t("mail.body")} aria-label={t("mail.body")} autoFocus />
+          <input
+            className="mail-subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder={t("mail.subjectDefault")}
+            aria-label={t("mail.subject")}
+          />
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={t("mail.body")}
+            aria-label={t("mail.body")}
+            autoFocus
+          />
         </div>
       </div>
     );
@@ -84,7 +101,12 @@ export function MailApp({ param }: { param?: string }) {
         </button>
       </header>
       {inbox.map((m) => (
-        <button key={m.id} className={`mail-item ${sel === m.id ? "on" : ""} ${m.unread && !read.has(m.id) ? "unread" : ""}`} onClick={() => pickMsg(m.id)} data-nav>
+        <button
+          key={m.id}
+          className={`mail-item ${sel === m.id ? "on" : ""} ${m.unread && !read.has(m.id) ? "unread" : ""}`}
+          onClick={() => pickMsg(m.id)}
+          data-nav
+        >
           <span className="mail-item-top">
             <strong>{m.from}</strong>
             <small>{formatDate(lang, m.date)}</small>
@@ -111,7 +133,15 @@ export function MailApp({ param }: { param?: string }) {
             <strong>{msg.from}</strong>
             <small>{formatDate(lang, msg.date)}</small>
           </span>
-          <button className="icon-btn" onClick={() => { setSubject(`Re: ${pick(lang, msg.subject)}`); setCompose(true); }} aria-label={t("mail.reply")} title={t("mail.reply")}>
+          <button
+            className="icon-btn"
+            onClick={() => {
+              setSubject(`Re: ${pick(lang, msg.subject)}`);
+              setCompose(true);
+            }}
+            aria-label={t("mail.reply")}
+            title={t("mail.reply")}
+          >
             <Icon name="reply" size={22} />
           </button>
         </div>
@@ -156,7 +186,13 @@ export function MailApp({ param }: { param?: string }) {
         {socials
           .filter((s) => s.id !== "mail")
           .map((s) => (
-            <a key={s.id} className="mail-folder" href={s.url === "#" ? undefined : s.url} target="_blank" rel="noreferrer">
+            <a
+              key={s.id}
+              className="mail-folder"
+              href={s.url === "#" ? undefined : s.url}
+              target="_blank"
+              rel="noreferrer"
+            >
               <Icon name={socialIcon(s.id)} size={16} />
               <span>{s.label}</span>
             </a>

@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useOS } from "@/lib/os";
-import { fs, useFS, join, basename, KNOWN, RECYCLE, type ArtSpec, type FNode } from "@/lib/fs";
+import { fs, useFS, join, basename, KNOWN, RECYCLE, type FNode } from "@/lib/fs";
 import { wm, useWM, TASKBAR_H } from "@/lib/wm";
 import { sound } from "@/lib/sound";
 import type { ShellIconName } from "@/lib/model";
@@ -15,29 +15,12 @@ import { PowerUserMenu } from "../Charms";
 import { Window } from "./Window";
 import { Taskbar } from "./Taskbar";
 import { PROGRAMS } from "./registry";
-import { ContextMenu, type MenuItem } from "./ui";
+import { Wallpaper } from "./Wallpaper";
+import { ContextMenu, RenameBox, type MenuItem } from "./ui";
 import { DND_TYPE, nodeIcon, readDrag, shellClipboard, useOpenPath } from "./shell";
 import { confirmDelete, itemMenu, newMenu } from "./fileMenu";
 import { showProperties } from "./Properties";
 import "./desktop.css";
-
-const DEFAULT_ART: ArtSpec = { seed: "wallpaper", motif: "dunes", palette: ["#0b1a3a", "#1e4fa8", "#7dd3fc"] };
-
-/** The desktop background for a wallpaper setting: a solid color, a saved picture or generated art. */
-export function Wallpaper({ value, className, animated }: { value: string; className?: string; animated?: boolean }) {
-  useFS();
-  if (value.startsWith("color:")) return <div className={className} style={{ background: value.slice(6) }} />;
-  const n = fs.get(value);
-  if (n?.data)
-    return (
-      <div className={className}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={n.data} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-      </div>
-    );
-  const art = n?.art ?? DEFAULT_ART;
-  return <CoverArt className={className} seed={art.seed} motif={art.motif} palette={art.palette} variant={art.variant} animated={animated} />;
-}
 
 type Item = { key: string; path: string | null; label: string; icon: ShellIconName; node?: FNode; shortcut?: boolean };
 type Pos = Record<string, { c: number; r: number }>;
@@ -64,18 +47,16 @@ export function DesktopShell({ active }: { active: boolean }) {
   const [menu, setMenu] = useState<{ x: number; y: number; items: MenuItem[] } | null>(null);
   const [winx, setWinx] = useState(false);
   const [network, setNetwork] = useState(false);
-  const [pos, setPos] = useState<Pos>({});
-  const [iconSize, setIconSize] = useState<32 | 48 | 96>(48);
+  // The desktop only mounts after a client-side visit, so storage and window are safe to read up front.
+  const [pos, setPos] = useState<Pos>(() => loadJSON(POS_KEY, {}));
+  const [iconSize, setIconSize] = useState<32 | 48 | 96>(() => loadJSON(VIEW_KEY, 48));
   const [band, setBand] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
-  const [vh, setVh] = useState(800);
+  const [vh, setVh] = useState(() => window.innerHeight);
   const layer = useRef<HTMLDivElement>(null);
   const tr = lang === "tr";
 
   useEffect(() => {
-    setPos(loadJSON(POS_KEY, {}));
-    setIconSize(loadJSON(VIEW_KEY, 48));
     const r = () => setVh(window.innerHeight);
-    r();
     window.addEventListener("resize", r);
     return () => window.removeEventListener("resize", r);
   }, []);
@@ -99,11 +80,23 @@ export function DesktopShell({ active }: { active: boolean }) {
   const items: Item[] = useMemo(() => {
     const files = fs.list(KNOWN.desktop).map((n) => {
       const p = join(KNOWN.desktop, n.name);
-      return { key: p, path: p, label: n.kind === "lnk" || n.kind === "url" ? n.name.replace(/\.(lnk|url)$/i, "") : fs.label(n, lang), icon: nodeIcon(n, p), node: n, shortcut: n.kind === "lnk" || n.kind === "url" };
+      return {
+        key: p,
+        path: p,
+        label: n.kind === "lnk" || n.kind === "url" ? n.name.replace(/\.(lnk|url)$/i, "") : fs.label(n, lang),
+        icon: nodeIcon(n, p),
+        node: n,
+        shortcut: n.kind === "lnk" || n.kind === "url",
+      };
     });
     return [
       { key: "::thispc", path: null, label: t("desk.thisPc"), icon: "thispc" as ShellIconName },
-      { key: "::recycle", path: null, label: t("desk.recycle"), icon: (binFull ? "recycle-full" : "recycle-empty") as ShellIconName },
+      {
+        key: "::recycle",
+        path: null,
+        label: t("desk.recycle"),
+        icon: (binFull ? "recycle-full" : "recycle-empty") as ShellIconName,
+      },
       ...files,
     ];
     // fs version drives the re-render through useFS
@@ -156,13 +149,18 @@ export function DesktopShell({ active }: { active: boolean }) {
     [openPath],
   );
 
-  const cellAt = (x: number, y: number) => ({ c: Math.max(0, Math.floor((x - 4) / cellW)), r: Math.max(0, Math.min(rows - 1, Math.floor((y - 4) / cellH))) });
+  const cellAt = (x: number, y: number) => ({
+    c: Math.max(0, Math.floor((x - 4) / cellW)),
+    r: Math.max(0, Math.min(rows - 1, Math.floor((y - 4) / cellH))),
+  });
 
   const placeAt = (keys: string[], x: number, y: number) => {
     const base = cellAt(x, y);
     setPos((cur) => {
       const next = { ...cur };
-      const occupied = new Set([...layout.entries()].filter(([k]) => !keys.includes(k)).map(([, v]) => `${v.c},${v.r}`));
+      const occupied = new Set(
+        [...layout.entries()].filter(([k]) => !keys.includes(k)).map(([, v]) => `${v.c},${v.r}`),
+      );
       let k = base.c * rows + base.r;
       for (const key of keys) {
         while (occupied.has(`${Math.floor(k / rows)},${k % rows}`)) k++;
@@ -184,14 +182,14 @@ export function DesktopShell({ active }: { active: boolean }) {
     const y = e.clientY - r.top;
     const target = (e.target as HTMLElement).closest<HTMLElement>("[data-dkey]")?.dataset.dkey;
     if (target === "::recycle") {
-      for (const p of paths) fs.exists(p) && fs.remove(p);
+      for (const p of paths) if (fs.exists(p)) fs.remove(p);
       sound.recycle();
       return;
     }
     if (target && target !== "::thispc" && !paths.includes(target) && fs.isDir(target)) {
       for (const p of paths) {
         try {
-          e.ctrlKey ? fs.copy(p, target) : fs.move(p, target);
+          (e.ctrlKey ? fs.copy : fs.move)(p, target);
         } catch {
           /* into itself */
         }
@@ -250,7 +248,8 @@ export function DesktopShell({ active }: { active: boolean }) {
       else if (e.key === "Enter" && sel.length) items.filter((i) => sel.includes(i.key)).forEach(activate);
       else if (e.key === "F5") setPos((p) => ({ ...p }));
       else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") setSel(items.map((i) => i.key));
-      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c" && paths.length) shellClipboard.set(paths, false);
+      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c" && paths.length)
+        shellClipboard.set(paths, false);
       else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "x" && paths.length) shellClipboard.set(paths, true);
       else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") shellClipboard.paste(KNOWN.desktop);
       else return;
@@ -267,11 +266,14 @@ export function DesktopShell({ active }: { active: boolean }) {
       [32, tr ? "Küçük simgeler" : "Small icons"],
     ];
     const sortBy = (key: "name" | "type" | "date") => () => {
-      const sorted = [...items].filter((i) => i.path).sort((a, b) => {
-        if (key === "name") return a.label.localeCompare(b.label, lang);
-        if (key === "type") return (a.node?.kind ?? "").localeCompare(b.node?.kind ?? "") || a.label.localeCompare(b.label, lang);
-        return (b.node?.modified ?? 0) - (a.node?.modified ?? 0);
-      });
+      const sorted = [...items]
+        .filter((i) => i.path)
+        .sort((a, b) => {
+          if (key === "name") return a.label.localeCompare(b.label, lang);
+          if (key === "type")
+            return (a.node?.kind ?? "").localeCompare(b.node?.kind ?? "") || a.label.localeCompare(b.label, lang);
+          return (b.node?.modified ?? 0) - (a.node?.modified ?? 0);
+        });
       const next: Pos = { "::thispc": { c: 0, r: 0 }, "::recycle": { c: 0, r: 1 } };
       sorted.forEach((it, i) => (next[it.key] = { c: Math.floor((i + 2) / rows), r: (i + 2) % rows }));
       setPos(next);
@@ -283,10 +285,19 @@ export function DesktopShell({ active }: { active: boolean }) {
         {
           label: tr ? "Görünüm" : "View",
           sub: [
-            ...sizes.map(([s, l]) => ({ label: l, checked: iconSize === s, radio: true, onClick: () => setIconSize(s) })),
+            ...sizes.map(([s, l]) => ({
+              label: l,
+              checked: iconSize === s,
+              radio: true,
+              onClick: () => setIconSize(s),
+            })),
             { sep: true },
             { label: tr ? "Simgeleri otomatik düzenle" : "Auto arrange icons", onClick: () => setPos({}) },
-            { label: tr ? "Masaüstü simgelerini göster" : "Show desktop icons", checked: showDesktopIcons, onClick: () => setPref("showDesktopIcons", !showDesktopIcons) },
+            {
+              label: tr ? "Masaüstü simgelerini göster" : "Show desktop icons",
+              checked: showDesktopIcons,
+              onClick: () => setPref("showDesktopIcons", !showDesktopIcons),
+            },
           ],
         },
         {
@@ -299,7 +310,11 @@ export function DesktopShell({ active }: { active: boolean }) {
         },
         { label: t("ctx.refresh"), onClick: () => setPos((p) => ({ ...p })) },
         { sep: true },
-        { label: tr ? "Yapıştır" : "Paste", disabled: !shellClipboard.get(), onClick: () => shellClipboard.paste(KNOWN.desktop) },
+        {
+          label: tr ? "Yapıştır" : "Paste",
+          disabled: !shellClipboard.get(),
+          onClick: () => shellClipboard.paste(KNOWN.desktop),
+        },
         { label: tr ? "Kısayolu yapıştır" : "Paste shortcut", disabled: true },
         { sep: true },
         newMenu(KNOWN.desktop, lang, (p) => {
@@ -324,7 +339,10 @@ export function DesktopShell({ active }: { active: boolean }) {
           { label: tr ? "Aç" : "Open", bold: true, onClick: () => activate(it) },
           { label: tr ? "Ağ sürücüsüne bağlan..." : "Map network drive...", disabled: true },
           { sep: true },
-          { label: tr ? "Özellikler" : "Properties", onClick: () => open({ kind: "app", app: "control", param: "system" }) },
+          {
+            label: tr ? "Özellikler" : "Properties",
+            onClick: () => open({ kind: "app", app: "control", param: "system" }),
+          },
         ],
       });
     if (it.key === "::recycle")
@@ -425,7 +443,12 @@ export function DesktopShell({ active }: { active: boolean }) {
                 <span className="w8-dicon-img">
                   {thumb?.art ? (
                     <span className="w8-thumb">
-                      <CoverArt seed={thumb.art.seed} motif={thumb.art.motif} palette={thumb.art.palette} variant={thumb.art.variant} />
+                      <CoverArt
+                        seed={thumb.art.seed}
+                        motif={thumb.art.motif}
+                        palette={thumb.art.palette}
+                        variant={thumb.art.variant}
+                      />
                     </span>
                   ) : thumb?.data ? (
                     <span className="w8-thumb">
@@ -436,7 +459,12 @@ export function DesktopShell({ active }: { active: boolean }) {
                     <ShellIcon name={it.icon} size={iconSize} />
                   )}
                   {it.shortcut && (
-                    <svg className="w8-lnk-arrow" viewBox="0 0 10 10" width={iconSize >= 48 ? 14 : 10} height={iconSize >= 48 ? 14 : 10}>
+                    <svg
+                      className="w8-lnk-arrow"
+                      viewBox="0 0 10 10"
+                      width={iconSize >= 48 ? 14 : 10}
+                      height={iconSize >= 48 ? 14 : 10}
+                    >
                       <rect width="10" height="10" fill="#fff" stroke="#999" strokeWidth="0.6" />
                       <path d="M2.5 7.5 7 3M4 3h3v3" fill="none" stroke="#1565c0" strokeWidth="1.3" />
                     </svg>
@@ -444,6 +472,7 @@ export function DesktopShell({ active }: { active: boolean }) {
                 </span>
                 {renaming === it.path && it.path ? (
                   <RenameBox
+                    className="w8-rename"
                     initial={it.node ? fs.label(it.node, lang) : it.label}
                     onDone={(v) => {
                       setRenaming(null);
@@ -465,7 +494,17 @@ export function DesktopShell({ active }: { active: boolean }) {
               </div>
             );
           })}
-        {band && <div className="w8-band" style={{ left: Math.min(band.x0, band.x1), top: Math.min(band.y0, band.y1), width: Math.abs(band.x1 - band.x0), height: Math.abs(band.y1 - band.y0) }} />}
+        {band && (
+          <div
+            className="w8-band"
+            style={{
+              left: Math.min(band.x0, band.x1),
+              top: Math.min(band.y0, band.y1),
+              width: Math.abs(band.x1 - band.x0),
+              height: Math.abs(band.y1 - band.y0),
+            }}
+          />
+        )}
       </div>
 
       <div className="w8-winlayer">
@@ -473,7 +512,18 @@ export function DesktopShell({ active }: { active: boolean }) {
           const Comp = PROGRAMS[w.app];
           if (!Comp) return null;
           const z = 10 + order.indexOf(w.id);
-          return <Window key={w.id} win={w} z={z} focused={focus === w.id} modal={wins.some((x) => x.owner === w.id)} Comp={Comp} />;
+          return (
+            <Window
+              key={w.id}
+              win={w}
+              z={z}
+              // A hidden desktop (Start or a Metro app on top) has no focused window: keys go nowhere, and
+              // apps re-focus their caret when the desktop comes back.
+              focused={active && focus === w.id}
+              modal={wins.some((x) => x.owner === w.id)}
+              Comp={Comp}
+            />
+          );
         })}
       </div>
       <Taskbar onWinX={() => setWinx(true)} onNetwork={() => setNetwork(true)} />
@@ -481,34 +531,6 @@ export function DesktopShell({ active }: { active: boolean }) {
       {network && <NetworkPane onClose={() => setNetwork(false)} />}
       {menu && <ContextMenu x={menu.x} y={menu.y} items={menu.items} onClose={() => setMenu(null)} />}
     </div>
-  );
-}
-
-function RenameBox({ initial, onDone }: { initial: string; onDone: (v: string | null) => void }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.focus();
-    const dot = initial.lastIndexOf(".");
-    el.setSelectionRange(0, dot > 0 ? dot : initial.length);
-  }, [initial]);
-  return (
-    <textarea
-      ref={ref}
-      className="w8-rename"
-      defaultValue={initial}
-      onPointerDown={(e) => e.stopPropagation()}
-      onBlur={(e) => onDone(e.currentTarget.value.trim())}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          onDone(e.currentTarget.value.trim());
-        }
-        if (e.key === "Escape") onDone(null);
-        e.stopPropagation();
-      }}
-    />
   );
 }
 
@@ -525,7 +547,11 @@ function NetworkPane({ onClose }: { onClose: () => void }) {
         <h2>{tr ? "Ağlar" : "Networks"}</h2>
         <div className="w8-net-row">
           <span>{tr ? "Uçak modu" : "Airplane mode"}</span>
-          <button className={`w8-toggle ${airplane ? "on" : ""}`} onClick={() => setAirplane((a) => !a)} aria-pressed={airplane}>
+          <button
+            className={`w8-toggle ${airplane ? "on" : ""}`}
+            onClick={() => setAirplane((a) => !a)}
+            aria-pressed={airplane}
+          >
             <i />
           </button>
           <small>{airplane ? (tr ? "Açık" : "On") : tr ? "Kapalı" : "Off"}</small>
@@ -542,14 +568,23 @@ function NetworkPane({ onClose }: { onClose: () => void }) {
               </svg>
               <span>
                 AFU-Ev
-                <small>{online ? (tr ? "Bağlı" : "Connected") : tr ? "İnternet erişimi yok" : "No Internet access"}</small>
+                <small>
+                  {online ? (tr ? "Bağlı" : "Connected") : tr ? "İnternet erişimi yok" : "No Internet access"}
+                </small>
               </span>
             </div>
             {["Kafe-WiFi", "TurkNet_5G", "DIRECT-HP-Yazıcı"].map((n, i) => (
               <div key={n} className="w8-net-item">
                 <svg width="22" height="18" viewBox="0 0 18 16" fill="currentColor" opacity="0.8">
                   {[0, 1, 2, 3].map((k) => (
-                    <rect key={k} x={1 + k * 4} y={11 - k * 3} width="3" height={4 + k * 3} opacity={k < 3 - (i % 3) ? 1 : 0.3} />
+                    <rect
+                      key={k}
+                      x={1 + k * 4}
+                      y={11 - k * 3}
+                      width="3"
+                      height={4 + k * 3}
+                      opacity={k < 3 - (i % 3) ? 1 : 0.3}
+                    />
                   ))}
                 </svg>
                 <span>{n}</span>

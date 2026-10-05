@@ -2,7 +2,19 @@
 /** The whole "operating system" state: power phase, navigation, charms, toasts, preferences and achievements. */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { t, type Key } from "./i18n";
-import { APPS, COLORS, PATTERNS, VISITOR_ACHIEVEMENTS, app, defaultTiles, isDesktopApp, type AppId, type IconName, type Pattern, type TileState } from "./model";
+import {
+  APPS,
+  COLORS,
+  PATTERNS,
+  VISITOR_ACHIEVEMENTS,
+  app,
+  defaultTiles,
+  isDesktopApp,
+  type AppId,
+  type IconName,
+  type Pattern,
+  type TileState,
+} from "./model";
 import { wm } from "./wm";
 import { sound } from "./sound";
 import type { L, Lang } from "./types";
@@ -12,7 +24,15 @@ export type Phase = "off" | "boot" | "lock" | "login" | "welcome" | "os" | "powe
 export type User = "owner" | "guest" | "recruiter";
 export type View = { kind: "start" } | { kind: "apps" } | { kind: "app"; app: AppId; param?: string };
 export type Charm = null | "bar" | "search" | "share" | "devices" | "settings" | "personalize" | "power";
-export type Toast = { id: number; title: string; body: string; color: string; icon: IconName; at: number; action?: View };
+export type Toast = {
+  id: number;
+  title: string;
+  body: string;
+  color: string;
+  icon: IconName;
+  at: number;
+  action?: View;
+};
 export type PowerAction = "shutdown" | "restart" | "signout" | "sleep";
 
 type Prefs = {
@@ -138,19 +158,19 @@ export function OSProvider({ children }: { children: ReactNode }) {
   const [track, setTrack] = useState<string | null>(null);
   const [trackStarted, setTrackStarted] = useState(0);
   const [sessionStart] = useState(() => Date.now());
-  const openedProjects = useRef(new Set<string>());
-  const readArticles = useRef(new Set<string>());
+  const [openedProjects] = useState(() => new Set<string>());
+  const [readArticles] = useState(() => new Set<string>());
   const toastId = useRef(1);
   const deepLink = useRef<{ id: AppId; param?: string } | null>(null);
+  // Mirrors `earned` synchronously so back-to-back earn() calls see each other.
   const earnedRef = useRef(earned);
-  earnedRef.current = earned;
 
   // Load what this browser remembers.
   useEffect(() => {
     const stored = load<Partial<Prefs>>("prefs", {});
     const lang: Lang = stored.lang ?? (navigator.language?.toLowerCase().startsWith("tr") ? "tr" : "en");
     setPrefs({ ...DEFAULT_PREFS, ...stored, lang, tiles: mergeTiles(stored.tiles) });
-    setEarned(load("earned", {}));
+    setEarned((earnedRef.current = load("earned", {})));
     setFirstRun(!load("seen", false));
     setReady(true);
     // Deep links for demos and screenshots: ?boot=start skips boot, lock and sign-in; &open=paint launches an app.
@@ -159,7 +179,8 @@ export function OSProvider({ children }: { children: ReactNode }) {
       setFirstRun(false);
       setPhaseState("os");
       const target = q.get("open");
-      if (target && APPS.some((a) => a.id === target)) deepLink.current = { id: target as AppId, param: q.get("arg") ?? undefined };
+      if (target && APPS.some((a) => a.id === target))
+        deepLink.current = { id: target as AppId, param: q.get("arg") ?? undefined };
     }
   }, []);
 
@@ -205,7 +226,8 @@ export function OSProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const earn = useCallback(
-    (id: string) => {
+    // Named so the delayed "completionist" call below refers to this function, not the outer const.
+    function earn(id: string) {
       if (earnedRef.current[id]) return;
       const a = VISITOR_ACHIEVEMENTS.find((x) => x.id === id);
       if (!a) return;
@@ -287,12 +309,12 @@ export function OSProvider({ children }: { children: ReactNode }) {
       }
       if (v.kind === "app") {
         if (v.app === "projects" && v.param) {
-          openedProjects.current.add(v.param);
-          if (openedProjects.current.size >= 3) earn("explorer");
+          openedProjects.add(v.param);
+          if (openedProjects.size >= 3) earn("explorer");
         }
         if (v.app === "reader" && v.param) {
-          readArticles.current.add(v.param);
-          if (readArticles.current.size >= 2) earn("bookworm");
+          readArticles.add(v.param);
+          if (readArticles.size >= 2) earn("bookworm");
         }
         if (v.app === "desktop") earn("desktop");
         setRecent((r) => [v, ...r.filter((x) => !(x.kind === "app" && x.app === v.app))].slice(0, 6));
@@ -304,7 +326,7 @@ export function OSProvider({ children }: { children: ReactNode }) {
         return [...s, v];
       });
     },
-    [earn],
+    [earn, openedProjects, readArticles],
   );
 
   const openApp = useCallback((id: AppId, param?: string) => open({ kind: "app", app: id, param }), [open]);
@@ -329,12 +351,18 @@ export function OSProvider({ children }: { children: ReactNode }) {
     [earn],
   );
 
-  const setPref = useCallback(<K extends keyof Prefs>(k: K, v: Prefs[K]) => {
-    setPrefs((p) => ({ ...p, [k]: v }));
-    if (k === "color" || k === "pattern") earn("painter");
-  }, [earn]);
+  const setPref = useCallback(
+    <K extends keyof Prefs>(k: K, v: Prefs[K]) => {
+      setPrefs((p) => ({ ...p, [k]: v }));
+      if (k === "color" || k === "pattern") earn("painter");
+    },
+    [earn],
+  );
 
-  const setTiles = useCallback((fn: (tiles: TileState[]) => TileState[]) => setPrefs((p) => ({ ...p, tiles: fn(p.tiles) })), []);
+  const setTiles = useCallback(
+    (fn: (tiles: TileState[]) => TileState[]) => setPrefs((p) => ({ ...p, tiles: fn(p.tiles) })),
+    [],
+  );
 
   const playTrack = useCallback(
     (id: string | null) => {
@@ -395,11 +423,44 @@ export function OSProvider({ children }: { children: ReactNode }) {
       track,
       trackStarted,
       playTrack,
-      openedProjects: openedProjects.current,
-      readArticles: readArticles.current,
+      openedProjects,
+      readArticles,
       sessionStart,
     }),
-    [prefs, tr, phase, setPhase, powerAction, power, user, signIn, firstRun, stack, open, openApp, closeApp, back, recent, charm, setCharm, toasts, notifications, toast, earned, earn, resetAchievements, setPref, setTiles, phone, track, trackStarted, playTrack, sessionStart],
+    [
+      prefs,
+      tr,
+      phase,
+      setPhase,
+      powerAction,
+      power,
+      user,
+      signIn,
+      firstRun,
+      stack,
+      open,
+      openApp,
+      closeApp,
+      back,
+      recent,
+      charm,
+      setCharm,
+      toasts,
+      notifications,
+      toast,
+      earned,
+      earn,
+      resetAchievements,
+      setPref,
+      setTiles,
+      phone,
+      track,
+      trackStarted,
+      playTrack,
+      openedProjects,
+      readArticles,
+      sessionStart,
+    ],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

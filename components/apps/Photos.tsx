@@ -9,15 +9,41 @@ import { CoverArt } from "../CoverArt";
 import { Icon } from "../Icons";
 import { Hub } from "../AppHost";
 
-type Photo = { key: string; seed: string; motif: Motif; palette: [string, string, string]; variant: number; title: string; lockId: string };
+type Photo = {
+  key: string;
+  seed: string;
+  motif: Motif;
+  palette: [string, string, string];
+  variant: number;
+  title: string;
+  lockId: string;
+};
 
 export function PhotosApp() {
   const { t, lang, setPref, toast } = useOS();
   const [cur, setCur] = useState<number | null>(null);
   const [show, setShow] = useState(false);
 
-  const projectPhotos: Photo[] = projects.flatMap((p) => [0, 1, 2].map((v) => ({ key: `${p.id}-${v}`, seed: p.id, motif: p.motif, palette: p.palette, variant: v, title: p.title, lockId: p.id })));
-  const postPhotos: Photo[] = media.map((m) => ({ key: m.id, seed: m.id, motif: m.motif, palette: m.palette, variant: 0, title: pick(lang, m.title), lockId: m.id }));
+  const projectPhotos: Photo[] = projects.flatMap((p) =>
+    [0, 1, 2].map((v) => ({
+      key: `${p.id}-${v}`,
+      seed: p.id,
+      motif: p.motif,
+      palette: p.palette,
+      variant: v,
+      title: p.title,
+      lockId: p.id,
+    })),
+  );
+  const postPhotos: Photo[] = media.map((m) => ({
+    key: m.id,
+    seed: m.id,
+    motif: m.motif,
+    palette: m.palette,
+    variant: 0,
+    title: pick(lang, m.title),
+    lockId: m.id,
+  }));
   const all = [...projectPhotos, ...postPhotos];
 
   useEffect(() => {
@@ -44,7 +70,13 @@ export function PhotosApp() {
   const grid = (list: Photo[], offset: number) => (
     <div className="photo-grid">
       {list.map((ph, i) => (
-        <button key={ph.key} className={`photo ${i % 5 === 0 ? "big" : ""}`} onClick={() => setCur(offset + i)} data-nav aria-label={ph.title}>
+        <button
+          key={ph.key}
+          className={`photo ${i % 5 === 0 ? "big" : ""}`}
+          onClick={() => setCur(offset + i)}
+          data-nav
+          aria-label={ph.title}
+        >
           <CoverArt seed={ph.seed} motif={ph.motif} palette={ph.palette} variant={ph.variant} />
         </button>
       ))}
@@ -57,8 +89,18 @@ export function PhotosApp() {
       <Hub
         title={t("app.photos")}
         sections={[
-          { id: "projects", title: `${t("photos.projects")} · ${projectPhotos.length}`, wide: true, content: grid(projectPhotos, 0) },
-          { id: "posts", title: `${t("photos.posts")} · ${postPhotos.length}`, wide: true, content: grid(postPhotos, projectPhotos.length) },
+          {
+            id: "projects",
+            title: `${t("photos.projects")} · ${projectPhotos.length}`,
+            wide: true,
+            content: grid(projectPhotos, 0),
+          },
+          {
+            id: "posts",
+            title: `${t("photos.posts")} · ${postPhotos.length}`,
+            wide: true,
+            content: grid(postPhotos, projectPhotos.length),
+          },
         ]}
       />
       {p && (
@@ -66,10 +108,24 @@ export function PhotosApp() {
           <div key={p.key} className={`viewer-art ${show ? "kb" : ""}`}>
             <CoverArt seed={p.seed} motif={p.motif} palette={p.palette} variant={p.variant} animated />
           </div>
-          <button className="viewer-nav prev" onClick={(e) => { e.stopPropagation(); setCur((cur! - 1 + all.length) % all.length); }} aria-label="prev">
+          <button
+            className="viewer-nav prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCur((cur! - 1 + all.length) % all.length);
+            }}
+            aria-label="prev"
+          >
             <Icon name="back" size={22} />
           </button>
-          <button className="viewer-nav next" onClick={(e) => { e.stopPropagation(); setCur((cur! + 1) % all.length); }} aria-label="next">
+          <button
+            className="viewer-nav next"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCur((cur! + 1) % all.length);
+            }}
+            aria-label="next"
+          >
             <Icon name="forward" size={22} />
           </button>
           <div className="viewer-bar" onClick={(e) => e.stopPropagation()}>
@@ -87,7 +143,12 @@ export function PhotosApp() {
               <Icon name="lock" size={20} />
               <span>{t("photos.setLock")}</span>
             </button>
-            <button onClick={() => { setCur(null); setShow(false); }}>
+            <button
+              onClick={() => {
+                setCur(null);
+                setShow(false);
+              }}
+            >
               <Icon name="close" size={20} />
               <span>{t("back")}</span>
             </button>

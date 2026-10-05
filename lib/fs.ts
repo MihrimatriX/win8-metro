@@ -7,7 +7,8 @@ import { useSyncExternalStore } from "react";
 import type { L, Lang, Motif } from "./types";
 import { media, profile, projects } from "@/content/portfolio";
 
-export type FileKind = "dir" | "drive" | "txt" | "rtf" | "img" | "lnk" | "url" | "exe" | "html" | "audio" | "video" | "other";
+export type FileKind =
+  "dir" | "drive" | "txt" | "rtf" | "img" | "lnk" | "url" | "exe" | "html" | "audio" | "video" | "other";
 export type ArtSpec = { seed: string; motif: Motif; palette: [string, string, string]; variant?: number };
 
 export type FNode = {
@@ -109,8 +110,21 @@ export function kindFromName(name: string): FileKind {
 
 const now = () => Date.now();
 const T0 = new Date("2026-09-14T10:24:00").getTime();
-const dir = (name: string, children: FNode[] = [], extra: Partial<FNode> = {}): FNode => ({ name, kind: "dir", children, created: T0, modified: T0, ...extra });
-const file = (name: string, extra: Partial<FNode> = {}): FNode => ({ name, kind: kindFromName(name), created: T0, modified: T0, ...extra });
+const dir = (name: string, children: FNode[] = [], extra: Partial<FNode> = {}): FNode => ({
+  name,
+  kind: "dir",
+  children,
+  created: T0,
+  modified: T0,
+  ...extra,
+});
+const file = (name: string, extra: Partial<FNode> = {}): FNode => ({
+  name,
+  kind: kindFromName(name),
+  created: T0,
+  modified: T0,
+  ...extra,
+});
 
 function seed(lang: Lang): FNode {
   const tr = lang === "tr";
@@ -138,12 +152,38 @@ function seed(lang: Lang): FNode {
     dir(
       p.title,
       [
-        file(tr ? "aciklama.txt" : "about.txt", { text: `${p.title}\r\n${p.tagline[lang]}\r\n\r\n${p.description[lang]}\r\n\r\n${p.tech.join(" · ")}`, created: year(p.year), modified: year(p.year) }),
-        file(tr ? "kapak.png" : "cover.png", { art: { seed: p.id, motif: p.motif, palette: p.palette }, size: 482_304, created: year(p.year), modified: year(p.year) }),
-        file(`${tr ? "ekran" : "screen"}-1.png`, { art: { seed: p.id, motif: p.motif, palette: p.palette, variant: 1 }, size: 391_220, created: year(p.year), modified: year(p.year) }),
-        file(`${tr ? "ekran" : "screen"}-2.png`, { art: { seed: p.id, motif: p.motif, palette: p.palette, variant: 2 }, size: 402_871, created: year(p.year), modified: year(p.year) }),
-        file(`${p.title}.lnk`, { target: `app:projects:${p.id}`, size: 1_024, created: year(p.year), modified: year(p.year) }),
-        ...(p.links.demo && p.links.demo !== "#" ? [file(`${p.title} demo.url`, { target: p.links.demo, size: 220 })] : []),
+        file(tr ? "aciklama.txt" : "about.txt", {
+          text: `${p.title}\r\n${p.tagline[lang]}\r\n\r\n${p.description[lang]}\r\n\r\n${p.tech.join(" · ")}`,
+          created: year(p.year),
+          modified: year(p.year),
+        }),
+        file(tr ? "kapak.png" : "cover.png", {
+          art: { seed: p.id, motif: p.motif, palette: p.palette },
+          size: 482_304,
+          created: year(p.year),
+          modified: year(p.year),
+        }),
+        file(`${tr ? "ekran" : "screen"}-1.png`, {
+          art: { seed: p.id, motif: p.motif, palette: p.palette, variant: 1 },
+          size: 391_220,
+          created: year(p.year),
+          modified: year(p.year),
+        }),
+        file(`${tr ? "ekran" : "screen"}-2.png`, {
+          art: { seed: p.id, motif: p.motif, palette: p.palette, variant: 2 },
+          size: 402_871,
+          created: year(p.year),
+          modified: year(p.year),
+        }),
+        file(`${p.title}.lnk`, {
+          target: `app:projects:${p.id}`,
+          size: 1_024,
+          created: year(p.year),
+          modified: year(p.year),
+        }),
+        ...(p.links.demo && p.links.demo !== "#"
+          ? [file(`${p.title} demo.url`, { target: p.links.demo, size: 220 })]
+          : []),
       ],
       { created: year(p.year), modified: year(p.year) },
     ),
@@ -151,8 +191,17 @@ function seed(lang: Lang): FNode {
 
   const exe = (name: string, target: string, size: number) => file(name, { target, size, system: true });
   const wallpapers = [
-    { name: "img0.jpg", art: { seed: "wallpaper", motif: "dunes" as Motif, palette: ["#0b1a3a", "#1e4fa8", "#7dd3fc"] as [string, string, string] } },
-    ...projects.slice(0, 5).map((p, i) => ({ name: `img${i + 1}.jpg`, art: { seed: p.id, motif: p.motif, palette: p.palette } })),
+    {
+      name: "img0.jpg",
+      art: {
+        seed: "wallpaper",
+        motif: "dunes" as Motif,
+        palette: ["#0b1a3a", "#1e4fa8", "#7dd3fc"] as [string, string, string],
+      },
+    },
+    ...projects
+      .slice(0, 5)
+      .map((p, i) => ({ name: `img${i + 1}.jpg`, art: { seed: p.id, motif: p.motif, palette: p.palette } })),
   ];
 
   return dir("", [
@@ -165,14 +214,30 @@ function seed(lang: Lang): FNode {
             dir(
               USER,
               [
-                dir("Desktop", [file(tr ? "Beni oku.txt" : "Read me.txt", { text: readme, modified: now() }), file("CV.txt", { text: cv })], { display: { tr: "Masaüstü", en: "Desktop" } }),
+                dir(
+                  "Desktop",
+                  [
+                    file(tr ? "Beni oku.txt" : "Read me.txt", { text: readme, modified: now() }),
+                    file("CV.txt", { text: cv }),
+                  ],
+                  { display: { tr: "Masaüstü", en: "Desktop" } },
+                ),
                 dir(
                   "Documents",
                   [
                     dir(tr ? "Projeler" : "Projects", projectDirs),
                     file("CV.txt", { text: cv }),
-                    file(tr ? "Yapılacaklar.txt" : "To do.txt", { text: tr ? "- Windows 8 klonunu bitir\r\n- Paint'te bir şey çiz\r\n- Mayın Tarlası'nda rekor kır" : "- Finish the Windows 8 clone\r\n- Draw something in Paint\r\n- Beat Minesweeper" }),
-                    ...media.map((m) => file(`${m.title[lang].replace(/[\\/:*?"<>|]/g, "")}.url`, { target: `app:reader:${m.id}`, size: 180 })),
+                    file(tr ? "Yapılacaklar.txt" : "To do.txt", {
+                      text: tr
+                        ? "- Windows 8 klonunu bitir\r\n- Paint'te bir şey çiz\r\n- Mayın Tarlası'nda rekor kır"
+                        : "- Finish the Windows 8 clone\r\n- Draw something in Paint\r\n- Beat Minesweeper",
+                    }),
+                    ...media.map((m) =>
+                      file(`${m.title[lang].replace(/[\\/:*?"<>|]/g, "")}.url`, {
+                        target: `app:reader:${m.id}`,
+                        size: 180,
+                      }),
+                    ),
                   ],
                   { display: { tr: "Belgeler", en: "Documents" } },
                 ),
@@ -191,13 +256,27 @@ function seed(lang: Lang): FNode {
                 dir(
                   "Pictures",
                   [
-                    dir(tr ? "Proje görselleri" : "Project art", projects.map((p) => file(`${p.id}.png`, { art: { seed: p.id, motif: p.motif, palette: p.palette }, size: 482_304 }))),
-                    ...media.map((m) => file(`${m.id}.png`, { art: { seed: m.id, motif: m.motif, palette: m.palette }, size: 356_112 })),
+                    dir(
+                      tr ? "Proje görselleri" : "Project art",
+                      projects.map((p) =>
+                        file(`${p.id}.png`, { art: { seed: p.id, motif: p.motif, palette: p.palette }, size: 482_304 }),
+                      ),
+                    ),
+                    ...media.map((m) =>
+                      file(`${m.id}.png`, { art: { seed: m.id, motif: m.motif, palette: m.palette }, size: 356_112 }),
+                    ),
                   ],
                   { display: { tr: "Resimler", en: "Pictures" } },
                 ),
                 dir("Videos", [], { display: { tr: "Videolar", en: "Videos" } }),
-                dir("Favorites", [file("Bing.url", { target: "https://www.bing.com" }), file("Wikipedia.url", { target: "https://www.wikipedia.org" })], { display: { tr: "Sık Kullanılanlar", en: "Favorites" } }),
+                dir(
+                  "Favorites",
+                  [
+                    file("Bing.url", { target: "https://www.bing.com" }),
+                    file("Wikipedia.url", { target: "https://www.wikipedia.org" }),
+                  ],
+                  { display: { tr: "Sık Kullanılanlar", en: "Favorites" } },
+                ),
               ],
               {},
             ),
@@ -217,12 +296,32 @@ function seed(lang: Lang): FNode {
               exe("taskmgr.exe", "taskmgr", 1_224_704),
               exe("winver.exe", "winver", 43_008),
               exe("write.exe", "wordpad", 10_240),
-              dir("drivers", [file("etc", { kind: "dir", children: [file("hosts", { kind: "txt", text: "# Copyright (c) 1993-2009 Microsoft Corp.\r\n#\r\n127.0.0.1       localhost\r\n::1             localhost\r\n" })] })]),
+              dir("drivers", [
+                file("etc", {
+                  kind: "dir",
+                  children: [
+                    file("hosts", {
+                      kind: "txt",
+                      text: "# Copyright (c) 1993-2009 Microsoft Corp.\r\n#\r\n127.0.0.1       localhost\r\n::1             localhost\r\n",
+                    }),
+                  ],
+                }),
+              ]),
             ]),
-            dir("Web", [dir("Wallpaper", [dir("Windows", wallpapers.map((w) => file(w.name, { art: w.art, size: 1_048_576, system: true })))])]),
+            dir("Web", [
+              dir("Wallpaper", [
+                dir(
+                  "Windows",
+                  wallpapers.map((w) => file(w.name, { art: w.art, size: 1_048_576, system: true })),
+                ),
+              ]),
+            ]),
             exe("explorer.exe", "explorer", 2_390_528),
             exe("notepad.exe", "notepad", 219_136),
-            file("win.ini", { text: "; for 16-bit app support\r\n[fonts]\r\n[extensions]\r\n[mci extensions]\r\n[files]\r\n[Mail]\r\nMAPI=1\r\n", system: true }),
+            file("win.ini", {
+              text: "; for 16-bit app support\r\n[fonts]\r\n[extensions]\r\n[mci extensions]\r\n[files]\r\n[Mail]\r\nMAPI=1\r\n",
+              system: true,
+            }),
           ],
           { system: true },
         ),
@@ -275,7 +374,8 @@ function ensure(): FNode {
     }
   }
   if (!root) {
-    const lang: Lang = typeof navigator !== "undefined" && !navigator.language?.toLowerCase().startsWith("tr") ? "en" : "tr";
+    const lang: Lang =
+      typeof navigator !== "undefined" && !navigator.language?.toLowerCase().startsWith("tr") ? "en" : "tr";
     let stored: Lang | undefined;
     try {
       stored = JSON.parse(window.localStorage.getItem("afu-metro:v2:prefs") ?? "{}").lang;
@@ -288,7 +388,8 @@ function ensure(): FNode {
   return root;
 }
 
-const eq = (a: string, b: string) => a.localeCompare(b, "en", { sensitivity: "accent" }) === 0 || a.toLowerCase() === b.toLowerCase();
+const eq = (a: string, b: string) =>
+  a.localeCompare(b, "en", { sensitivity: "accent" }) === 0 || a.toLowerCase() === b.toLowerCase();
 
 function walk(path: string): { node: FNode; parent: FNode | null } | null {
   const parts = splitPath(normalize(path));
@@ -408,7 +509,12 @@ export const fs = {
     const inBin = p.toLowerCase().startsWith(RECYCLE.toLowerCase());
     if (!permanent && !inBin) {
       const bin = walk(RECYCLE)?.node ?? fs.mkdir(RECYCLE);
-      const stored = { ...at.node, name: `$R${Math.random().toString(36).slice(2, 8).toUpperCase()}${extname(at.node.name) ? `.${extname(at.node.name)}` : ""}`, orig: p, deleted: now() };
+      const stored = {
+        ...at.node,
+        name: `$R${Math.random().toString(36).slice(2, 8).toUpperCase()}${extname(at.node.name) ? `.${extname(at.node.name)}` : ""}`,
+        orig: p,
+        deleted: now(),
+      };
       bin.children!.push(stored);
     }
     emit();
@@ -483,7 +589,8 @@ export function useFS() {
 
 /** "12,4 KB" in the Explorer style. */
 export function formatSize(bytes: number, lang: Lang) {
-  const nf = (n: number) => n.toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: n < 10 ? 1 : 0 });
+  const nf = (n: number) =>
+    n.toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: n < 10 ? 1 : 0 });
   if (bytes < 1024) return `${bytes} ${lang === "tr" ? "bayt" : "bytes"}`;
   if (bytes < 1024 * 1024) return `${nf(Math.ceil(bytes / 1024))} KB`;
   if (bytes < 1024 ** 3) return `${nf(bytes / 1024 / 1024)} MB`;

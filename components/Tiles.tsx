@@ -3,14 +3,23 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useOS, useTick, type View } from "@/lib/os";
 import { dayName, monthName, pick } from "@/lib/i18n";
-import { VISITOR_ACHIEVEMENTS, app, parseKey, socialColor, socialIcon, type AppId, type IconName, type TileSize } from "@/lib/model";
+import {
+  VISITOR_ACHIEVEMENTS,
+  app,
+  parseKey,
+  socialColor,
+  socialIcon,
+  type AppId,
+  type IconName,
+  type TileSize,
+} from "@/lib/model";
 import { TRACKS } from "@/lib/sound";
 import { media, profile, projects, socials } from "@/content/portfolio";
 import { inbox } from "@/content/mailbox";
 import { CoverArt } from "./CoverArt";
 import { Icon } from "./Icons";
 import { ShellIcon } from "./icons/ShellIcons";
-import { Wallpaper } from "./desktop/DesktopShell";
+import { Wallpaper } from "./desktop/Wallpaper";
 
 export type TileMeta = { title: string; color: string; icon: IconName; view?: View; url?: string; app?: AppId };
 
@@ -24,10 +33,20 @@ export function useTileMeta() {
     }
     if (ref.kind === "project") {
       const p = projects.find((x) => x.id === ref.id)!;
-      return { title: p?.title ?? ref.id, color: p?.palette[1] ?? "#333", icon: "projects", view: { kind: "app", app: "projects", param: ref.id } };
+      return {
+        title: p?.title ?? ref.id,
+        color: p?.palette[1] ?? "#333",
+        icon: "projects",
+        view: { kind: "app", app: "projects", param: ref.id },
+      };
     }
     const s = socials.find((x) => x.id === ref.id)!;
-    return { title: s?.label === "E-posta" && lang === "en" ? "Email" : s?.label ?? ref.id, color: socialColor(ref.id), icon: socialIcon(ref.id), url: s?.url };
+    return {
+      title: s?.label === "E-posta" && lang === "en" ? "Email" : (s?.label ?? ref.id),
+      color: socialColor(ref.id),
+      icon: socialIcon(ref.id),
+      url: s?.url,
+    };
   };
 }
 
@@ -41,10 +60,13 @@ function useCycle(n: number, on: boolean, seed: string) {
     for (const c of seed) h = (h * 31 + c.charCodeAt(0)) % 9973;
     const period = 5200 + (h % 7) * 900;
     let timer = 0;
-    const startId = window.setTimeout(() => {
-      setI((x) => (x + 1) % n);
-      timer = window.setInterval(() => setI((x) => (x + 1) % n), period);
-    }, 1500 + (h % 13) * 420);
+    const startId = window.setTimeout(
+      () => {
+        setI((x) => (x + 1) % n);
+        timer = window.setInterval(() => setI((x) => (x + 1) % n), period);
+      },
+      1500 + (h % 13) * 420,
+    );
     return () => {
       window.clearTimeout(startId);
       window.clearInterval(timer);
@@ -71,7 +93,10 @@ function Flip({ faces, index }: { faces: ReactNode[]; index: number }) {
   return (
     <div className="flip">
       {faces.map((f, k) => (
-        <div className={`flip-face ${k === index ? "on" : ""} ${k === (index + faces.length - 1) % faces.length ? "was" : ""}`} key={k}>
+        <div
+          className={`flip-face ${k === index ? "on" : ""} ${k === (index + faces.length - 1) % faces.length ? "was" : ""}`}
+          key={k}
+        >
           {f}
         </div>
       ))}
@@ -88,7 +113,11 @@ const IconFace = ({ icon, size }: { icon: IconName; size: TileSize }) => (
 /** Desktop programs on Start: their colorful icon centered on the tile, like Windows 8 does. */
 const ShellFace = ({ id, size }: { id: AppId; size: TileSize }) => {
   const a = app(id);
-  return <div className="tile-icon tile-shell">{a.shell && <ShellIcon name={a.shell} size={size === "small" ? 32 : 48} />}</div>;
+  return (
+    <div className="tile-icon tile-shell">
+      {a.shell && <ShellIcon name={a.shell} size={size === "small" ? 32 : 48} />}
+    </div>
+  );
 };
 
 export function TileFace({ tileKey, size, live }: { tileKey: string; size: TileSize; live: boolean }) {
@@ -125,7 +154,9 @@ function ProjectFace({ id, size, live }: { id: string; size: TileSize; live: boo
   const p = projects.find((x) => x.id === id);
   const i = useCycle(2, live && size !== "small", id);
   if (!p) return null;
-  const art = <CoverArt className="tile-art" seed={p.id} motif={p.motif} palette={p.palette} animated={size === "large"} />;
+  const art = (
+    <CoverArt className="tile-art" seed={p.id} motif={p.motif} palette={p.palette} animated={size === "large"} />
+  );
   if (size === "small")
     return (
       <div className="tile-fill" style={{ background: p.palette[1] }}>
@@ -138,7 +169,14 @@ function ProjectFace({ id, size, live }: { id: string; size: TileSize; live: boo
       faces={[
         <div className="tile-fill" key="a">
           {art}
-          <div className={`tile-logo font-${p.logo.font}`} style={p.logo.gradient ? { backgroundImage: `linear-gradient(90deg, ${p.logo.gradient[0]}, ${p.logo.gradient[1]})` } : undefined}>
+          <div
+            className={`tile-logo font-${p.logo.font}`}
+            style={
+              p.logo.gradient
+                ? { backgroundImage: `linear-gradient(90deg, ${p.logo.gradient[0]}, ${p.logo.gradient[1]})` }
+                : undefined
+            }
+          >
             <span className={p.logo.caps ? "caps" : undefined}>{p.title}</span>
           </div>
         </div>,

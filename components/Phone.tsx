@@ -115,7 +115,9 @@ function PhoneStart() {
   // Phone Start is one long column: me, projects, reading, links.
   const order = GROUPS.map((g) => g.id as string);
   // Desktop programs don't exist on the phone.
-  const list = [...tiles].filter((x) => x.pinned && !(x.key.startsWith("app:") && app(x.key.slice(4) as AppId).phone === false)).sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group));
+  const list = [...tiles]
+    .filter((x) => x.pinned && !(x.key.startsWith("app:") && app(x.key.slice(4) as AppId).phone === false))
+    .sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group));
   const sel = list.find((x) => x.key === selected);
 
   return (
@@ -145,7 +147,14 @@ function PhoneStart() {
           />
         ))}
       </div>
-      <button className="pstart-more" onClick={(e) => { e.stopPropagation(); open({ kind: "apps" }); }} aria-label={t("allApps")}>
+      <button
+        className="pstart-more"
+        onClick={(e) => {
+          e.stopPropagation();
+          open({ kind: "apps" });
+        }}
+        aria-label={t("allApps")}
+      >
         <Icon name="forward" size={18} />
       </button>
       {sel && (
@@ -186,7 +195,11 @@ function PhoneAppList({ onSearch }: { onSearch: () => void }) {
   const meta = useTileMeta();
   const launch = useLauncher();
   const [jump, setJump] = useState(false);
-  const keys = [...APPS.filter((a) => a.phone !== false).map((a) => `app:${a.id}`), ...projects.map((p) => `project:${p.id}`), ...socials.map((s) => `social:${s.id}`)];
+  const keys = [
+    ...APPS.filter((a) => a.phone !== false).map((a) => `app:${a.id}`),
+    ...projects.map((p) => `project:${p.id}`),
+    ...socials.map((s) => `social:${s.id}`),
+  ];
   const items = keys.map((k) => ({ k, m: meta(k) })).sort((a, b) => a.m.title.localeCompare(b.m.title, lang));
   const groups = useMemo(() => {
     const g = new Map<string, typeof items>();
@@ -248,7 +261,13 @@ function PhoneSearch({ onClose }: { onClose: () => void }) {
     <div className="psearch">
       <div className="psearch-box">
         <Icon name="search" size={20} />
-        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search.placeholder")} aria-label={t("charm.search")} />
+        <input
+          autoFocus
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("search.placeholder")}
+          aria-label={t("charm.search")}
+        />
         <button onClick={onClose} aria-label={t("mail.cancel")}>
           <Icon name="close" size={18} />
         </button>
@@ -267,7 +286,11 @@ function PhoneSearch({ onClose }: { onClose: () => void }) {
             }}
           >
             <span className="search-hit-icon" style={{ background: h.color }}>
-              {h.art ? <CoverArt seed={h.art.seed} motif={h.art.motif} palette={h.art.palette} /> : <Icon name={h.icon} size={20} />}
+              {h.art ? (
+                <CoverArt seed={h.art.seed} motif={h.art.motif} palette={h.art.palette} />
+              ) : (
+                <Icon name={h.icon} size={20} />
+              )}
             </span>
             <span className="search-hit-text">
               <strong>{h.title}</strong>
@@ -298,7 +321,13 @@ function ActionCenter({ open: isOpen, onClose }: { open: boolean; onClose: () =>
       <div className="ac-head">
         <span className="ac-time">{time(now)}</span>
         <span className="ac-date">{longDate(lang, now)}</span>
-        <button className="ac-all" onClick={() => { onClose(); openApp("settings"); }}>
+        <button
+          className="ac-all"
+          onClick={() => {
+            onClose();
+            openApp("settings");
+          }}
+        >
           {t("phone.allSettings")}
         </button>
       </div>
@@ -311,7 +340,10 @@ function ActionCenter({ open: isOpen, onClose }: { open: boolean; onClose: () =>
           <Icon name={sfx ? "volume" : "mute"} size={22} />
           <small>{t("settings.sound")}</small>
         </button>
-        <button className={motion === "full" ? "on" : ""} onClick={() => setPref("motion", motion === "full" ? "reduced" : "full")}>
+        <button
+          className={motion === "full" ? "on" : ""}
+          onClick={() => setPref("motion", motion === "full" ? "reduced" : "full")}
+        >
           <Icon name="motion" size={22} />
           <small>{t("settings.motion")}</small>
         </button>
@@ -319,7 +351,13 @@ function ActionCenter({ open: isOpen, onClose }: { open: boolean; onClose: () =>
           <Icon name="brush" size={22} />
           <small>{t(phoneTheme === "dark" ? "settings.dark" : "settings.light")}</small>
         </button>
-        <button className="on" onClick={() => { onClose(); power("sleep"); }}>
+        <button
+          className="on"
+          onClick={() => {
+            onClose();
+            power("sleep");
+          }}
+        >
           <Icon name="lock" size={22} />
           <small>{t("power.lock")}</small>
         </button>

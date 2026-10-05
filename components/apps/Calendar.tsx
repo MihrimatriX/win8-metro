@@ -22,8 +22,20 @@ export function CalendarApp() {
   });
 
   const events: Ev[] = [
-    ...media.map((m) => ({ date: m.date, label: formatDate(lang, m.date), title: pick(lang, m.title), color: app("reader").color, view: { kind: "app", app: "reader", param: m.id } as View })),
-    ...achievements.map((a) => ({ date: `${a.date}-01`.slice(0, 10), label: formatDate(lang, a.date), title: pick(lang, a.name), color: app("achievements").color, view: { kind: "app", app: "achievements" } as View })),
+    ...media.map((m) => ({
+      date: m.date,
+      label: formatDate(lang, m.date),
+      title: pick(lang, m.title),
+      color: app("reader").color,
+      view: { kind: "app", app: "reader", param: m.id } as View,
+    })),
+    ...achievements.map((a) => ({
+      date: `${a.date}-01`.slice(0, 10),
+      label: formatDate(lang, a.date),
+      title: pick(lang, a.name),
+      color: app("achievements").color,
+      view: { kind: "app", app: "achievements" } as View,
+    })),
   ].sort((a, b) => b.date.localeCompare(a.date));
 
   const first = new Date(ym.y, ym.m, 1);
@@ -35,7 +47,8 @@ export function CalendarApp() {
     return { d, iso, inMonth: d.getMonth() === ym.m, evs: events.filter((e) => e.date === iso) };
   });
   const rows = lead + days > 35 ? 6 : 5;
-  const shift = (n: number) => setYm(({ y, m }) => ({ y: m + n < 0 ? y - 1 : m + n > 11 ? y + 1 : y, m: (m + n + 12) % 12 }));
+  const shift = (n: number) =>
+    setYm(({ y, m }) => ({ y: m + n < 0 ? y - 1 : m + n > 11 ? y + 1 : y, m: (m + n + 12) % 12 }));
 
   const agenda = (
     <div className="agenda">
@@ -89,7 +102,13 @@ export function CalendarApp() {
               <div key={c.iso} className={`month-cell ${c.inMonth ? "" : "out"} ${isToday ? "today" : ""}`}>
                 <span className="month-num">{c.d.getDate()}</span>
                 {c.evs.map((e, k) => (
-                  <button key={k} className="month-ev" style={{ background: e.color }} onClick={() => open(e.view)} title={e.title}>
+                  <button
+                    key={k}
+                    className="month-ev"
+                    style={{ background: e.color }}
+                    onClick={() => open(e.view)}
+                    title={e.title}
+                  >
                     {phone ? "" : e.title}
                   </button>
                 ))}

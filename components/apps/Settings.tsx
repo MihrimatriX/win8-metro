@@ -17,7 +17,13 @@ function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
   return (
     <div className="toggle-row">
       <span>{label}</span>
-      <button className={`toggle ${on ? "on" : ""}`} onClick={() => onChange(!on)} role="switch" aria-checked={on} aria-label={label}>
+      <button
+        className={`toggle ${on ? "on" : ""}`}
+        onClick={() => onChange(!on)}
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+      >
         <i />
       </button>
       <small>{on ? t("on") : t("off")}</small>
@@ -85,7 +91,10 @@ export function SettingsApp({ param }: { param?: string }) {
 function Personalize() {
   const { t, lockImage, setPref, color, pattern, phoneTheme, lang } = useOS();
   const art = lockArt(lockImage);
-  const pics = [...projects.map((p) => ({ id: p.id, ...lockArt(p.id) })), ...media.slice(0, 3).map((m) => ({ id: m.id, ...lockArt(m.id) }))];
+  const pics = [
+    ...projects.map((p) => ({ id: p.id, ...lockArt(p.id) })),
+    ...media.slice(0, 3).map((m) => ({ id: m.id, ...lockArt(m.id) })),
+  ];
   return (
     <>
       <h2>{t("settings.lockImage")}</h2>
@@ -95,7 +104,12 @@ function Personalize() {
       </div>
       <div className="pcs-thumbs">
         {pics.map((p) => (
-          <button key={p.id} className={lockImage === p.id ? "on" : ""} onClick={() => setPref("lockImage", p.id)} aria-label={p.id}>
+          <button
+            key={p.id}
+            className={lockImage === p.id ? "on" : ""}
+            onClick={() => setPref("lockImage", p.id)}
+            aria-label={p.id}
+          >
             <CoverArt seed={p.seed} motif={p.motif} palette={p.palette} />
           </button>
         ))}
@@ -103,7 +117,13 @@ function Personalize() {
       <h2>{t("settings.bgColor")}</h2>
       <div className="swatches big">
         {COLORS.map((c, i) => (
-          <button key={i} className={`swatch ${color === i ? "on" : ""}`} style={{ background: c.bg }} onClick={() => setPref("color", i)} aria-label={`${i + 1}`}>
+          <button
+            key={i}
+            className={`swatch ${color === i ? "on" : ""}`}
+            style={{ background: c.bg }}
+            onClick={() => setPref("color", i)}
+            aria-label={`${i + 1}`}
+          >
             <i style={{ background: c.accent }} />
           </button>
         ))}
@@ -119,7 +139,11 @@ function Personalize() {
       <h2>{t("settings.theme")}</h2>
       <div className="pcs-chips">
         {(["dark", "light"] as const).map((th) => (
-          <button key={th} className={`chip-btn ${phoneTheme === th ? "on" : ""}`} onClick={() => setPref("phoneTheme", th)}>
+          <button
+            key={th}
+            className={`chip-btn ${phoneTheme === th ? "on" : ""}`}
+            onClick={() => setPref("phoneTheme", th)}
+          >
             {t(th === "dark" ? "settings.dark" : "settings.light")}
           </button>
         ))}
@@ -136,7 +160,9 @@ function Accounts() {
       <div className="pcs-account">
         <Avatar user={user} size={110} />
         <div>
-          <strong>{user === "owner" ? profile.name : user === "guest" ? t("login.guest") : t("login.recruiter")}</strong>
+          <strong>
+            {user === "owner" ? profile.name : user === "guest" ? t("login.guest") : t("login.recruiter")}
+          </strong>
           <small>
             {t("pc.signedInAs")}: {user === "owner" ? profile.onlineId : user}
           </small>
@@ -157,7 +183,9 @@ function SkyDriveInfo() {
   return (
     <>
       <h2>{t("pc.storage")}</h2>
-      <p className="pcs-big">{formatSize(total - used, lang)} {lang === "tr" ? "kullanılabilir" : "available"}</p>
+      <p className="pcs-big">
+        {formatSize(total - used, lang)} {lang === "tr" ? "kullanılabilir" : "available"}
+      </p>
       <div className="pcs-meter">
         <i style={{ width: `${Math.max(1, (used / total) * 100)}%` }} />
       </div>
@@ -178,11 +206,33 @@ function Privacy() {
   return (
     <>
       <h2>{t("pc.privacy")}</h2>
-      <Toggle label={lang === "tr" ? "Uygulamaların konumumu kullanmasına izin ver" : "Let apps use my location"} on={st.location} onChange={flip("location")} />
-      <Toggle label={lang === "tr" ? "Uygulamaların web kameramı kullanmasına izin ver" : "Let apps use my webcam"} on={st.camera} onChange={flip("camera")} />
-      <Toggle label={lang === "tr" ? "Uygulamaların mikrofonumu kullanmasına izin ver" : "Let apps use my microphone"} on={st.mic} onChange={flip("mic")} />
-      <Toggle label={lang === "tr" ? "Uygulamaların reklam kimliğimi kullanmasına izin ver" : "Let apps use my advertising ID"} on={st.ads} onChange={flip("ads")} />
-      <p className="dim small">{lang === "tr" ? "Kamera, mikrofon ve konum için tarayıcınız ayrıca izin isteyecektir." : "Your browser will also ask before apps use the camera, microphone or location."}</p>
+      <Toggle
+        label={lang === "tr" ? "Uygulamaların konumumu kullanmasına izin ver" : "Let apps use my location"}
+        on={st.location}
+        onChange={flip("location")}
+      />
+      <Toggle
+        label={lang === "tr" ? "Uygulamaların web kameramı kullanmasına izin ver" : "Let apps use my webcam"}
+        on={st.camera}
+        onChange={flip("camera")}
+      />
+      <Toggle
+        label={lang === "tr" ? "Uygulamaların mikrofonumu kullanmasına izin ver" : "Let apps use my microphone"}
+        on={st.mic}
+        onChange={flip("mic")}
+      />
+      <Toggle
+        label={
+          lang === "tr" ? "Uygulamaların reklam kimliğimi kullanmasına izin ver" : "Let apps use my advertising ID"
+        }
+        on={st.ads}
+        onChange={flip("ads")}
+      />
+      <p className="dim small">
+        {lang === "tr"
+          ? "Kamera, mikrofon ve konum için tarayıcınız ayrıca izin isteyecektir."
+          : "Your browser will also ask before apps use the camera, microphone or location."}
+      </p>
     </>
   );
 }
@@ -191,7 +241,10 @@ function Network() {
   const { t, lang } = useOS();
   const [airplane, setAirplane] = useState(false);
   const online = typeof navigator === "undefined" ? true : navigator.onLine;
-  const conn = (typeof navigator !== "undefined" ? (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number } }).connection : undefined) ?? {};
+  const conn =
+    (typeof navigator !== "undefined"
+      ? (navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number } }).connection
+      : undefined) ?? {};
   return (
     <>
       <h2>{t("pc.network")}</h2>
@@ -201,7 +254,19 @@ function Network() {
         <Icon name="wifi" size={28} />
         <div>
           <strong>AFU-Ev</strong>
-          <small>{airplane ? (lang === "tr" ? "Kapalı" : "Off") : online ? (lang === "tr" ? "Bağlı" : "Connected") : lang === "tr" ? "İnternet erişimi yok" : "No Internet access"}</small>
+          <small>
+            {airplane
+              ? lang === "tr"
+                ? "Kapalı"
+                : "Off"
+              : online
+                ? lang === "tr"
+                  ? "Bağlı"
+                  : "Connected"
+                : lang === "tr"
+                  ? "İnternet erişimi yok"
+                  : "No Internet access"}
+          </small>
           {conn.effectiveType && <small>{`${conn.effectiveType.toUpperCase()} · ${conn.downlink ?? "?"} Mb/s`}</small>}
         </div>
       </div>
@@ -223,7 +288,9 @@ function TimeLang() {
         ))}
       </div>
       <h2>{t("cal.today")}</h2>
-      <p className="pcs-big">{now.toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { dateStyle: "full", timeStyle: "medium" })}</p>
+      <p className="pcs-big">
+        {now.toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { dateStyle: "full", timeStyle: "medium" })}
+      </p>
       <p className="dim">{Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
     </>
   );
@@ -234,7 +301,11 @@ function Ease() {
   return (
     <>
       <h2>{t("pc.ease")}</h2>
-      <Toggle label={t("settings.motion")} on={motion === "full"} onChange={(v) => setPref("motion", v ? "full" : "reduced")} />
+      <Toggle
+        label={t("settings.motion")}
+        on={motion === "full"}
+        onChange={(v) => setPref("motion", v ? "full" : "reduced")}
+      />
       <Toggle label={t("settings.sound")} on={sfx} onChange={(v) => setPref("sfx", v)} />
     </>
   );
@@ -252,7 +323,15 @@ function Update() {
     <>
       <h2>{t("pc.update")}</h2>
       <p className="pcs-big">{checking ? t("pc.checking") : t("pc.upToDate")}</p>
-      {checking && <div className="dots-bar"><i /><i /><i /><i /><i /></div>}
+      {checking && (
+        <div className="dots-bar">
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+        </div>
+      )}
       <button className="btn" onClick={() => setChecking(true)} disabled={checking}>
         {t("pc.check")}
       </button>
@@ -300,7 +379,10 @@ function PcInfo() {
     [t("pc.edition"), "Windows 8.1 Pro"],
     [t("pc.build"), "6.3.9600"],
     [lang === "tr" ? "Bilgisayar adı" : "PC name", `${profile.name}-PC`],
-    ["CPU", `${typeof navigator !== "undefined" ? navigator.hardwareConcurrency ?? "?" : "?"} ${lang === "tr" ? "çekirdek" : "cores"}`],
+    [
+      "CPU",
+      `${typeof navigator !== "undefined" ? (navigator.hardwareConcurrency ?? "?") : "?"} ${lang === "tr" ? "çekirdek" : "cores"}`,
+    ],
     [t("pc.screen"), typeof window !== "undefined" ? `${window.innerWidth} × ${window.innerHeight}` : ""],
     [t("group.projects"), String(projects.length)],
     [t("pc.uptime"), `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`],

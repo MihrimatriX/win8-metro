@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev -p 3200",
     "build": "next build",
-    "start": "next start -p 3200",
+    "start": "docker build -t win8-metro . && docker run --rm -p 3200:3200 win8-metro",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint && prettier --check .",
+    "format": "eslint --fix && prettier --write .",
     "preview": "node scripts/build-preview.mjs"
   },
   "dependencies": {
@@ -19,6 +21,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.8",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.9",
     "typescript": "^5"
   }
 }

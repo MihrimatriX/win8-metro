@@ -3,7 +3,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useOS, useTick, type View } from "@/lib/os";
 import { longDate, pick, time, dayName, type Key } from "@/lib/i18n";
-import { APPS, COLORS, PATTERNS, VISITOR_ACHIEVEMENTS, app, socialIcon, type AppId, type IconName, type ShellIconName } from "@/lib/model";
+import {
+  APPS,
+  COLORS,
+  PATTERNS,
+  VISITOR_ACHIEVEMENTS,
+  app,
+  socialIcon,
+  type AppId,
+  type IconName,
+  type ShellIconName,
+} from "@/lib/model";
 import { fs, join, HOME, type FNode } from "@/lib/fs";
 import { AppIcon } from "./icons/AppIcon";
 import { ShellIcon } from "./icons/ShellIcons";
@@ -73,11 +83,21 @@ export function Charms() {
       <div className="corner corner-tr" onMouseEnter={enterCorner} />
       <div className="corner corner-br" onMouseEnter={enterCorner} />
       <div className="corner corner-tl" onMouseEnter={() => prevApp && setLeft("top")} />
-      {!(view.kind === "app" && view.app === "desktop") && <div className="corner corner-bl" onMouseEnter={() => view.kind !== "start" && setLeft("bottom")} onContextMenu={openWinx} />}
+      {!(view.kind === "app" && view.app === "desktop") && (
+        <div
+          className="corner corner-bl"
+          onMouseEnter={() => view.kind !== "start" && setLeft("bottom")}
+          onContextMenu={openWinx}
+        />
+      )}
       {winx && <PowerUserMenu onClose={() => setWinx(false)} />}
 
       {left && (
-        <div className="switcher" onMouseLeave={() => setLeft(null)} onMouseMove={(e) => left === "top" && e.clientY > 140 && setLeft("list")}>
+        <div
+          className="switcher"
+          onMouseLeave={() => setLeft(null)}
+          onMouseMove={(e) => left === "top" && e.clientY > 140 && setLeft("list")}
+        >
           {left === "bottom" ? (
             <button
               className="switch-thumb switch-start"
@@ -91,13 +111,35 @@ export function Charms() {
               <Icon name="start" size={34} />
             </button>
           ) : left === "top" && prevApp ? (
-            <SwitchThumb v={prevApp} onPick={(v) => { setLeft(null); open(v); }} />
+            <SwitchThumb
+              v={prevApp}
+              onPick={(v) => {
+                setLeft(null);
+                open(v);
+              }}
+            />
           ) : (
             <div className="switch-list">
-              {recent.filter((r) => JSON.stringify(r) !== JSON.stringify(view)).map((r, i) => (
-                <SwitchThumb key={i} v={r} onPick={(v) => { setLeft(null); open(v); }} inList />
-              ))}
-              <button className="switch-thumb switch-start in-list" onClick={() => { setLeft(null); open({ kind: "start" }); }}>
+              {recent
+                .filter((r) => JSON.stringify(r) !== JSON.stringify(view))
+                .map((r, i) => (
+                  <SwitchThumb
+                    key={i}
+                    v={r}
+                    onPick={(v) => {
+                      setLeft(null);
+                      open(v);
+                    }}
+                    inList
+                  />
+                ))}
+              <button
+                className="switch-thumb switch-start in-list"
+                onClick={() => {
+                  setLeft(null);
+                  open({ kind: "start" });
+                }}
+              >
                 <Icon name="start" size={30} />
               </button>
             </div>
@@ -121,7 +163,15 @@ export function Charms() {
           [
             ["search", "charm.search", () => setCharm("search")],
             ["share", "charm.share", () => setCharm("share")],
-            ["start", "charm.start", () => { setCharm(null); setPeek(false); open(view.kind === "start" && recent[0] ? recent[0] : { kind: "start" }); }],
+            [
+              "start",
+              "charm.start",
+              () => {
+                setCharm(null);
+                setPeek(false);
+                open(view.kind === "start" && recent[0] ? recent[0] : { kind: "start" });
+              },
+            ],
             ["devices", "charm.devices", () => setCharm("devices")],
             ["settings", "charm.settings", () => setCharm("settings")],
           ] as [IconName, Parameters<typeof t>[0], () => void][]
@@ -211,7 +261,12 @@ function SwitchThumb({ v, onPick, inList }: { v: View; onPick: (v: View) => void
   if (v.kind !== "app") return null;
   const a = app(v.app);
   return (
-    <button className={`switch-thumb ${inList ? "in-list" : ""}`} style={{ background: a.color }} onClick={() => onPick(v)} title={t(a.title)}>
+    <button
+      className={`switch-thumb ${inList ? "in-list" : ""}`}
+      style={{ background: a.color }}
+      onClick={() => onPick(v)}
+      title={t(a.title)}
+    >
       <AppIcon id={a.id} size={inList ? 30 : 40} />
       {!inList && <span>{t(a.title)}</span>}
     </button>
@@ -230,18 +285,36 @@ function ClockOverlay() {
       <div className="clock-time">{time(now)}</div>
       <div className="clock-date">
         <span>{dayName(lang, now.getDay())}</span>
-        <span>{longDate(lang, now).replace(`, ${dayName(lang, now.getDay())}`, "").replace(`${dayName(lang, now.getDay())}, `, "")}</span>
+        <span>
+          {longDate(lang, now)
+            .replace(`, ${dayName(lang, now.getDay())}`, "")
+            .replace(`${dayName(lang, now.getDay())}, `, "")}
+        </span>
       </div>
     </div>
   );
 }
 
-function Pane({ title, children, className, onBack }: { title: string; children: React.ReactNode; className?: string; onBack?: () => void }) {
+function Pane({
+  title,
+  children,
+  className,
+  onBack,
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+  onBack?: () => void;
+}) {
   const { setCharm, t } = useOS();
   return (
     <aside className={`pane ${className ?? ""}`} onClick={(e) => e.stopPropagation()}>
       <header className="pane-head">
-        <button className="circle-btn small" onClick={() => (onBack ? onBack() : setCharm("bar"))} aria-label={t("back")}>
+        <button
+          className="circle-btn small"
+          onClick={() => (onBack ? onBack() : setCharm("bar"))}
+          aria-label={t("back")}
+        >
           <Icon name="back" size={18} />
         </button>
         <h2>{title}</h2>
@@ -291,19 +364,81 @@ export function useSearch(q: string, files = false): Hit[] {
     const hits: Hit[] = [];
     for (const a of APPS)
       if (!a.hidden && !(a.kind === "desktop" && !files) && has(t(a.title), a.id, a.exe ?? ""))
-        hits.push({ id: `app:${a.id}`, title: t(a.title), sub: a.kind === "desktop" ? t(a.cat === "accessories" ? "cat.accessories" : a.cat === "games" ? "cat.games" : "cat.system") : t("apps"), icon: a.icon, color: a.color, view: { kind: "app", app: a.id }, app: a.id });
+        hits.push({
+          id: `app:${a.id}`,
+          title: t(a.title),
+          sub:
+            a.kind === "desktop"
+              ? t(a.cat === "accessories" ? "cat.accessories" : a.cat === "games" ? "cat.games" : "cat.system")
+              : t("apps"),
+          icon: a.icon,
+          color: a.color,
+          view: { kind: "app", app: a.id },
+          app: a.id,
+        });
     if (files)
       for (const f of findFiles(s, lang))
-        hits.push({ id: `f:${f.path}`, title: fs.label(f.node, lang), sub: f.path, icon: "file", color: "#4a4a4a", path: f.path, shell: nodeIcon(f.node, f.path) });
+        hits.push({
+          id: `f:${f.path}`,
+          title: fs.label(f.node, lang),
+          sub: f.path,
+          icon: "file",
+          color: "#4a4a4a",
+          path: f.path,
+          shell: nodeIcon(f.node, f.path),
+        });
     for (const p of projects)
       if (has(p.title, pick(lang, p.tagline), pick(lang, p.description), ...p.tech, pick(lang, p.genre)))
-        hits.push({ id: `p:${p.id}`, title: p.title, sub: pick(lang, p.tagline), icon: "projects", color: p.palette[1], view: { kind: "app", app: "projects", param: p.id }, art: { seed: p.id, motif: p.motif, palette: p.palette } });
+        hits.push({
+          id: `p:${p.id}`,
+          title: p.title,
+          sub: pick(lang, p.tagline),
+          icon: "projects",
+          color: p.palette[1],
+          view: { kind: "app", app: "projects", param: p.id },
+          art: { seed: p.id, motif: p.motif, palette: p.palette },
+        });
     for (const m of media)
       if (has(pick(lang, m.title), pick(lang, m.summary)))
-        hits.push({ id: `m:${m.id}`, title: pick(lang, m.title), sub: t(`kind.${m.kind}`), icon: "reader", color: app("reader").color, view: { kind: "app", app: "reader", param: m.id }, art: { seed: m.id, motif: m.motif, palette: m.palette } });
-    for (const a of achievements) if (has(pick(lang, a.name), a.issuer)) hits.push({ id: `a:${a.id}`, title: pick(lang, a.name), sub: a.issuer, icon: "achievements", color: app("achievements").color, view: { kind: "app", app: "achievements" } });
-    for (const e of profile.experience) if (has(e.company, pick(lang, e.role))) hits.push({ id: `e:${e.company}`, title: e.company, sub: pick(lang, e.role), icon: "profile", color: app("profile").color, view: { kind: "app", app: "profile" } });
-    for (const so of socials) if (has(so.label, so.handle)) hits.push({ id: `s:${so.id}`, title: so.label, sub: so.handle, icon: socialIcon(so.id), color: "#333", url: so.url });
+        hits.push({
+          id: `m:${m.id}`,
+          title: pick(lang, m.title),
+          sub: t(`kind.${m.kind}`),
+          icon: "reader",
+          color: app("reader").color,
+          view: { kind: "app", app: "reader", param: m.id },
+          art: { seed: m.id, motif: m.motif, palette: m.palette },
+        });
+    for (const a of achievements)
+      if (has(pick(lang, a.name), a.issuer))
+        hits.push({
+          id: `a:${a.id}`,
+          title: pick(lang, a.name),
+          sub: a.issuer,
+          icon: "achievements",
+          color: app("achievements").color,
+          view: { kind: "app", app: "achievements" },
+        });
+    for (const e of profile.experience)
+      if (has(e.company, pick(lang, e.role)))
+        hits.push({
+          id: `e:${e.company}`,
+          title: e.company,
+          sub: pick(lang, e.role),
+          icon: "profile",
+          color: app("profile").color,
+          view: { kind: "app", app: "profile" },
+        });
+    for (const so of socials)
+      if (has(so.label, so.handle))
+        hits.push({
+          id: `s:${so.id}`,
+          title: so.label,
+          sub: so.handle,
+          icon: socialIcon(so.id),
+          color: "#333",
+          url: so.url,
+        });
     return hits.slice(0, 24);
     // fs.version keeps file results fresh
   }, [q, t, lang, files, fs.version]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -342,7 +477,13 @@ function SearchPane() {
           if (hits[0]) go(hits[0]);
         }}
       >
-        <input ref={input} value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search.placeholder")} aria-label={t("charm.search")} />
+        <input
+          ref={input}
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("search.placeholder")}
+          aria-label={t("charm.search")}
+        />
         <button type="submit" aria-label={t("charm.search")}>
           <Icon name="search" size={18} />
         </button>
@@ -351,18 +492,28 @@ function SearchPane() {
         {!q && (
           <>
             <h3>{t("search.suggest")}</h3>
-            {["Three.js", "React", "Next.js", profile.experience[0]?.company ?? "", "Web Audio"].filter(Boolean).map((s) => (
-              <button key={s} className="search-suggest" onClick={() => setQ(s)}>
-                <Icon name="search" size={14} /> {s}
-              </button>
-            ))}
+            {["Three.js", "React", "Next.js", profile.experience[0]?.company ?? "", "Web Audio"]
+              .filter(Boolean)
+              .map((s) => (
+                <button key={s} className="search-suggest" onClick={() => setQ(s)}>
+                  <Icon name="search" size={14} /> {s}
+                </button>
+              ))}
           </>
         )}
         {q && !hits.length && <p className="dim">{t("search.empty")}</p>}
         {hits.map((h) => (
           <button key={h.id} className="search-hit" onClick={() => go(h)}>
             <span className="search-hit-icon" style={{ background: h.color }}>
-              {h.art ? <CoverArt seed={h.art.seed} motif={h.art.motif} palette={h.art.palette} /> : h.shell ? <ShellIcon name={h.shell} size={24} /> : h.app ? <AppIcon id={h.app} size={h.app && app(h.app).kind === "desktop" ? 24 : 20} /> : <Icon name={h.icon} size={20} />}
+              {h.art ? (
+                <CoverArt seed={h.art.seed} motif={h.art.motif} palette={h.art.palette} />
+              ) : h.shell ? (
+                <ShellIcon name={h.shell} size={24} />
+              ) : h.app ? (
+                <AppIcon id={h.app} size={h.app && app(h.app).kind === "desktop" ? 24 : 20} />
+              ) : (
+                <Icon name={h.icon} size={20} />
+              )}
             </span>
             <span className="search-hit-text">
               <strong>{h.title}</strong>
@@ -377,7 +528,12 @@ function SearchPane() {
 
 function SharePane() {
   const { t, view, toast, lang } = useOS();
-  const subject = view.kind === "app" ? (view.app === "projects" && view.param ? projects.find((p) => p.id === view.param)?.title : t(app(view.app).title)) : t("start");
+  const subject =
+    view.kind === "app"
+      ? view.app === "projects" && view.param
+        ? projects.find((p) => p.id === view.param)?.title
+        : t(app(view.app).title)
+      : t("start");
   const url = typeof window !== "undefined" ? window.location.href : "";
   const text = `${profile.name} · ${subject ?? ""}`;
   return (
@@ -415,7 +571,19 @@ function SharePane() {
       )}
       <h3>{lang === "tr" ? "Bağlantılarım" : "My links"}</h3>
       {socials.map((s) => (
-        <a key={s.id} className="pane-row" href={s.url === "#" ? undefined : s.url} target="_blank" rel="noreferrer" onClick={(e) => { if (s.url === "#") { e.preventDefault(); toast({ title: t("placeholderLink"), body: s.label, color: "#555", icon: "link" }); } }}>
+        <a
+          key={s.id}
+          className="pane-row"
+          href={s.url === "#" ? undefined : s.url}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(e) => {
+            if (s.url === "#") {
+              e.preventDefault();
+              toast({ title: t("placeholderLink"), body: s.label, color: "#555", icon: "link" });
+            }
+          }}
+        >
           <span className="pane-row-icon" style={{ background: "#333" }}>
             <Icon name={socialIcon(s.id)} size={22} />
           </span>
@@ -490,7 +658,10 @@ function SettingsPane() {
             <Icon name={sfx ? "volume" : "mute"} size={26} />
             <span>{t("settings.sound")}</span>
           </button>
-          <button className={`quick ${motion === "full" ? "on" : ""}`} onClick={() => setPref("motion", motion === "full" ? "reduced" : "full")}>
+          <button
+            className={`quick ${motion === "full" ? "on" : ""}`}
+            onClick={() => setPref("motion", motion === "full" ? "reduced" : "full")}
+          >
             <Icon name="motion" size={26} />
             <span>{t("settings.motion")}</span>
           </button>
@@ -532,7 +703,12 @@ function PersonalizePane() {
       <h3>{t("settings.background")}</h3>
       <div className="pat-grid">
         {PATTERNS.map((p) => (
-          <button key={p} className={`pat-thumb pat-${p} ${pattern === p ? "on" : ""}`} onClick={() => setPref("pattern", p)} aria-label={p}>
+          <button
+            key={p}
+            className={`pat-thumb pat-${p} ${pattern === p ? "on" : ""}`}
+            onClick={() => setPref("pattern", p)}
+            aria-label={p}
+          >
             <PatternThumb kind={p} />
           </button>
         ))}
@@ -540,7 +716,13 @@ function PersonalizePane() {
       <h3>{t("settings.bgColor")}</h3>
       <div className="swatches">
         {COLORS.map((c, i) => (
-          <button key={i} className={`swatch ${color === i ? "on" : ""}`} style={{ background: c.bg }} onClick={() => setPref("color", i)} aria-label={`${i + 1}`}>
+          <button
+            key={i}
+            className={`swatch ${color === i ? "on" : ""}`}
+            style={{ background: c.bg }}
+            onClick={() => setPref("color", i)}
+            aria-label={`${i + 1}`}
+          >
             <i style={{ background: c.accent }} />
           </button>
         ))}
@@ -548,7 +730,13 @@ function PersonalizePane() {
       <h3>{t("settings.accent")}</h3>
       <div className="swatches">
         {COLORS.map((c, i) => (
-          <button key={i} className={`swatch ${color === i ? "on" : ""}`} style={{ background: c.accent }} onClick={() => setPref("color", i)} aria-label={`${i + 1}`} />
+          <button
+            key={i}
+            className={`swatch ${color === i ? "on" : ""}`}
+            style={{ background: c.accent }}
+            onClick={() => setPref("color", i)}
+            aria-label={`${i + 1}`}
+          />
         ))}
       </div>
     </Pane>
@@ -559,10 +747,39 @@ function PatternThumb({ kind }: { kind: (typeof PATTERNS)[number] }) {
   return (
     <svg viewBox="0 0 80 50" preserveAspectRatio="none">
       <rect width="80" height="50" fill="var(--start-bg)" />
-      {kind === "waves" && [0, 1, 2, 3].map((i) => <path key={i} d={`M0 ${18 + i * 5} Q20 ${8 + i * 5} 40 ${18 + i * 5} T80 ${18 + i * 5}`} fill="none" stroke="#fff" strokeOpacity="0.3" />)}
-      {kind === "geo" && [0, 1, 2].map((i) => <polygon key={i} points={`${10 + i * 25},8 ${30 + i * 25},20 ${10 + i * 25},38`} fill="#fff" fillOpacity="0.15" />)}
-      {kind === "circuit" && [0, 1, 2].map((i) => <path key={i} d={`M${6 + i * 24} ${12 + i * 9} h18 l6 6 v10`} fill="none" stroke="#fff" strokeOpacity="0.35" />)}
-      {kind === "bubbles" && [0, 1, 2, 3, 4].map((i) => <circle key={i} cx={10 + i * 16} cy={14 + (i % 2) * 18} r={4 + (i % 3) * 4} fill="#fff" fillOpacity="0.15" />)}
+      {kind === "waves" &&
+        [0, 1, 2, 3].map((i) => (
+          <path
+            key={i}
+            d={`M0 ${18 + i * 5} Q20 ${8 + i * 5} 40 ${18 + i * 5} T80 ${18 + i * 5}`}
+            fill="none"
+            stroke="#fff"
+            strokeOpacity="0.3"
+          />
+        ))}
+      {kind === "geo" &&
+        [0, 1, 2].map((i) => (
+          <polygon
+            key={i}
+            points={`${10 + i * 25},8 ${30 + i * 25},20 ${10 + i * 25},38`}
+            fill="#fff"
+            fillOpacity="0.15"
+          />
+        ))}
+      {kind === "circuit" &&
+        [0, 1, 2].map((i) => (
+          <path
+            key={i}
+            d={`M${6 + i * 24} ${12 + i * 9} h18 l6 6 v10`}
+            fill="none"
+            stroke="#fff"
+            strokeOpacity="0.35"
+          />
+        ))}
+      {kind === "bubbles" &&
+        [0, 1, 2, 3, 4].map((i) => (
+          <circle key={i} cx={10 + i * 16} cy={14 + (i % 2) * 18} r={4 + (i % 3) * 4} fill="#fff" fillOpacity="0.15" />
+        ))}
       {kind === "desktop" && (
         <>
           <rect width="80" height="50" fill="#1e4fa8" />

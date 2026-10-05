@@ -74,7 +74,10 @@ export function AchievementsApp() {
               {achievements.map((a) => (
                 <li key={a.id} onClick={() => a.url && link(a.url)} className={a.url ? "clickable" : ""}>
                   <span className="medal" style={{ background: TIER_COLOR[a.tier] }}>
-                    <Icon name={a.kind === "certificate" ? "cv" : a.kind === "award" ? "star" : "achievements"} size={18} />
+                    <Icon
+                      name={a.kind === "certificate" ? "cv" : a.kind === "award" ? "star" : "achievements"}
+                      size={18}
+                    />
                   </span>
                   <span>
                     <strong>{pick(lang, a.name)}</strong>

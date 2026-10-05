@@ -15,7 +15,7 @@ const dict = {
   "login.owner": { tr: "Sahibin hesabı", en: "The owner's account" },
   "login.switch": { tr: "Kullanıcı değiştir", en: "Switch user" },
   "login.signIn": { tr: "Oturum aç", en: "Sign in" },
-  "welcome": { tr: "Hoş geldiniz", en: "Welcome" },
+  welcome: { tr: "Hoş geldiniz", en: "Welcome" },
   "hi.1": { tr: "Merhaba", en: "Hi" },
   "hi.2": { tr: "Uygulamalarınızı hazırlıyoruz", en: "We're setting up your apps" },
   "hi.3": { tr: "Gezinmenin yeni yolu: ekranın köşeleri", en: "A new way to get around: the corners of the screen" },
@@ -25,13 +25,13 @@ const dict = {
     en: "Move the mouse to the top-right corner or swipe in from the right edge: Search, Share, Start, Devices and Settings live there.",
   },
   "hi.skip": { tr: "Geçmek için tıkla", en: "Click to skip" },
-  "shutdown": { tr: "Kapatılıyor", en: "Shutting down" },
-  "restart": { tr: "Yeniden başlatılıyor", en: "Restarting" },
-  "signout": { tr: "Oturum kapatılıyor", en: "Signing out" },
+  shutdown: { tr: "Kapatılıyor", en: "Shutting down" },
+  restart: { tr: "Yeniden başlatılıyor", en: "Restarting" },
+  signout: { tr: "Oturum kapatılıyor", en: "Signing out" },
 
   // Start
-  "start": { tr: "Başlangıç", en: "Start" },
-  "apps": { tr: "Uygulamalar", en: "Apps" },
+  start: { tr: "Başlangıç", en: "Start" },
+  apps: { tr: "Uygulamalar", en: "Apps" },
   "apps.byName": { tr: "ada göre", en: "by name" },
   "apps.byCategory": { tr: "kategoriye göre", en: "by category" },
   "apps.search": { tr: "Uygulama ara", en: "Search apps" },
@@ -60,7 +60,7 @@ const dict = {
   "size.wide": { tr: "Geniş", en: "Wide" },
   "size.large": { tr: "Büyük", en: "Large" },
   "zoom.out": { tr: "Uzaklaştır", en: "Zoom out" },
-  "allApps": { tr: "Tüm uygulamalar", en: "All apps" },
+  allApps: { tr: "Tüm uygulamalar", en: "All apps" },
 
   // Apps
   "app.projects": { tr: "Mağaza", en: "Store" },
@@ -119,11 +119,20 @@ const dict = {
   "share.native": { tr: "Cihazın paylaşım menüsü", en: "Device share menu" },
   "devices.title": { tr: "Bu bilgisayarla kullanılanlar", en: "Used with this PC" },
   "devices.keyboard": { tr: "Klavye", en: "Keyboard" },
-  "devices.keyboardNote": { tr: "Oklar gezinir, Esc geri gider, Enter açar", en: "Arrows move, Esc goes back, Enter opens" },
+  "devices.keyboardNote": {
+    tr: "Oklar gezinir, Esc geri gider, Enter açar",
+    en: "Arrows move, Esc goes back, Enter opens",
+  },
   "devices.mouse": { tr: "Fare", en: "Mouse" },
-  "devices.mouseNote": { tr: "Köşeler: sağ üst charm, sol üst uygulamalar, sol alt Başlangıç", en: "Corners: top right charms, top left apps, bottom left Start" },
+  "devices.mouseNote": {
+    tr: "Köşeler: sağ üst charm, sol üst uygulamalar, sol alt Başlangıç",
+    en: "Corners: top right charms, top left apps, bottom left Start",
+  },
   "devices.touch": { tr: "Dokunmatik", en: "Touch" },
-  "devices.touchNote": { tr: "Sağ kenardan charm, sol kenardan son uygulama", en: "Right edge for charms, left edge for the last app" },
+  "devices.touchNote": {
+    tr: "Sağ kenardan charm, sol kenardan son uygulama",
+    en: "Right edge for charms, left edge for the last app",
+  },
   "devices.print": { tr: "Özgeçmişi yazdır", en: "Print the CV" },
   "settings.title": { tr: "Ayarlar", en: "Settings" },
   "settings.personalize": { tr: "Kişiselleştir", en: "Personalize" },
@@ -149,25 +158,25 @@ const dict = {
   "power.restart": { tr: "Yeniden başlat", en: "Restart" },
   "power.signout": { tr: "Oturumu kapat", en: "Sign out" },
   "power.lock": { tr: "Kilitle", en: "Lock" },
-  "on": { tr: "Açık", en: "On" },
-  "off": { tr: "Kapalı", en: "Off" },
-  "full": { tr: "Tam", en: "Full" },
-  "reduced": { tr: "Azaltılmış", en: "Reduced" },
+  on: { tr: "Açık", en: "On" },
+  off: { tr: "Kapalı", en: "Off" },
+  full: { tr: "Tam", en: "Full" },
+  reduced: { tr: "Azaltılmış", en: "Reduced" },
 
   // Shared content words
   "status.live": { tr: "Yayında", en: "Live" },
   "status.dev": { tr: "Geliştiriliyor", en: "In development" },
   "status.archived": { tr: "Arşivde", en: "Archived" },
-  "sample": { tr: "Örnek içerik", en: "Sample content" },
-  "demo": { tr: "Canlı demo", en: "Live demo" },
-  "source": { tr: "Kaynak kod", en: "Source code" },
-  "noLinks": { tr: "Bağlantılar yakında", en: "Links coming soon" },
-  "placeholderLink": { tr: "Bu bağlantı henüz eklenmedi", en: "This link hasn't been added yet" },
-  "leaving": { tr: "Yeni sekmede açılıyor", en: "Opening in a new tab" },
-  "back": { tr: "Geri", en: "Back" },
-  "all": { tr: "Tümü", en: "All" },
-  "minutes": { tr: "dk", en: "min" },
-  "hours": { tr: "saat", en: "hours" },
+  sample: { tr: "Örnek içerik", en: "Sample content" },
+  demo: { tr: "Canlı demo", en: "Live demo" },
+  source: { tr: "Kaynak kod", en: "Source code" },
+  noLinks: { tr: "Bağlantılar yakında", en: "Links coming soon" },
+  placeholderLink: { tr: "Bu bağlantı henüz eklenmedi", en: "This link hasn't been added yet" },
+  leaving: { tr: "Yeni sekmede açılıyor", en: "Opening in a new tab" },
+  back: { tr: "Geri", en: "Back" },
+  all: { tr: "Tümü", en: "All" },
+  minutes: { tr: "dk", en: "min" },
+  hours: { tr: "saat", en: "hours" },
   "kind.post": { tr: "Yazı", en: "Post" },
   "kind.tutorial": { tr: "Eğitim", en: "Tutorial" },
   "kind.video": { tr: "Video", en: "Video" },
@@ -245,7 +254,10 @@ const dict = {
   "music.collection": { tr: "Koleksiyon", en: "Collection" },
   "music.play": { tr: "Çal", en: "Play" },
   "music.pause": { tr: "Duraklat", en: "Pause" },
-  "music.note": { tr: "Her parça tarayıcıda anlık olarak sentezleniyor; ses dosyası yok.", en: "Every track is synthesized live in the browser; there are no audio files." },
+  "music.note": {
+    tr: "Her parça tarayıcıda anlık olarak sentezleniyor; ses dosyası yok.",
+    en: "Every track is synthesized live in the browser; there are no audio files.",
+  },
   "music.album": { tr: "Tarayıcı Seansları", en: "Browser Sessions" },
   "music.idle": { tr: "Çalan bir şey yok", en: "Nothing playing" },
 
@@ -329,8 +341,14 @@ const dict = {
   "pc.network": { tr: "Ağ", en: "Network" },
   "pc.storage": { tr: "Dosya depolama alanı", en: "File storage" },
   "pc.resetAll": { tr: "Her şeyi kaldır ve Windows'u yeniden yükle", en: "Remove everything and reinstall Windows" },
-  "pc.resetAllNote": { tr: "Dosyalarınız, kutucuk düzeniniz ve ayarlarınız silinir; bilgisayar ilk günkü haline döner.", en: "Your files, tile layout and settings are removed and the PC goes back to how it was on day one." },
-  "pc.resetAllConfirm": { tr: "Bu bilgisayardaki tüm dosyalar ve ayarlar silinsin mi?", en: "Remove all files and settings from this PC?" },
+  "pc.resetAllNote": {
+    tr: "Dosyalarınız, kutucuk düzeniniz ve ayarlarınız silinir; bilgisayar ilk günkü haline döner.",
+    en: "Your files, tile layout and settings are removed and the PC goes back to how it was on day one.",
+  },
+  "pc.resetAllConfirm": {
+    tr: "Bu bilgisayardaki tüm dosyalar ve ayarlar silinsin mi?",
+    en: "Remove all files and settings from this PC?",
+  },
   "pc.resetAllGo": { tr: "Başlayın", en: "Get started" },
 
   // Phone
@@ -352,7 +370,20 @@ export function pick(lang: Lang, value: L): string {
 
 const MONTHS: Record<Lang, string[]> = {
   tr: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
-  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  en: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
 };
 const DAYS: Record<Lang, string[]> = {
   tr: ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"],
@@ -363,7 +394,9 @@ export const monthName = (lang: Lang, m: number) => MONTHS[lang][m];
 export const dayName = (lang: Lang, d: number) => DAYS[lang][d];
 export const time = (d: Date) => `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
 export const longDate = (lang: Lang, d: Date) =>
-  lang === "tr" ? `${d.getDate()} ${MONTHS.tr[d.getMonth()]}, ${DAYS.tr[d.getDay()]}` : `${DAYS.en[d.getDay()]}, ${MONTHS.en[d.getMonth()]} ${d.getDate()}`;
+  lang === "tr"
+    ? `${d.getDate()} ${MONTHS.tr[d.getMonth()]}, ${DAYS.tr[d.getDay()]}`
+    : `${DAYS.en[d.getDay()]}, ${MONTHS.en[d.getMonth()]} ${d.getDate()}`;
 
 /** "2026-09-12" or "2025-11" → "12 Eylül 2026" / "November 2025". */
 export function formatDate(lang: Lang, iso: string) {

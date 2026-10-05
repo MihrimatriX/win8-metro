@@ -98,7 +98,12 @@ export function ProfileApp() {
       content: (
         <div className="social-tiles">
           {socials.map((s) => (
-            <button key={s.id} className="social-tile" style={{ background: socialColor(s.id) }} onClick={() => link(s.url)}>
+            <button
+              key={s.id}
+              className="social-tile"
+              style={{ background: socialColor(s.id) }}
+              onClick={() => link(s.url)}
+            >
               <Icon name={socialIcon(s.id)} size={30} />
               <span>
                 {s.label}

@@ -8,9 +8,28 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { IconName } from "@/lib/model";
 import { Icon } from "../Icons";
 
-export type AppBarCmd = { icon: IconName; label: string; onClick: () => void; disabled?: boolean; active?: boolean; hidden?: boolean };
+export type AppBarCmd = {
+  icon: IconName;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  active?: boolean;
+  hidden?: boolean;
+};
 
-export function AppBar({ left = [], right = [], sticky, children, className }: { left?: AppBarCmd[]; right?: AppBarCmd[]; sticky?: boolean; children?: ReactNode; className?: string }) {
+export function AppBar({
+  left = [],
+  right = [],
+  sticky,
+  children,
+  className,
+}: {
+  left?: AppBarCmd[];
+  right?: AppBarCmd[];
+  sticky?: boolean;
+  children?: ReactNode;
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   const bar = useRef<HTMLDivElement>(null);
 
@@ -34,7 +53,8 @@ export function AppBar({ left = [], right = [], sticky, children, className }: {
       if (e.key === "Escape") setOpen(false);
     };
     let startY: number | null = null;
-    const ts = (e: TouchEvent) => (startY = e.touches[0].clientY > window.innerHeight - 30 ? e.touches[0].clientY : null);
+    const ts = (e: TouchEvent) =>
+      (startY = e.touches[0].clientY > window.innerHeight - 30 ? e.touches[0].clientY : null);
     const te = (e: TouchEvent) => {
       if (startY !== null && startY - e.changedTouches[0].clientY > 30) setOpen(true);
       startY = null;
@@ -70,7 +90,11 @@ export function AppBar({ left = [], right = [], sticky, children, className }: {
     );
 
   return (
-    <div ref={bar} className={`appbar metro-appbar ${open || sticky ? "open" : ""} ${className ?? ""}`} onContextMenu={(e) => e.stopPropagation()}>
+    <div
+      ref={bar}
+      className={`appbar metro-appbar ${open || sticky ? "open" : ""} ${className ?? ""}`}
+      onContextMenu={(e) => e.stopPropagation()}
+    >
       <div className="appbar-left">{left.map(btn)}</div>
       {children}
       <div className="appbar-right">{right.map(btn)}</div>

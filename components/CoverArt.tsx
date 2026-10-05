@@ -57,8 +57,28 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
           {stars(70)}
           <circle cx={px} cy={py} r={pr * 2.2} fill={url("glow")} opacity="0.55" />
           <circle cx={px} cy={py} r={pr} fill={url("planet")} />
-          <ellipse cx={px} cy={py} rx={pr * 1.9} ry={pr * 0.42} fill="none" stroke={acc} strokeOpacity="0.55" strokeWidth="0.8" transform={`rotate(-18 ${px} ${py})`} />
-          <ellipse cx={px} cy={py} rx={pr * 2.3} ry={pr * 0.55} fill="none" stroke="#fff" strokeOpacity="0.18" strokeWidth="0.4" transform={`rotate(-18 ${px} ${py})`} />
+          <ellipse
+            cx={px}
+            cy={py}
+            rx={pr * 1.9}
+            ry={pr * 0.42}
+            fill="none"
+            stroke={acc}
+            strokeOpacity="0.55"
+            strokeWidth="0.8"
+            transform={`rotate(-18 ${px} ${py})`}
+          />
+          <ellipse
+            cx={px}
+            cy={py}
+            rx={pr * 2.3}
+            ry={pr * 0.55}
+            fill="none"
+            stroke="#fff"
+            strokeOpacity="0.18"
+            strokeWidth="0.4"
+            transform={`rotate(-18 ${px} ${py})`}
+          />
           <circle cx={px - pr * 2.4} cy={py + pr * 0.9} r={pr * 0.18} fill={acc} opacity="0.9" />
         </>
       );
@@ -69,10 +89,32 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
       const lines = [];
       for (let i = 0; i < 14; i++) {
         const y = hz + Math.pow(i / 13, 2) * (90 - hz);
-        lines.push(<line key={`h${i}`} x1="0" x2="160" y1={y} y2={y} stroke={acc} strokeOpacity={0.25 + i * 0.05} strokeWidth="0.35" />);
+        lines.push(
+          <line
+            key={`h${i}`}
+            x1="0"
+            x2="160"
+            y1={y}
+            y2={y}
+            stroke={acc}
+            strokeOpacity={0.25 + i * 0.05}
+            strokeWidth="0.35"
+          />,
+        );
       }
       for (let i = -12; i <= 12; i++) {
-        lines.push(<line key={`v${i}`} x1={80 + i * 2.2} y1={hz} x2={80 + i * 18} y2="90" stroke={acc} strokeOpacity="0.55" strokeWidth="0.35" />);
+        lines.push(
+          <line
+            key={`v${i}`}
+            x1={80 + i * 2.2}
+            y1={hz}
+            x2={80 + i * 18}
+            y2="90"
+            stroke={acc}
+            strokeOpacity="0.55"
+            strokeWidth="0.35"
+          />,
+        );
       }
       scene = (
         <>
@@ -93,9 +135,18 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
         const amp = 4 + r() * 7;
         const ph = r() * Math.PI * 2;
         let d = `M0 ${base}`;
-        for (let x = 0; x <= 160; x += 4) d += ` L${x} ${(base + Math.sin(x / 18 + ph) * amp + Math.sin(x / 7 + ph * 2) * amp * 0.25).toFixed(2)}`;
+        for (let x = 0; x <= 160; x += 4)
+          d += ` L${x} ${(base + Math.sin(x / 18 + ph) * amp + Math.sin(x / 7 + ph * 2) * amp * 0.25).toFixed(2)}`;
         d += " L160 90 L0 90 Z";
-        return <path key={i} d={d} fill={i % 2 ? acc : mid} opacity={0.18 + i * 0.1} className={animated ? `wave wave-${i % 3}` : undefined} />;
+        return (
+          <path
+            key={i}
+            d={d}
+            fill={i % 2 ? acc : mid}
+            opacity={0.18 + i * 0.1}
+            className={animated ? `wave wave-${i % 3}` : undefined}
+          />
+        );
       });
       scene = (
         <>
@@ -118,7 +169,16 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
           const rad = s * (0.5 + r() * 0.8);
           return `${(cx + Math.cos(ang) * rad).toFixed(1)},${(cy + Math.sin(ang) * rad).toFixed(1)}`;
         });
-        return <polygon key={i} points={pts.join(" ")} fill={i % 3 === 0 ? url("shardA") : url("shardB")} opacity={(0.15 + r() * 0.55).toFixed(2)} className={animated && i % 4 === 0 ? "float" : undefined} style={animated ? { animationDelay: `${(r() * 6).toFixed(2)}s` } : undefined} />;
+        return (
+          <polygon
+            key={i}
+            points={pts.join(" ")}
+            fill={i % 3 === 0 ? url("shardA") : url("shardB")}
+            opacity={(0.15 + r() * 0.55).toFixed(2)}
+            className={animated && i % 4 === 0 ? "float" : undefined}
+            style={animated ? { animationDelay: `${(r() * 6).toFixed(2)}s` } : undefined}
+          />
+        );
       });
       scene = (
         <>
@@ -141,7 +201,19 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
           {stars(40)}
           <circle cx={cx} cy={cy} r="40" fill={url("glow")} opacity="0.6" />
           {Array.from({ length: 11 }, (_, i) => (
-            <circle key={i} cx={cx} cy={cy} r={6 + i * 6.5} fill="none" stroke={i % 3 === 0 ? "#fff" : acc} strokeOpacity={0.75 - i * 0.06} strokeWidth={i % 3 === 0 ? 0.35 : 0.6} strokeDasharray={i % 2 ? `${2 + r() * 8} ${1 + r() * 4}` : undefined} className={animated ? `spin spin-${i % 3}` : undefined} style={{ transformOrigin: `${cx}px ${cy}px` }} />
+            <circle
+              key={i}
+              cx={cx}
+              cy={cy}
+              r={6 + i * 6.5}
+              fill="none"
+              stroke={i % 3 === 0 ? "#fff" : acc}
+              strokeOpacity={0.75 - i * 0.06}
+              strokeWidth={i % 3 === 0 ? 0.35 : 0.6}
+              strokeDasharray={i % 2 ? `${2 + r() * 8} ${1 + r() * 4}` : undefined}
+              className={animated ? `spin spin-${i % 3}` : undefined}
+              style={{ transformOrigin: `${cx}px ${cy}px` }}
+            />
           ))}
           <circle cx={cx} cy={cy} r="4" fill="#fff" />
         </>
@@ -153,7 +225,8 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
         const base = 50 + i * 9;
         const ph = r() * 6;
         let d = `M0 ${base}`;
-        for (let x = 0; x <= 160; x += 5) d += ` L${x} ${(base - Math.sin(x / (26 + i * 6) + ph) * (6 + i)).toFixed(2)}`;
+        for (let x = 0; x <= 160; x += 5)
+          d += ` L${x} ${(base - Math.sin(x / (26 + i * 6) + ph) * (6 + i)).toFixed(2)}`;
         d += " L160 90 L0 90 Z";
         return <path key={i} d={d} fill={i % 2 ? mid : bg} opacity={0.55 + i * 0.1} />;
       });
@@ -176,7 +249,20 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
         const w = 6 + r() * 12;
         const h = 18 + r() * 45;
         blds.push(<rect key={`b${i}`} x={x} y={90 - h} width={w - 0.8} height={h} fill={bg} opacity="0.92" />);
-        for (let wy = 90 - h + 3; wy < 88; wy += 4) for (let wx = x + 1.5; wx < x + w - 2; wx += 3) if (r() > 0.62) blds.push(<rect key={`w${i}-${wx}-${wy}`} x={wx} y={wy} width="1.1" height="1.6" fill={acc} opacity={0.5 + r() * 0.5} />);
+        for (let wy = 90 - h + 3; wy < 88; wy += 4)
+          for (let wx = x + 1.5; wx < x + w - 2; wx += 3)
+            if (r() > 0.62)
+              blds.push(
+                <rect
+                  key={`w${i}-${wx}-${wy}`}
+                  x={wx}
+                  y={wy}
+                  width="1.1"
+                  height="1.6"
+                  fill={acc}
+                  opacity={0.5 + r() * 0.5}
+                />,
+              );
         x += w;
         i++;
       }
@@ -203,7 +289,14 @@ export function CoverArt({ seed, motif, palette, variant = 0, className, animate
         }
         return (
           <g key={i}>
-            <path d={d} fill="none" stroke={acc} strokeOpacity={0.25 + r() * 0.5} strokeWidth="0.5" className={animated && i % 3 === 0 ? "trace" : undefined} />
+            <path
+              d={d}
+              fill="none"
+              stroke={acc}
+              strokeOpacity={0.25 + r() * 0.5}
+              strokeWidth="0.5"
+              className={animated && i % 3 === 0 ? "trace" : undefined}
+            />
             <circle cx={px} cy={py} r="1" fill={acc} />
           </g>
         );

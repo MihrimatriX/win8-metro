@@ -235,7 +235,13 @@ function FindDlg({
       <div className="np-find-fields">
         <label className="np-find-row">
           <span>{L("Aranan:", "Find what:")}</span>
-          <input ref={box} className="w8-input" value={term} spellCheck={false} onChange={(e) => setTerm(e.target.value)} />
+          <input
+            ref={box}
+            className="w8-input"
+            value={term}
+            spellCheck={false}
+            onChange={(e) => setTerm(e.target.value)}
+          />
         </label>
         {replace && (
           <label className="np-find-row">
@@ -298,7 +304,8 @@ function FindDlg({
   );
 }
 
-const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] ?? c);
+const escHtml = (s: string) =>
+  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] ?? c);
 
 /** Print through a hidden frame so only the document (not the whole desktop) reaches the printer. */
 export function printHtml(title: string, bodyHtml: string, css: string) {
@@ -313,7 +320,9 @@ export function printHtml(title: string, bodyHtml: string, css: string) {
     return;
   }
   d.open();
-  d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${css}</style></head><body>${bodyHtml}</body></html>`);
+  d.write(
+    `<!doctype html><html><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>${css}</style></head><body>${bodyHtml}</body></html>`,
+  );
   d.close();
   window.setTimeout(() => {
     try {
@@ -329,9 +338,33 @@ export function printHtml(title: string, bodyHtml: string, css: string) {
 function caretXY(t: HTMLTextAreaElement, pos: number) {
   const cs = getComputedStyle(t);
   const m = document.createElement("div");
-  const copy = ["fontFamily", "fontSize", "fontWeight", "fontStyle", "lineHeight", "letterSpacing", "tabSize", "paddingTop", "paddingLeft", "paddingRight", "paddingBottom", "whiteSpace", "overflowWrap", "wordBreak", "direction"] as const;
+  const copy = [
+    "fontFamily",
+    "fontSize",
+    "fontWeight",
+    "fontStyle",
+    "lineHeight",
+    "letterSpacing",
+    "tabSize",
+    "paddingTop",
+    "paddingLeft",
+    "paddingRight",
+    "paddingBottom",
+    "whiteSpace",
+    "overflowWrap",
+    "wordBreak",
+    "direction",
+  ] as const;
   for (const p of copy) m.style[p] = cs[p];
-  Object.assign(m.style, { position: "absolute", visibility: "hidden", top: "0", left: "-99999px", boxSizing: "border-box", border: "0", width: `${t.clientWidth}px` });
+  Object.assign(m.style, {
+    position: "absolute",
+    visibility: "hidden",
+    top: "0",
+    left: "-99999px",
+    boxSizing: "border-box",
+    border: "0",
+    width: `${t.clientWidth}px`,
+  });
   m.textContent = t.value.slice(0, pos);
   const sp = document.createElement("span");
   sp.textContent = t.value.slice(pos, pos + 1) || ".";
@@ -367,7 +400,16 @@ function Group({ label, className, children }: { label: string; className?: stri
 
 type FontStyle = "normal" | "italic" | "bold" | "bolditalic";
 type NpFont = { family: string; style: FontStyle; size: number };
-type PageSetup = { paper: string; orient: "portrait" | "landscape"; left: number; right: number; top: number; bottom: number; header: string; footer: string };
+type PageSetup = {
+  paper: string;
+  orient: "portrait" | "landscape";
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  header: string;
+  footer: string;
+};
 type NpPrefs = { wrap: boolean; status: boolean; font: NpFont; page: PageSetup };
 
 const PREFS_KEY = "afu-metro:v2:notepad";
@@ -399,7 +441,12 @@ const SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 function loadPrefs(): NpPrefs {
   try {
     const raw = JSON.parse(window.localStorage.getItem(PREFS_KEY) ?? "{}") as Partial<NpPrefs>;
-    return { ...DEFAULT_PREFS, ...raw, font: { ...DEFAULT_PREFS.font, ...raw.font }, page: { ...DEFAULT_PREFS.page, ...raw.page } };
+    return {
+      ...DEFAULT_PREFS,
+      ...raw,
+      font: { ...DEFAULT_PREFS.font, ...raw.font },
+      page: { ...DEFAULT_PREFS.page, ...raw.page },
+    };
   } catch {
     return DEFAULT_PREFS;
   }
@@ -477,7 +524,9 @@ export default function NotepadApp() {
     void (async () => {
       const r = await msgBox(id, {
         title: appName,
-        text: tr ? `${p} dosyası bulunamıyor.\n\nYeni dosya oluşturmak istiyor musunuz?` : `Cannot find the ${p} file.\n\nDo you want to create a new file?`,
+        text: tr
+          ? `${p} dosyası bulunamıyor.\n\nYeni dosya oluşturmak istiyor musunuz?`
+          : `Cannot find the ${p} file.\n\nDo you want to create a new file?`,
         icon: "warning",
         buttons: tr ? ["Evet", "Hayır", "İptal"] : ["Yes", "No", "Cancel"],
       });
@@ -554,7 +603,14 @@ export default function NotepadApp() {
     try {
       fs.write(p, { text: body.replace(/\n/g, "\r\n") });
     } catch {
-      await msgBox(id, { title: appName, text: tr ? `${p}\nDosya kaydedilemedi. Klasör bulunamadı.` : `${p}\nThe file could not be saved. The folder doesn't exist.`, icon: "error", buttons: [L("Tamam", "OK")] });
+      await msgBox(id, {
+        title: appName,
+        text: tr
+          ? `${p}\nDosya kaydedilemedi. Klasör bulunamadı.`
+          : `${p}\nThe file could not be saved. The folder doesn't exist.`,
+        icon: "error",
+        buttons: [L("Tamam", "OK")],
+      });
       return false;
     }
     setPath(p);
@@ -565,10 +621,21 @@ export default function NotepadApp() {
   const saveAs = async (): Promise<boolean> => {
     const body = text;
     for (;;) {
-      const p = await fileDialog(id, { mode: "save", lang, filters, name: path ? basename(path) : "*.txt", dir: path ? dirname(path) : KNOWN.documents });
+      const p = await fileDialog(id, {
+        mode: "save",
+        lang,
+        filters,
+        name: path ? basename(path) : "*.txt",
+        dir: path ? dirname(path) : KNOWN.documents,
+      });
       if (!p) return false;
       if (/[*?"<>|]/.test(basename(p))) {
-        await msgBox(id, { title: L("Farklı Kaydet", "Save As"), text: `${basename(p)}\n${L("Dosya adı geçerli değil.", "The file name is not valid.")}`, icon: "warning", buttons: [L("Tamam", "OK")] });
+        await msgBox(id, {
+          title: L("Farklı Kaydet", "Save As"),
+          text: `${basename(p)}\n${L("Dosya adı geçerli değil.", "The file name is not valid.")}`,
+          icon: "warning",
+          buttons: [L("Tamam", "OK")],
+        });
         continue;
       }
       return writeTo(p, body);
@@ -581,7 +648,12 @@ export default function NotepadApp() {
   const confirmSave = async (): Promise<boolean> => {
     if (!dirty) return true;
     const name = path ?? untitled;
-    const r = await askSave(id, appName, tr ? `Değişiklikleri ${name} dosyasına kaydetmek istiyor musunuz?` : `Do you want to save changes to ${name}?`, lang);
+    const r = await askSave(
+      id,
+      appName,
+      tr ? `Değişiklikleri ${name} dosyasına kaydetmek istiyor musunuz?` : `Do you want to save changes to ${name}?`,
+      lang,
+    );
     if (r === 0) return save();
     return r === 1;
   };
@@ -599,7 +671,12 @@ export default function NotepadApp() {
   const openPathIn = async (p: string) => {
     const body = readText(p);
     if (body === null) {
-      await msgBox(id, { title: appName, text: tr ? `${p}\nDosya bulunamadı.` : `${p}\nFile not found.`, icon: "warning", buttons: [L("Tamam", "OK")] });
+      await msgBox(id, {
+        title: appName,
+        text: tr ? `${p}\nDosya bulunamadı.` : `${p}\nFile not found.`,
+        icon: "warning",
+        buttons: [L("Tamam", "OK")],
+      });
       return;
     }
     load(normalize(p), body);
@@ -617,8 +694,16 @@ export default function NotepadApp() {
     const css = `@page{size:${pg.paper === "Letter" ? "letter" : pg.paper} ${pg.orient};margin:${pg.top}mm ${pg.right}mm ${pg.bottom}mm ${pg.left}mm}
       body{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:${f.style.endsWith("italic") ? "italic" : "normal"} ${f.style.startsWith("bold") ? 700 : 400} ${f.size}pt ${FONTS[f.family] ?? "monospace"}}
       header{text-align:center;font:10pt Arial,sans-serif;margin-bottom:8mm}`;
-    const head = pg.header.replace(/&f/gi, path ? basename(path) : untitled).replace(/&d/gi, new Date().toLocaleDateString(lang)).replace(/&t/gi, new Date().toLocaleTimeString(lang)).replace(/&[a-z]/gi, "");
-    printHtml(path ? basename(path) : untitled, `${head ? `<header>${escHtml(head)}</header>` : ""}${escHtml(text)}`, css);
+    const head = pg.header
+      .replace(/&f/gi, path ? basename(path) : untitled)
+      .replace(/&d/gi, new Date().toLocaleDateString(lang))
+      .replace(/&t/gi, new Date().toLocaleTimeString(lang))
+      .replace(/&[a-z]/gi, "");
+    printHtml(
+      path ? basename(path) : untitled,
+      `${head ? `<header>${escHtml(head)}</header>` : ""}${escHtml(text)}`,
+      css,
+    );
   };
 
   // ---------- editing ----------
@@ -682,7 +767,10 @@ export default function NotepadApp() {
     replace: (term, repl, o) => {
       const t = ta.current;
       if (!t) return false;
-      if (t.selectionStart !== t.selectionEnd && sameText(t.value.slice(t.selectionStart, t.selectionEnd), term, o, lang)) {
+      if (
+        t.selectionStart !== t.selectionEnd &&
+        sameText(t.value.slice(t.selectionStart, t.selectionEnd), term, o, lang)
+      ) {
         const back = document.activeElement as HTMLElement | null;
         t.focus({ preventScroll: true });
         document.execCommand(repl ? "insertText" : "delete", false, repl);
@@ -696,7 +784,11 @@ export default function NotepadApp() {
       let out = "";
       let at = 0;
       let n = 0;
-      for (let i = searchText(t.value, term, 0, { ...o, up: false }, lang); i >= 0; i = searchText(t.value, term, at, { ...o, up: false }, lang)) {
+      for (
+        let i = searchText(t.value, term, 0, { ...o, up: false }, lang);
+        i >= 0;
+        i = searchText(t.value, term, at, { ...o, up: false }, lang)
+      ) {
         out += t.value.slice(at, i) + repl;
         at = i + term.length;
         n++;
@@ -725,7 +817,8 @@ export default function NotepadApp() {
       find(false);
       return;
     }
-    if (!target().find(st.term, st)) void msgBox(id, { title: appName, text: notFound(st.term), icon: "info", buttons: [L("Tamam", "OK")] });
+    if (!target().find(st.term, st))
+      void msgBox(id, { title: appName, text: notFound(st.term), icon: "info", buttons: [L("Tamam", "OK")] });
   };
 
   const goTo = () => {
@@ -807,7 +900,12 @@ export default function NotepadApp() {
 
   const hasText = text.length > 0;
   const editItems = (withUndo = true): MenuItem[] => [
-    ...(withUndo ? ([{ label: L("Geri Al", "Undo"), shortcut: "Ctrl+Z", onClick: edit.undo, disabled: !dirty }, { sep: true }] as MenuItem[]) : []),
+    ...(withUndo
+      ? ([
+          { label: L("Geri Al", "Undo"), shortcut: "Ctrl+Z", onClick: edit.undo, disabled: !dirty },
+          { sep: true },
+        ] as MenuItem[])
+      : []),
     { label: L("Kes", "Cut"), shortcut: "Ctrl+X", onClick: edit.cut, disabled: !caret.sel },
     { label: L("Kopyala", "Copy"), shortcut: "Ctrl+C", onClick: edit.copy, disabled: !caret.sel },
     { label: L("Yapıştır", "Paste"), shortcut: "Ctrl+V", onClick: () => void edit.paste() },
@@ -852,14 +950,25 @@ export default function NotepadApp() {
     },
     {
       label: L("Görünüm", "View"),
-      items: [{ label: L("Durum Çubuğu", "Status Bar"), checked: prefs.status && !prefs.wrap, disabled: prefs.wrap, onClick: () => setPref("status", !prefs.status) }],
+      items: [
+        {
+          label: L("Durum Çubuğu", "Status Bar"),
+          checked: prefs.status && !prefs.wrap,
+          disabled: prefs.wrap,
+          onClick: () => setPref("status", !prefs.status),
+        },
+      ],
     },
     {
       label: L("Yardım", "Help"),
       items: [
         {
           label: L("Yardımı Görüntüle", "View Help"),
-          onClick: () => openApp("ie", `https://www.bing.com/search?q=${encodeURIComponent(tr ? "windows 8.1 not defteri yardım" : "get help with notepad in windows 8.1")}`),
+          onClick: () =>
+            openApp(
+              "ie",
+              `https://www.bing.com/search?q=${encodeURIComponent(tr ? "windows 8.1 not defteri yardım" : "get help with notepad in windows 8.1")}`,
+            ),
         },
         { sep: true },
         { label: L("Not Defteri Hakkında", "About Notepad"), onClick: about },
@@ -884,9 +993,16 @@ export default function NotepadApp() {
     { sep: true },
     { label: L("Tümünü Seç", "Select All"), onClick: edit.selectAll },
     { sep: true },
-    { label: L("Sağdan sola okuma düzeni", "Right to left Reading order"), checked: rtl, onClick: () => setRtl((r) => !r) },
+    {
+      label: L("Sağdan sola okuma düzeni", "Right to left Reading order"),
+      checked: rtl,
+      onClick: () => setRtl((r) => !r),
+    },
     { label: L("Unicode denetim karakterlerini göster", "Show Unicode control characters"), disabled: true },
-    { label: L("Unicode denetim karakteri ekle", "Insert Unicode control character"), sub: unicode.map(([n, ch]) => ({ label: n, onClick: () => insert(ch) })) },
+    {
+      label: L("Unicode denetim karakteri ekle", "Insert Unicode control character"),
+      sub: unicode.map(([n, ch]) => ({ label: n, onClick: () => insert(ch) })),
+    },
     { sep: true },
     { label: L("IME'yi Aç", "Open IME"), disabled: true },
     { label: L("Yeniden Dönüştür", "Reconversion"), disabled: true },
@@ -918,8 +1034,12 @@ export default function NotepadApp() {
             insert("\t");
           }
         }}
-        onCopy={(e) => (localClip = e.currentTarget.value.slice(e.currentTarget.selectionStart, e.currentTarget.selectionEnd))}
-        onCut={(e) => (localClip = e.currentTarget.value.slice(e.currentTarget.selectionStart, e.currentTarget.selectionEnd))}
+        onCopy={(e) =>
+          (localClip = e.currentTarget.value.slice(e.currentTarget.selectionStart, e.currentTarget.selectionEnd))
+        }
+        onCut={(e) =>
+          (localClip = e.currentTarget.value.slice(e.currentTarget.selectionStart, e.currentTarget.selectionEnd))
+        }
         onContextMenu={(e) => {
           e.preventDefault();
           setCtx({ x: e.clientX, y: e.clientY });
@@ -948,7 +1068,9 @@ export default function NotepadApp() {
       {showStatus && (
         <div className="np-status">
           <span className="np-status-main" />
-          <span className="np-status-pos">{tr ? `Satır ${caret.line}, Sütun ${caret.col}` : `Ln ${caret.line}, Col ${caret.col}`}</span>
+          <span className="np-status-pos">
+            {tr ? `Satır ${caret.line}, Sütun ${caret.col}` : `Ln ${caret.line}, Col ${caret.col}`}
+          </span>
           <svg className="np-grip" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
             {[
               [9, 1],
@@ -970,7 +1092,19 @@ export default function NotepadApp() {
 
 // ---------- Go To ----------
 
-function GoToDlg({ lang, line, lines, go, close }: { lang: Lang; line: number; lines: number; go: (n: number) => void; close: () => void }) {
+function GoToDlg({
+  lang,
+  line,
+  lines,
+  go,
+  close,
+}: {
+  lang: Lang;
+  line: number;
+  lines: number;
+  go: (n: number) => void;
+  close: () => void;
+}) {
   const { id } = useWindow();
   const tr = lang === "tr";
   const [v, setV] = useState(String(line));
@@ -984,7 +1118,9 @@ function GoToDlg({ lang, line, lines, go, close }: { lang: Lang; line: number; l
     if (!n || n < 1 || n > lines) {
       await msgBox(id, {
         title: tr ? "Not Defteri - Satıra Git" : "Notepad - Goto Line",
-        text: tr ? "Satır numarası toplam satır sayısının dışında" : "The line number is beyond the total number of lines",
+        text: tr
+          ? "Satır numarası toplam satır sayısının dışında"
+          : "The line number is beyond the total number of lines",
         buttons: [tr ? "Tamam" : "OK"],
       });
       box.current?.focus();
@@ -998,7 +1134,13 @@ function GoToDlg({ lang, line, lines, go, close }: { lang: Lang; line: number; l
     <div className="np-dlg np-goto">
       <label>
         {tr ? "Satır numarası:" : "Line number:"}
-        <input ref={box} className="w8-input" inputMode="numeric" value={v} onChange={(e) => setV(e.target.value.replace(/\D/g, ""))} />
+        <input
+          ref={box}
+          className="w8-input"
+          inputMode="numeric"
+          value={v}
+          onChange={(e) => setV(e.target.value.replace(/\D/g, ""))}
+        />
       </label>
       <div className="np-dlg-btns">
         <Btn primary onClick={() => void submit()}>
@@ -1012,7 +1154,19 @@ function GoToDlg({ lang, line, lines, go, close }: { lang: Lang; line: number; l
 
 // ---------- Font ----------
 
-function ListPick<T extends string | number>({ items, value, label, onPick, className }: { items: T[]; value: T | null; label: (v: T) => string; onPick: (v: T) => void; className?: string }) {
+function ListPick<T extends string | number>({
+  items,
+  value,
+  label,
+  onPick,
+  className,
+}: {
+  items: T[];
+  value: T | null;
+  label: (v: T) => string;
+  onPick: (v: T) => void;
+  className?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     ref.current?.querySelector<HTMLElement>(".on")?.scrollIntoView({ block: "nearest" });
@@ -1020,7 +1174,13 @@ function ListPick<T extends string | number>({ items, value, label, onPick, clas
   return (
     <div ref={ref} className={`np-list ${className ?? ""}`} role="listbox">
       {items.map((it) => (
-        <div key={String(it)} role="option" aria-selected={it === value} className={it === value ? "on" : ""} onPointerDown={() => onPick(it)}>
+        <div
+          key={String(it)}
+          role="option"
+          aria-selected={it === value}
+          className={it === value ? "on" : ""}
+          onPointerDown={() => onPick(it)}
+        >
           {label(it)}
         </div>
       ))}
@@ -1028,12 +1188,24 @@ function ListPick<T extends string | number>({ items, value, label, onPick, clas
   );
 }
 
-function FontDlg({ lang, font, apply, close }: { lang: Lang; font: NpFont; apply: (f: NpFont) => void; close: () => void }) {
+function FontDlg({
+  lang,
+  font,
+  apply,
+  close,
+}: {
+  lang: Lang;
+  font: NpFont;
+  apply: (f: NpFont) => void;
+  close: () => void;
+}) {
   const tr = lang === "tr";
   const families = Object.keys(FONTS);
   const styles: FontStyle[] = ["normal", "italic", "bold", "bolditalic"];
   const styleName = (s: FontStyle) =>
-    tr ? { normal: "Normal", italic: "İtalik", bold: "Kalın", bolditalic: "Kalın İtalik" }[s] : { normal: "Regular", italic: "Italic", bold: "Bold", bolditalic: "Bold Italic" }[s];
+    tr
+      ? { normal: "Normal", italic: "İtalik", bold: "Kalın", bolditalic: "Kalın İtalik" }[s]
+      : { normal: "Regular", italic: "Italic", bold: "Bold", bolditalic: "Bold Italic" }[s];
   const [family, setFamily] = useState(font.family);
   const [familyText, setFamilyText] = useState(font.family);
   const [style, setStyle] = useState<FontStyle>(font.style);
@@ -1122,7 +1294,10 @@ function FontDlg({ lang, font, apply, close }: { lang: Lang; font: NpFont; apply
           <label className="np-font-script">
             <span>{L("Betik:", "Script:")}</span>
             <select className="w8-select" value={script} onChange={(e) => setScript(e.target.value)}>
-              {(tr ? ["Batı", "Türkçe", "Yunanca", "Kiril", "Orta Avrupa"] : ["Western", "Turkish", "Greek", "Cyrillic", "Central European"]).map((s) => (
+              {(tr
+                ? ["Batı", "Türkçe", "Yunanca", "Kiril", "Orta Avrupa"]
+                : ["Western", "Turkish", "Greek", "Cyrillic", "Central European"]
+              ).map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </select>
@@ -1138,13 +1313,27 @@ function FontDlg({ lang, font, apply, close }: { lang: Lang; font: NpFont; apply
 
 // ---------- Page Setup ----------
 
-function PageDlg({ lang, page, apply, close }: { lang: Lang; page: PageSetup; apply: (p: PageSetup) => void; close: () => void }) {
+function PageDlg({
+  lang,
+  page,
+  apply,
+  close,
+}: {
+  lang: Lang;
+  page: PageSetup;
+  apply: (p: PageSetup) => void;
+  close: () => void;
+}) {
   const tr = lang === "tr";
   const L = (a: string, b: string) => (tr ? a : b);
   const [p, setP] = useState(page);
   const set = <K extends keyof PageSetup>(k: K, v: PageSetup[K]) => setP((x) => ({ ...x, [k]: v }));
   const num = (k: "left" | "right" | "top" | "bottom") => (
-    <input className="w8-input" value={p[k]} onChange={(e) => set(k, Math.min(100, Number(e.target.value.replace(/\D/g, "")) || 0))} />
+    <input
+      className="w8-input"
+      value={p[k]}
+      onChange={(e) => set(k, Math.min(100, Number(e.target.value.replace(/\D/g, "")) || 0))}
+    />
   );
   useWinKeys({ escape: close, enter: () => apply(p) });
   const land = p.orient === "landscape";
@@ -1200,7 +1389,10 @@ function PageDlg({ lang, page, apply, close }: { lang: Lang; page: PageSetup; ap
         </div>
         <Group label={L("Önizleme", "Preview")} className="np-page-preview">
           <div className="np-page-sheet" style={{ width: pw, height: ph }}>
-            <div className="np-page-text" style={{ left: p.left * s, right: p.right * s, top: p.top * s, bottom: p.bottom * s }} />
+            <div
+              className="np-page-text"
+              style={{ left: p.left * s, right: p.right * s, top: p.top * s, bottom: p.bottom * s }}
+            />
           </div>
         </Group>
       </div>

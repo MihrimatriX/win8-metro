@@ -5,8 +5,8 @@ Masaüstü ve tablette Windows 8.1, telefonda Windows Phone 8.1 düzeni açılı
 
 ![Başlangıç ekranı](docs/screenshots/start.png)
 
-| Charm çubuğu | Masaüstü |
-| --- | --- |
+| Charm çubuğu                                 | Masaüstü                                  |
+| -------------------------------------------- | ----------------------------------------- |
 | ![Charm çubuğu](docs/screenshots/charms.png) | ![Masaüstü](docs/screenshots/desktop.png) |
 
 ![Metro uygulama simgeleri](docs/screenshots/icons.png)
@@ -20,8 +20,12 @@ Masaüstü ve tablette Windows 8.1, telefonda Windows Phone 8.1 düzeni açılı
 - **Pencere yöneticisi** (`lib/wm.ts`): odak, z-sırası, modal iletişim kutuları, "değişiklikleri kaydet?" kapatma koruması. Pencereler Başlangıç'a gidip gelince kaybolmaz.
 - **Windows 8 görünümü:** Windows logosu, Segoe UI Symbol tarzında yeniden çizilmiş Metro glifleri, Selawik yazı tipi (Segoe UI yoksa), Windows 8.1 varsayılan Başlangıç düzeni,
   çalışan kutucuk sürükleme, grup adlandırma, masaüstü arka planını Başlangıç'ta gösterme, kategoriye göre Uygulamalar görünümü, dosya ve program arayan Ara charm'ı.
-- Programlar: Not Defteri, Çalıştır, Windows Hakkında ve Hesap Makinesi'nin ilk sürümleri var ama yarım kaldı ve henüz test edilmedi.
-  Diğer masaüstü ve Metro uygulamaları (Dosya Gezgini, Paint, Komut İstemi, IE, Hava Durumu, Haritalar…) kayıtlı ve açılıyor, şimdilik içleri boş.
+- Masaüstü programları: Dosya Gezgini (şerit, ağaç, altı görünüm, arama, sürükle-bırak, Geri Dönüşüm Kutusu), Paint, WordPad,
+  Internet Explorer 11 (sekmeler, yerel .html dosyaları), Komut İstemi (`dir`, `cd`, `copy`, `tasklist`… sanal dosya sisteminde),
+  Görev Yöneticisi, Denetim Masası (Kişiselleştirme ve Bölge ayarları gerçek tercihlere bağlı), Mayın Tarlası, Not Defteri,
+  Hesap Makinesi, Çalıştır ve Windows Hakkında.
+- Metro tarafında Kamera ve portfolyo uygulamaları çalışıyor; Hava Durumu, Haritalar, Haberler, Spor, Finans, Seyahat, Video,
+  Alarmlar, SkyDrive ve Ses Kaydedici kayıtlı ve açılıyor ama şimdilik içleri boş.
 
 Derin bağlantı: `?boot=1&open=notepad` açılışı, kilit ve oturum açmayı atlayıp doğrudan bir uygulamayı açar.
 
@@ -30,39 +34,39 @@ Derin bağlantı: `?boot=1&open=notepad` açılışı, kilit ve oturum açmayı 
 
 ## Bölümler ve karşılıkları
 
-| Windows'ta | Portfolyoda |
-| --- | --- |
-| Kilit ekranı | Saat, tarih, bildirim sayıları; yukarı sürükleyerek açılır. Resmi Fotoğraflar'dan ya da ayarlardan seçilir |
-| Oturum açma | AFU, Misafir ve İşe alım (doğrudan Profil'e gider) hesapları; dil (TUR/ENG) ve güç düğmesi |
-| İlk açılış ("Merhaba") | Renk değiştiren kurulum ekranı ve köşeleri anlatan kısa tanıtım |
-| Başlangıç ekranı | Gruplar halinde canlı kutucuklar: Ben, Projeler, Okuma köşesi, Bağlantılar |
-| Projeler (Mağaza) | Tüm projeler; her proje kendi mağaza sayfasında: genel bakış, ekran görüntüleri, özellikler, ayrıntılar, kilometre taşları |
-| Profil (Kişiler) | Özgeçmiş: deneyim, yetenekler, eğitim, diller, sertifikalar, bağlantılar |
-| Posta | Ziyaretçiye yazılmış tanıtım iletileri; "Yeni" ile AFU'ya e-posta yazılır |
-| Okuyucu (Haberler) | Blog yazıları, eğitimler ve konuşmalar |
-| Fotoğraflar | Tüm proje ve yazı görselleri, slayt gösterisi, kilit ekranı yapma |
-| Müzik | Tarayıcıda anlık sentezlenen üç parça ve canlı spektrum |
-| Başarılar | Sertifikalar ve ödüller + ziyaretçinin gezerken kazandığı başarılar |
-| Takvim | Yazılar ve sertifikalar ay görünümünde, deneyim zaman çizelgesinde |
-| Masaüstü | Görev çubuğu, sürüklenebilir pencereler: Dosya Gezgini (her proje bir klasör), Not Defteri, resim görüntüleyici |
-| Charm çubuğu | Ara, Paylaş, Başlangıç, Cihazlar, Ayarlar (kişiselleştir, ses, animasyon, dil, güç) |
-| Bilgisayar ayarları | Kilit ekranı resmi, renkler, desen, hesap, dil, erişim kolaylığı, başarıları sıfırlama, bilgisayar bilgisi |
+| Windows'ta             | Portfolyoda                                                                                                                |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Kilit ekranı           | Saat, tarih, bildirim sayıları; yukarı sürükleyerek açılır. Resmi Fotoğraflar'dan ya da ayarlardan seçilir                 |
+| Oturum açma            | AFU, Misafir ve İşe alım (doğrudan Profil'e gider) hesapları; dil (TUR/ENG) ve güç düğmesi                                 |
+| İlk açılış ("Merhaba") | Renk değiştiren kurulum ekranı ve köşeleri anlatan kısa tanıtım                                                            |
+| Başlangıç ekranı       | Gruplar halinde canlı kutucuklar: Ben, Projeler, Okuma köşesi, Bağlantılar                                                 |
+| Projeler (Mağaza)      | Tüm projeler; her proje kendi mağaza sayfasında: genel bakış, ekran görüntüleri, özellikler, ayrıntılar, kilometre taşları |
+| Profil (Kişiler)       | Özgeçmiş: deneyim, yetenekler, eğitim, diller, sertifikalar, bağlantılar                                                   |
+| Posta                  | Ziyaretçiye yazılmış tanıtım iletileri; "Yeni" ile AFU'ya e-posta yazılır                                                  |
+| Okuyucu (Haberler)     | Blog yazıları, eğitimler ve konuşmalar                                                                                     |
+| Fotoğraflar            | Tüm proje ve yazı görselleri, slayt gösterisi, kilit ekranı yapma                                                          |
+| Müzik                  | Tarayıcıda anlık sentezlenen üç parça ve canlı spektrum                                                                    |
+| Başarılar              | Sertifikalar ve ödüller + ziyaretçinin gezerken kazandığı başarılar                                                        |
+| Takvim                 | Yazılar ve sertifikalar ay görünümünde, deneyim zaman çizelgesinde                                                         |
+| Masaüstü               | Görev çubuğu, sürüklenebilir pencereler: Dosya Gezgini (her proje bir klasör), Not Defteri, resim görüntüleyici            |
+| Charm çubuğu           | Ara, Paylaş, Başlangıç, Cihazlar, Ayarlar (kişiselleştir, ses, animasyon, dil, güç)                                        |
+| Bilgisayar ayarları    | Kilit ekranı resmi, renkler, desen, hesap, dil, erişim kolaylığı, başarıları sıfırlama, bilgisayar bilgisi                 |
 
 ## Kontroller
 
-| | Fare / klavye | Dokunmatik |
-| --- | --- | --- |
-| Charm çubuğu | Sağ üst ya da sağ alt köşe | Sağ kenardan içeri kaydır |
-| Önceki uygulama | Sol üst köşe | Sol kenardan içeri kaydır |
-| Başlangıç'a dön | Sol alt köşe, Windows tuşu | Charm çubuğundaki Başlangıç |
-| Kutucuk menüsü | Sağ tık (yeniden boyutlandır, kaldır, canlı kutucuk) | Basılı tut |
-| Kutucuğu taşı | Tıkla ve sürükle | Kutucuğu aşağı/yukarı çek |
-| Uygulamayı kapat | Üst kenara gel → X; ya da üst kenardan aşağı sürükle | Üst kenardan aşağı sürükle |
-| Win+X menüsü | Sol alt köşeye ya da görev çubuğundaki Başlat'a sağ tık | |
-| Masaüstü pencereleri | Kenara sürükle: yarım ekran / tam ekran (Aero Snap); kenarlardan boyutlandır; masaüstüne sağ tık | |
-| Uzaklaştır | Sağ alttaki "−" ya da Ctrl + tekerlek | Sağ alttaki "−" |
-| Ara | Başlangıç'ta yazmaya başla | Charm'daki Ara |
-| Geri | Esc / Backspace / yuvarlak geri oku | Geri oku |
+|                      | Fare / klavye                                                                                    | Dokunmatik                  |
+| -------------------- | ------------------------------------------------------------------------------------------------ | --------------------------- |
+| Charm çubuğu         | Sağ üst ya da sağ alt köşe                                                                       | Sağ kenardan içeri kaydır   |
+| Önceki uygulama      | Sol üst köşe                                                                                     | Sol kenardan içeri kaydır   |
+| Başlangıç'a dön      | Sol alt köşe, Windows tuşu                                                                       | Charm çubuğundaki Başlangıç |
+| Kutucuk menüsü       | Sağ tık (yeniden boyutlandır, kaldır, canlı kutucuk)                                             | Basılı tut                  |
+| Kutucuğu taşı        | Tıkla ve sürükle                                                                                 | Kutucuğu aşağı/yukarı çek   |
+| Uygulamayı kapat     | Üst kenara gel → X; ya da üst kenardan aşağı sürükle                                             | Üst kenardan aşağı sürükle  |
+| Win+X menüsü         | Sol alt köşeye ya da görev çubuğundaki Başlat'a sağ tık                                          |                             |
+| Masaüstü pencereleri | Kenara sürükle: yarım ekran / tam ekran (Aero Snap); kenarlardan boyutlandır; masaüstüne sağ tık |                             |
+| Uzaklaştır           | Sağ alttaki "−" ya da Ctrl + tekerlek                                                            | Sağ alttaki "−"             |
+| Ara                  | Başlangıç'ta yazmaya başla                                                                       | Charm'daki Ara              |
+| Geri                 | Esc / Backspace / yuvarlak geri oku                                                              | Geri oku                    |
 
 Telefonda: alttaki gezinme çubuğu (geri, Başlangıç, ara), sola kaydırınca uygulama listesi, üst çubuktan aşağı çekince işlem merkezi.
 
@@ -82,9 +86,16 @@ Telefonda: alttaki gezinme çubuğu (geri, Başlangıç, ara), sola kaydırınca
 cd win8-metro
 npm install
 npm run dev        # http://localhost:3200
-npm run build
+npm run build      # statik export: out/
+npm start          # Docker imajını kurar ve http://localhost:3200 adresinde çalıştırır
+npm run lint       # ESLint + Prettier kontrolü (npm run format düzeltir)
 npm run preview    # preview/index.html: kurulum gerektirmeyen tek dosyalık sürüm
 ```
+
+Nasıl çalışır: uygulamanın sunucu tarafı yok (dosya sistemi, ayarlar, başarılar tarayıcının localStorage'ında),
+bu yüzden `next build` her şeyi `out/` klasörüne düz HTML/JS/CSS olarak yazar (`output: "export"`).
+`Dockerfile` iki aşamalıdır: Node imajında derler, sonra yalnızca `out/` klasörünü nginx'e kopyalar; çalışan imajda Node yoktur.
+`nginx.conf` gzip açar ve adında hash olan `/_next/static/` dosyalarını bir yıl önbelleğe aldırır.
 
 Bu klasör kökteki blogdan ve `ps5-showcase`'ten bağımsızdır. Vercel'de ayrı bir proje olarak yayınlamak için "Root Directory" olarak
 `win8-metro` seçilir.

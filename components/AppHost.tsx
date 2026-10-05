@@ -66,12 +66,17 @@ export function AppHost({ view }: { view: Extract<View, { kind: "app" }> }) {
     const id = window.setTimeout(() => setSplash(false), 950);
     return () => window.clearTimeout(id);
   }, [splash]);
-  const Comp = APP_COMPONENTS[view.app] ?? (() => null);
+  const Comp = APP_COMPONENTS[view.app];
   const s = pull ? Math.max(0.28, 1 - pull.dy / 260) : 1;
   return (
     <div
       className={`app app-${view.app} ${pull ? "pulled" : ""} ${pull?.closing ? "closing" : ""}`}
-      style={{ "--app": a.color, transform: pull ? `translate(${pull.dx}px, ${pull.dy}px) scale(${s})` : undefined } as React.CSSProperties}
+      style={
+        {
+          "--app": a.color,
+          transform: pull ? `translate(${pull.dx}px, ${pull.dy}px) scale(${s})` : undefined,
+        } as React.CSSProperties
+      }
     >
       {splash ? (
         <div className="splash" style={{ background: a.color }}>
@@ -79,7 +84,7 @@ export function AppHost({ view }: { view: Extract<View, { kind: "app" }> }) {
         </div>
       ) : (
         <div className="app-body" key={view.param ?? "root"}>
-          <Comp param={view.param} />
+          {Comp && <Comp param={view.param} />}
         </div>
       )}
       {!phone && view.app !== "desktop" && <TitleBar id={view.app} onPull={setPull} />}
@@ -88,7 +93,13 @@ export function AppHost({ view }: { view: Extract<View, { kind: "app" }> }) {
 }
 
 /** Win8.1 Update title bar: hover the top edge to reveal minimize / close; grab the edge and drag down to close. */
-function TitleBar({ id, onPull }: { id: AppId; onPull: (p: { dx: number; dy: number; closing?: boolean } | null) => void }) {
+function TitleBar({
+  id,
+  onPull,
+}: {
+  id: AppId;
+  onPull: (p: { dx: number; dy: number; closing?: boolean } | null) => void;
+}) {
   const { t, open, closeApp } = useOS();
   const a = app(id);
   const [show, setShow] = useState(false);
@@ -172,7 +183,19 @@ export type Section = { id: string; title: string; content: ReactNode; wide?: bo
  * Win8 Hub: a page title with a back button, an optional hero, then sections laid out side by side on a horizontal strip.
  * On the phone the same sections become a Pivot: swipeable headers, one section per screen.
  */
-export function Hub({ title, appTitle, hero, sections, className }: { title: string; appTitle?: string; hero?: ReactNode; sections: Section[]; className?: string }) {
+export function Hub({
+  title,
+  appTitle,
+  hero,
+  sections,
+  className,
+}: {
+  title: string;
+  appTitle?: string;
+  hero?: ReactNode;
+  sections: Section[];
+  className?: string;
+}) {
   const { phone } = useOS();
   const scroller = useRef<HTMLDivElement>(null);
 
@@ -184,7 +207,12 @@ export function Hub({ title, appTitle, hero, sections, className }: { title: str
       // Let inner vertical scrollers have the wheel when they can scroll.
       let n = e.target as HTMLElement | null;
       while (n && n !== el) {
-        if (n.scrollHeight > n.clientHeight + 2 && getComputedStyle(n).overflowY !== "visible" && getComputedStyle(n).overflowY !== "hidden") return;
+        if (
+          n.scrollHeight > n.clientHeight + 2 &&
+          getComputedStyle(n).overflowY !== "visible" &&
+          getComputedStyle(n).overflowY !== "hidden"
+        )
+          return;
         n = n.parentElement;
       }
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
@@ -196,7 +224,13 @@ export function Hub({ title, appTitle, hero, sections, className }: { title: str
     return () => el.removeEventListener("wheel", onWheel);
   }, [phone]);
 
-  if (phone) return <Pivot title={appTitle ?? title} sections={hero ? [{ id: "_hero", title, content: hero }, ...sections] : sections} />;
+  if (phone)
+    return (
+      <Pivot
+        title={appTitle ?? title}
+        sections={hero ? [{ id: "_hero", title, content: hero }, ...sections] : sections}
+      />
+    );
 
   return (
     <div className={`hub ${className ?? ""}`}>
@@ -209,7 +243,11 @@ export function Hub({ title, appTitle, hero, sections, className }: { title: str
           </header>
           {hero && <div className="hub-hero">{hero}</div>}
           {sections.map((s, i) => (
-            <section key={s.id} className={`hub-section ${s.wide ? "wide" : ""}`} style={{ "--i": i } as React.CSSProperties}>
+            <section
+              key={s.id}
+              className={`hub-section ${s.wide ? "wide" : ""}`}
+              style={{ "--i": i } as React.CSSProperties}
+            >
               <h2 className={s.onTitle ? "link" : ""} onClick={s.onTitle}>
                 {s.title}
                 {s.onTitle && <Icon name="forward" size={18} />}
@@ -235,7 +273,9 @@ function Pivot({ title, sections }: { title: string; sections: Section[] }) {
     sound.tap();
   };
   useEffect(() => {
-    head.current?.querySelector<HTMLElement>(".on")?.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
+    head.current
+      ?.querySelector<HTMLElement>(".on")
+      ?.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
   }, [i]);
   const s = sections[i];
   return (
@@ -345,7 +385,13 @@ export function AppsView() {
             </div>
           )}
         </h1>
-        <input className="appsview-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("apps.search")} aria-label={t("apps.search")} />
+        <input
+          className="appsview-search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("apps.search")}
+          aria-label={t("apps.search")}
+        />
       </header>
       <div className="appsview-scroll">
         {(() => {
@@ -380,7 +426,10 @@ export function AppsView() {
             );
           };
           const visible = groups
-            .map((c) => ({ ...c, keys: c.keys.filter((k) => !ql || meta(k).title.toLocaleLowerCase(lang).includes(ql)) }))
+            .map((c) => ({
+              ...c,
+              keys: c.keys.filter((k) => !ql || meta(k).title.toLocaleLowerCase(lang).includes(ql)),
+            }))
             .filter((c) => c.keys.length);
           // By name: one grid that flows top to bottom, with each letter header taking a cell, like 8.1.
           if (sort === "name")
@@ -406,7 +455,12 @@ export function AppsView() {
           ));
         })()}
       </div>
-      <button className="start-allapps up" onClick={() => open({ kind: "start" })} aria-label={t("start")} title={t("start")}>
+      <button
+        className="start-allapps up"
+        onClick={() => open({ kind: "start" })}
+        aria-label={t("start")}
+        title={t("start")}
+      >
         <Icon name="up" size={20} />
       </button>
     </div>

@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useOS } from "@/lib/os";
 import { fs, normalize, KNOWN, HOME, extname, type FNode } from "@/lib/fs";
 import { wm } from "@/lib/wm";
-import { appByExe, isDesktopApp, type AppId, type ShellIconName } from "@/lib/model";
+import { appByExe, type AppId, type ShellIconName } from "@/lib/model";
 
 const KNOWN_ICONS: [string, ShellIconName][] = [
   [KNOWN.desktop, "folder-desktop"],
@@ -71,7 +71,8 @@ export function parseAppTarget(t: string): { id: AppId; param?: string } | null 
 export function useOpenPath() {
   const { open, playTrack } = useOS();
   return useCallback(
-    (path: string, opts: { navigate?: (p: string) => void } = {}) => {
+    // Named so a shortcut can open its target through the same rules.
+    function openPath(path: string, opts: { navigate?: (p: string) => void } = {}): boolean {
       const p = normalize(path);
       const n = fs.get(p);
       if (!n) return false;
@@ -120,13 +121,8 @@ export function useOpenPath() {
             launch(app.id, app.param);
             return true;
           }
-          if (fs.exists(t)) {
-            const target = fs.get(t)!;
-            if ((target.kind === "dir" || target.kind === "drive") && opts.navigate) opts.navigate(normalize(t));
-            else return openTarget(t, launch);
-            return true;
-          }
-          return false;
+          // A shortcut to a shortcut stops here, so a .lnk pointing at itself can't loop.
+          return fs.get(t)?.kind !== "lnk" && openPath(t, opts);
         }
         default:
           // Unknown types open as text, like "Open with Notepad".
@@ -139,19 +135,6 @@ export function useOpenPath() {
     },
     [open, playTrack],
   );
-}
-
-function openTarget(t: string, launch: (id: AppId, param?: string) => void) {
-  const n = fs.get(t);
-  if (!n) return false;
-  if (n.kind === "dir" || n.kind === "drive") wm.launch("explorer", { arg: normalize(t) });
-  else if (n.kind === "txt") launch("notepad", normalize(t));
-  else if (n.kind === "img") launch("paint", normalize(t));
-  else if (n.kind === "exe") {
-    const a = appByExe(n.target ?? n.name);
-    if (a && isDesktopApp(a.id)) launch(a.id);
-  }
-  return true;
 }
 
 // ---------- shell clipboard (Cut / Copy / Paste between Explorer windows and the desktop) ----------

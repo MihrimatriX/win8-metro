@@ -6,18 +6,42 @@
  * precedence and parentheses (2 + 3 * 4 = 14). The keyboard works like calc.exe (Esc, Delete, F9, R, @…).
  */
 import "./calc.css";
-import { useEffect, useLayoutEffect, useReducer, useRef, useState, type ReactNode } from "react";
+import { useEffect, useReducer, useRef, useState, type ReactNode } from "react";
 import { useL, useOS } from "@/lib/os";
-import { wm } from "@/lib/wm";
-import { MenuBar, useWindow, useWinKeys, type MenuItem } from "../ui";
+import { MenuBar, useFitWindow, useWindow, useWinKeys, type MenuItem } from "../ui";
 
 type Mode = "std" | "sci";
 type Bin = "+" | "-" | "*" | "/" | "mod" | "pow" | "root";
 type Angle = "deg" | "rad" | "grad";
 type Err = "div0" | "undef" | "invalid" | "overflow";
 type Fn =
-  | "sqrt" | "recip" | "negate" | "sqr" | "cube" | "cbrt" | "fact" | "ln" | "exp" | "log" | "pow10" | "int" | "frac" | "dms" | "deg"
-  | "sin" | "cos" | "tan" | "asin" | "acos" | "atan" | "sinh" | "cosh" | "tanh" | "asinh" | "acosh" | "atanh";
+  | "sqrt"
+  | "recip"
+  | "negate"
+  | "sqr"
+  | "cube"
+  | "cbrt"
+  | "fact"
+  | "ln"
+  | "exp"
+  | "log"
+  | "pow10"
+  | "int"
+  | "frac"
+  | "dms"
+  | "deg"
+  | "sin"
+  | "cos"
+  | "tan"
+  | "asin"
+  | "acos"
+  | "atan"
+  | "sinh"
+  | "cosh"
+  | "tanh"
+  | "asinh"
+  | "acosh"
+  | "atanh";
 
 const STORE = "afu-metro:v2:calc";
 
@@ -77,7 +101,10 @@ function applyBin(a: number, op: Bin, b: number): number {
 function gamma(x: number): number {
   if (x < 0.5) return Math.PI / (Math.sin(Math.PI * x) * gamma(1 - x));
   const g = 7;
-  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  const c = [
+    0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059,
+    12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7,
+  ];
   x -= 1;
   let a = c[0];
   const t = x + g + 0.5;
@@ -542,7 +569,7 @@ type Key = { id: string; label: ReactNode; act: () => void; cls?: string; title?
 
 /** Calculator window: menu bar, display and keypad; it resizes its window to fit each mode exactly. */
 export default function CalcApp() {
-  const { id, setTitle } = useWindow();
+  const { setTitle } = useWindow();
   const { lang, open } = useOS();
   const L = useL();
   const tr = lang === "tr";
@@ -578,26 +605,8 @@ export default function CalcApp() {
     }
   }, [mode, group]);
 
-  // calc.exe is a fixed-size window that snaps to the size of each mode (re-fit whenever the content's size changes,
-  // e.g. once its stylesheet or fonts arrive).
-  useLayoutEffect(() => {
-    const el = root.current;
-    const client = el?.closest(".w8-client") as HTMLElement | null;
-    if (!el || !client) return;
-    const fit = () => {
-      const w = wm.get(id);
-      if (!w) return;
-      const nw = el.offsetWidth + (w.w - client.clientWidth);
-      const nh = el.offsetHeight + (w.h - client.clientHeight);
-      if (nw === w.w && nh === w.h) return;
-      const x = Math.max(0, Math.min(w.x, window.innerWidth - nw - 4));
-      wm.patch(id, { w: nw, h: nh, x });
-    };
-    fit();
-    const ro = new ResizeObserver(fit);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [id]);
+  // calc.exe is a fixed-size window that snaps to the size of each mode.
+  useFitWindow(root);
 
   /** Press a key: run it, re-render, and light the key up briefly (also for keyboard input). */
   const press = (keyId: string, fn: () => void) => {
@@ -632,7 +641,13 @@ export default function CalcApp() {
   };
 
   // ---- keys ----
-  const k = (id: string, label: ReactNode, act: () => void, cls?: string, title?: string): Key => ({ id, label, act, cls, title });
+  const k = (id: string, label: ReactNode, act: () => void, cls?: string, title?: string): Key => ({
+    id,
+    label,
+    act,
+    cls,
+    title,
+  });
   const inv = E.inv;
   const sup = (base: ReactNode, s: ReactNode) => (
     <>
@@ -687,12 +702,24 @@ export default function CalcApp() {
     k("cosh", inv ? sup("cosh", "-1") : "cosh", () => E.unary(inv ? "acosh" : "cosh")),
     k("cos", inv ? sup("cos", "-1") : "cos", () => E.unary(inv ? "acos" : "cos")),
     k("pow", sup(x, y), () => E.binary("pow")),
-    k("root", <>{<sup>{y}</sup>}√{x}</>, () => E.binary("root")),
+    k(
+      "root",
+      <>
+        {<sup>{y}</sup>}√{x}
+      </>,
+      () => E.binary("root"),
+    ),
     k("pi", inv ? "2*π" : "π", () => E.pi()),
     k("tanh", inv ? sup("tanh", "-1") : "tanh", () => E.unary(inv ? "atanh" : "tanh")),
     k("tan", inv ? sup("tan", "-1") : "tan", () => E.unary(inv ? "atan" : "tan")),
     k("cube", sup(x, "3"), () => E.unary("cube")),
-    k("cbrt", <>{<sup>3</sup>}√{x}</>, () => E.unary("cbrt")),
+    k(
+      "cbrt",
+      <>
+        {<sup>3</sup>}√{x}
+      </>,
+      () => E.unary("cbrt"),
+    ),
     { ...k("fe", "F-E", () => (E.fe = !E.fe)), on: E.fe },
     k("exp", "Exp", () => E.expKey()),
     k("mod", "Mod", () => E.binary("mod")),
@@ -706,8 +733,36 @@ export default function CalcApp() {
   function keyFor(ch: string): Key | undefined {
     if (/^[0-9]$/.test(ch)) return byId(ch);
     if (ch === "." || ch === ",") return byId(".");
-    const map: Record<string, string> = { "+": "+", "-": "-", "*": "*", "/": "/", "%": "%", "=": "=", "@": "sqrt", r: "recip" };
-    const sciMap: Record<string, string> = { "(": "(", ")": ")", s: "sin", o: "cos", t: "tan", n: "ln", l: "log", q: "sqr", y: "pow", "#": "cube", "!": "fact", p: "pi", i: "inv", x: "exp", v: "fe", m: "dms", d: "mod", ";": "int" };
+    const map: Record<string, string> = {
+      "+": "+",
+      "-": "-",
+      "*": "*",
+      "/": "/",
+      "%": "%",
+      "=": "=",
+      "@": "sqrt",
+      r: "recip",
+    };
+    const sciMap: Record<string, string> = {
+      "(": "(",
+      ")": ")",
+      s: "sin",
+      o: "cos",
+      t: "tan",
+      n: "ln",
+      l: "log",
+      q: "sqr",
+      y: "pow",
+      "#": "cube",
+      "!": "fact",
+      p: "pi",
+      i: "inv",
+      x: "exp",
+      v: "fe",
+      m: "dms",
+      d: "mod",
+      ";": "int",
+    };
     const lc = ch.toLowerCase();
     const kid = map[lc] ?? (mode === "sci" ? sciMap[lc] : undefined);
     return kid ? byId(kid) : undefined;
@@ -751,10 +806,26 @@ export default function CalcApp() {
     {
       label: L({ tr: "Görünüm", en: "View" }),
       items: [
-        { label: L({ tr: "Standart", en: "Standard" }), shortcut: "Alt+1", checked: mode === "std", radio: true, onClick: () => switchMode("std") },
-        { label: L({ tr: "Bilimsel", en: "Scientific" }), shortcut: "Alt+2", checked: mode === "sci", radio: true, onClick: () => switchMode("sci") },
+        {
+          label: L({ tr: "Standart", en: "Standard" }),
+          shortcut: "Alt+1",
+          checked: mode === "std",
+          radio: true,
+          onClick: () => switchMode("std"),
+        },
+        {
+          label: L({ tr: "Bilimsel", en: "Scientific" }),
+          shortcut: "Alt+2",
+          checked: mode === "sci",
+          radio: true,
+          onClick: () => switchMode("sci"),
+        },
         { sep: true },
-        { label: L({ tr: "Basamak gruplama", en: "Digit grouping" }), checked: group, onClick: () => setGroup((g) => !g) },
+        {
+          label: L({ tr: "Basamak gruplama", en: "Digit grouping" }),
+          checked: group,
+          onClick: () => setGroup((g) => !g),
+        },
       ],
     },
     {
@@ -766,7 +837,12 @@ export default function CalcApp() {
     },
     {
       label: L({ tr: "Yardım", en: "Help" }),
-      items: [{ label: L({ tr: "Hesap Makinesi Hakkında", en: "About Calculator" }), onClick: () => open({ kind: "app", app: "winver" }) }],
+      items: [
+        {
+          label: L({ tr: "Hesap Makinesi Hakkında", en: "About Calculator" }),
+          onClick: () => open({ kind: "app", app: "winver" }),
+        },
+      ],
     },
   ];
 
@@ -816,7 +892,12 @@ export default function CalcApp() {
             <div className="calc-keys calc-sci">
               <div className="calc-angles">
                 {angles.map(([a, label]) => (
-                  <label key={a} className={E.angle === a ? "on" : ""} onMouseDown={(e) => e.preventDefault()} onClick={() => ((E.angle = a), bump())}>
+                  <label
+                    key={a}
+                    className={E.angle === a ? "on" : ""}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => ((E.angle = a), bump())}
+                  >
                     <span className="calc-radio" />
                     {label}
                   </label>

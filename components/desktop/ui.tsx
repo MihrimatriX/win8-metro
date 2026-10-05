@@ -3,9 +3,18 @@
  * Desktop UI kit in the Windows 8 style: menu bars, context menus, the ribbon, buttons and text boxes.
  * Every desktop program builds on these so they look and behave alike. Styles live in desktop.css (.w8-*).
  */
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
-import { wm, type Win } from "@/lib/wm";
+import { wm, TASKBAR_H, type Win } from "@/lib/wm";
 
 // ---------- window context ----------
 
@@ -32,11 +41,10 @@ export function useWindow(): WinApi {
  */
 export function useCloseGuard(fn: () => boolean | Promise<boolean>, enabled = true) {
   const { id } = useWindow();
-  const ref = useRef(fn);
-  ref.current = fn;
+  const latest = useEffectEvent(fn);
   useEffect(() => {
     if (!enabled) return;
-    wm.guard(id, () => ref.current());
+    wm.guard(id, () => latest());
     return () => wm.guard(id, null);
   }, [id, enabled]);
 }
@@ -44,17 +52,24 @@ export function useCloseGuard(fn: () => boolean | Promise<boolean>, enabled = tr
 /**
  * Keyboard shortcuts for the focused window only (Ctrl+S in Notepad shouldn't save Paint too).
  * `keys` maps "ctrl+s", "f5", "delete", "ctrl+shift+n"… to handlers; return false to let the event through.
+ * "*" catches every combo not listed (it gets the combo as its second argument).
  */
-export function useWinKeys(keys: Record<string, (e: KeyboardEvent) => void | boolean>, enabled = true) {
+export function useWinKeys(keys: Record<string, (e: KeyboardEvent, combo: string) => void | boolean>, enabled = true) {
   const { focused } = useWindow();
-  const ref = useRef(keys);
-  ref.current = keys;
+  const handler = useEffectEvent((combo: string) => keys[combo] ?? keys["*"]);
   useEffect(() => {
     if (!focused || !enabled) return;
     const onKey = (e: KeyboardEvent) => {
-      const combo = [e.ctrlKey || e.metaKey ? "ctrl" : "", e.altKey ? "alt" : "", e.shiftKey ? "shift" : "", e.key.toLowerCase()].filter(Boolean).join("+");
-      const fn = ref.current[combo];
-      if (fn && fn(e) !== false) {
+      const combo = [
+        e.ctrlKey || e.metaKey ? "ctrl" : "",
+        e.altKey ? "alt" : "",
+        e.shiftKey ? "shift" : "",
+        e.key.toLowerCase(),
+      ]
+        .filter(Boolean)
+        .join("+");
+      const fn = handler(combo);
+      if (fn && fn(e, combo) !== false) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -62,6 +77,79 @@ export function useWinKeys(keys: Record<string, (e: KeyboardEvent) => void | boo
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
   }, [focused, enabled]);
+}
+
+/** Size a fixed window to its content (Calc, Minesweeper) and re-fit whenever the content or the frame changes size. */
+export function useFitWindow(root: React.RefObject<HTMLElement | null>) {
+  const { id } = useWindow();
+  useLayoutEffect(() => {
+    const el = root.current;
+    const client = el?.closest<HTMLElement>(".w8-client");
+    const frame = client?.closest<HTMLElement>(".w8-win");
+    if (!el || !client || !frame) return;
+    const fit = () => {
+      const w = wm.get(id);
+      if (!w) return;
+      // Frame thickness from the DOM, never from wm state: right after a patch the store is ahead of the DOM.
+      const nw = el.offsetWidth + frame.offsetWidth - client.clientWidth;
+      const nh = el.offsetHeight + frame.offsetHeight - client.clientHeight;
+      if (nw === w.w && nh === w.h) return;
+      const x = Math.max(0, Math.min(w.x, window.innerWidth - nw - 4));
+      const y = Math.max(0, Math.min(w.y, window.innerHeight - nh - TASKBAR_H));
+      wm.patch(id, { w: nw, h: nh, x, y });
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    ro.observe(client);
+    return () => ro.disconnect();
+  }, [id, root]);
+}
+
+/** In-place rename for desktop and Explorer icons: selects the name without its extension, Enter/blur commits once. */
+export function RenameBox({
+  initial,
+  className,
+  onDone,
+}: {
+  initial: string;
+  className: string;
+  onDone: (v: string | null) => void;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  // Escape unmounts the box, and the blur that follows must not commit the name after all.
+  const done = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    const dot = initial.lastIndexOf(".");
+    el.setSelectionRange(0, dot > 0 ? dot : initial.length);
+  }, [initial]);
+  const finish = (v: string | null) => {
+    if (done.current) return;
+    done.current = true;
+    onDone(v);
+  };
+  return (
+    <textarea
+      ref={ref}
+      className={className}
+      rows={1}
+      defaultValue={initial}
+      spellCheck={false}
+      onPointerDown={(e) => e.stopPropagation()}
+      onDoubleClick={(e) => e.stopPropagation()}
+      onBlur={(e) => finish(e.currentTarget.value.trim())}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") {
+          e.preventDefault();
+          finish(e.currentTarget.value.trim());
+        } else if (e.key === "Escape") finish(null);
+      }}
+    />
+  );
 }
 
 // ---------- menus ----------
@@ -83,11 +171,26 @@ export type MenuItem =
     };
 
 /** A dropdown/context menu list. Hovering an item with `sub` opens its submenu to the side. */
-export function MenuList({ items, onDone, className, style }: { items: MenuItem[]; onDone: () => void; className?: string; style?: React.CSSProperties }) {
+export function MenuList({
+  items,
+  onDone,
+  className,
+  style,
+}: {
+  items: MenuItem[];
+  onDone: () => void;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   const [sub, setSub] = useState<number | null>(null);
   const timer = useRef(0);
   return (
-    <div className={`w8-menu ${className ?? ""}`} style={style} onContextMenu={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+    <div
+      className={`w8-menu ${className ?? ""}`}
+      style={style}
+      onContextMenu={(e) => e.preventDefault()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       {items.map((it, i) =>
         it.sep ? (
           <div key={i} className="w8-menu-sep" />
@@ -107,7 +210,7 @@ export function MenuList({ items, onDone, className, style }: { items: MenuItem[
               it.onClick?.();
             }}
           >
-            <span className="w8-menu-check">{it.checked ? (it.radio ? "●" : "✓") : it.icon ?? null}</span>
+            <span className="w8-menu-check">{it.checked ? (it.radio ? "●" : "✓") : (it.icon ?? null)}</span>
             <span className="w8-menu-label">{it.label}</span>
             <span className="w8-menu-key">{it.shortcut ?? (it.sub ? "›" : "")}</span>
             {it.sub && sub === i && <MenuList items={it.sub} onDone={onDone} className="w8-submenu" />}
@@ -119,14 +222,27 @@ export function MenuList({ items, onDone, className, style }: { items: MenuItem[
 }
 
 /** A context menu at a screen position, kept on screen, closed by clicking elsewhere or Esc. */
-export function ContextMenu({ x, y, items, onClose }: { x: number; y: number; items: MenuItem[]; onClose: () => void }) {
+export function ContextMenu({
+  x,
+  y,
+  items,
+  onClose,
+}: {
+  x: number;
+  y: number;
+  items: MenuItem[];
+  onClose: () => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x, y });
   useLayoutEffect(() => {
     const el = ref.current?.firstElementChild as HTMLElement | null;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    setPos({ x: Math.max(0, Math.min(x, window.innerWidth - r.width - 2)), y: Math.max(0, y + r.height > window.innerHeight ? y - r.height : y) });
+    setPos({
+      x: Math.max(0, Math.min(x, window.innerWidth - r.width - 2)),
+      y: Math.max(0, y + r.height > window.innerHeight ? y - r.height : y),
+    });
   }, [x, y]);
   useEffect(() => {
     const close = (e: Event) => {
@@ -175,7 +291,10 @@ export function MenuBar({ menus }: { menus: { label: string; items: MenuItem[] }
     <div className="w8-menubar" ref={bar}>
       {menus.map((m, i) => (
         <div key={m.label} className={`w8-menubar-item ${open === i ? "open" : ""}`}>
-          <button onPointerDown={(e) => (e.stopPropagation(), setOpen(open === i ? null : i))} onPointerEnter={() => open !== null && setOpen(i)}>
+          <button
+            onPointerDown={(e) => (e.stopPropagation(), setOpen(open === i ? null : i))}
+            onPointerEnter={() => open !== null && setOpen(i)}
+          >
             {m.label}
           </button>
           {open === i && <MenuList items={m.items} onDone={() => setOpen(null)} className="w8-dropdown" />}
@@ -235,7 +354,21 @@ function RibbonButton({ it }: { it: RibbonItem }) {
  * The Windows 8 ribbon: a blue File tab, tabs, and groups of big and small buttons.
  * `fileMenu` opens the backstage-style dropdown; `collapsed` hides the groups until a tab is clicked.
  */
-export function Ribbon({ tabs, fileLabel, fileMenu, fileColor = "#1979ca", initial, right }: { tabs: RibbonTab[]; fileLabel: string; fileMenu?: MenuItem[]; fileColor?: string; initial?: string; right?: ReactNode }) {
+export function Ribbon({
+  tabs,
+  fileLabel,
+  fileMenu,
+  fileColor = "#1979ca",
+  initial,
+  right,
+}: {
+  tabs: RibbonTab[];
+  fileLabel: string;
+  fileMenu?: MenuItem[];
+  fileColor?: string;
+  initial?: string;
+  right?: ReactNode;
+}) {
   const [tab, setTab] = useState(initial ?? tabs[0]?.id);
   const [collapsed, setCollapsed] = useState(false);
   const [file, setFile] = useState<{ x: number; y: number } | null>(null);
@@ -276,7 +409,11 @@ export function Ribbon({ tabs, fileLabel, fileMenu, fileColor = "#1979ca", initi
         <div className="w8-ribbon-body">
           {cur.groups.map((g) => (
             <div key={g.label} className="w8-ribbon-group">
-              <div className="w8-ribbon-items">{g.items.map((it, i) => (isItem(it) ? <RibbonButton key={it.label} it={it} /> : <div key={i}>{it}</div>))}</div>
+              <div className="w8-ribbon-items">
+                {g.items.map((it, i) =>
+                  isItem(it) ? <RibbonButton key={it.label} it={it} /> : <div key={i}>{it}</div>,
+                )}
+              </div>
               <div className="w8-ribbon-glabel">{g.label}</div>
             </div>
           ))}
@@ -289,7 +426,12 @@ export function Ribbon({ tabs, fileLabel, fileMenu, fileColor = "#1979ca", initi
 
 // ---------- controls ----------
 
-export function Btn({ children, primary, className, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { primary?: boolean }) {
+export function Btn({
+  children,
+  primary,
+  className,
+  ...rest
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { primary?: boolean }) {
   return (
     <button className={`w8-btn ${primary ? "primary" : ""} ${className ?? ""}`} {...rest}>
       {children}

@@ -84,7 +84,9 @@
   background: linear-gradient(#eef3f9 0%, #e6edf6 49%, #d9e3ef 50%, #e3eaf3 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
   color: #1e395b;
-  font: 12px/1 "Segoe UI", var(--font);
+  font:
+    12px/1 "Segoe UI",
+    var(--font);
   white-space: nowrap;
   cursor: default;
 }
@@ -105,7 +107,9 @@
 .calc-key:hover {
   border-color: #e3b55d;
   background: linear-gradient(#fff4d6 0%, #ffe8a6 49%, #ffd36b 50%, #ffe08f 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 252, 238, 0.75), 0 0 3px rgba(255, 196, 64, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 252, 238, 0.75),
+    0 0 3px rgba(255, 196, 64, 0.55);
 }
 .calc-key:active,
 .calc-key.down {
@@ -168,14 +172,4 @@
   height: 5px;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 35%, #8ad0ff, #1a5aa3);
-}
-
-/* The title doesn't fit centered in such a narrow frame; Windows slides it between the icon and the buttons. */
-.w8-win.app-calc .w8-titlebar-text {
-  left: 22px;
-  right: 96px;
-}
-.w8-win.app-calc:has(.calc-sci) .w8-titlebar-text {
-  left: 110px;
-  right: 110px;
 }

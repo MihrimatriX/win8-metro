@@ -2,15 +2,51 @@
  * Every sound here is synthesized with Web Audio; the app ships no audio files.
  * The context is created lazily on the first user gesture (browsers block it before that).
  */
-type Voice = { type: OscillatorType; freq: number; to?: number; at?: number; dur: number; gain: number; glide?: number };
+type Voice = {
+  type: OscillatorType;
+  freq: number;
+  to?: number;
+  at?: number;
+  dur: number;
+  gain: number;
+  glide?: number;
+};
 
-export type Track = { id: string; title: string; artist: string; bpm: number; seconds: number; palette: [string, string, string] };
+export type Track = {
+  id: string;
+  title: string;
+  artist: string;
+  bpm: number;
+  seconds: number;
+  palette: [string, string, string];
+};
 
 /** Music app tracks. Each one is a small generative piece, so they never repeat exactly. */
 export const TRACKS: Track[] = [
-  { id: "aurora", title: "Kuzey Işığı", artist: "AFU & Web Audio", bpm: 72, seconds: 214, palette: ["#05121f", "#0f5a7a", "#5eead4"] },
-  { id: "harbor", title: "Liman", artist: "AFU & Web Audio", bpm: 96, seconds: 187, palette: ["#140a1f", "#6d28d9", "#f0abfc"] },
-  { id: "night-train", title: "Gece Treni", artist: "AFU & Web Audio", bpm: 112, seconds: 241, palette: ["#1a0b05", "#b45309", "#fcd34d"] },
+  {
+    id: "aurora",
+    title: "Kuzey Işığı",
+    artist: "AFU & Web Audio",
+    bpm: 72,
+    seconds: 214,
+    palette: ["#05121f", "#0f5a7a", "#5eead4"],
+  },
+  {
+    id: "harbor",
+    title: "Liman",
+    artist: "AFU & Web Audio",
+    bpm: 96,
+    seconds: 187,
+    palette: ["#140a1f", "#6d28d9", "#f0abfc"],
+  },
+  {
+    id: "night-train",
+    title: "Gece Treni",
+    artist: "AFU & Web Audio",
+    bpm: 112,
+    seconds: 241,
+    palette: ["#1a0b05", "#b45309", "#fcd34d"],
+  },
 ];
 
 const mtof = (m: number) => 440 * Math.pow(2, (m - 69) / 12);
@@ -31,7 +67,8 @@ class SoundEngine {
   setVolume(v: number, muted = this.muted) {
     this.volume = Math.max(0, Math.min(1, v));
     this.muted = muted;
-    if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime, 0.02);
+    if (this.master && this.ctx)
+      this.master.gain.setTargetAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime, 0.02);
     this.onVolume.forEach((f) => f());
   }
   /** The effective level for <audio>/<video> elements. */
@@ -42,7 +79,8 @@ class SoundEngine {
   private ensure(): AudioContext | null {
     if (typeof window === "undefined") return null;
     if (!this.ctx) {
-      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      const Ctx =
+        window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!Ctx) return null;
       const ctx = new Ctx();
       const master = ctx.createGain();
@@ -136,14 +174,26 @@ class SoundEngine {
   /** Sign-in: a slow rising major chord. */
   login() {
     this.play(
-      [392, 493.88, 587.33, 783.99, 987.77].map((f, i) => ({ type: "sine" as const, freq: f, at: i * 0.09, dur: 1.6 - i * 0.1, gain: 0.04 })),
+      [392, 493.88, 587.33, 783.99, 987.77].map((f, i) => ({
+        type: "sine" as const,
+        freq: f,
+        at: i * 0.09,
+        dur: 1.6 - i * 0.1,
+        gain: 0.04,
+      })),
       { wet: 1 },
     );
   }
 
   shutdown() {
     this.play(
-      [783.99, 587.33, 493.88, 392].map((f, i) => ({ type: "sine" as const, freq: f, at: i * 0.12, dur: 1.2, gain: 0.04 })),
+      [783.99, 587.33, 493.88, 392].map((f, i) => ({
+        type: "sine" as const,
+        freq: f,
+        at: i * 0.12,
+        dur: 1.2,
+        gain: 0.04,
+      })),
       { wet: 1 },
     );
   }
@@ -178,7 +228,8 @@ class SoundEngine {
     const len = Math.floor(ctx.sampleRate * 0.35);
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2) * (Math.random() > 0.7 ? 1 : 0.3);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2) * (Math.random() > 0.7 ? 1 : 0.3);
     const src = ctx.createBufferSource();
     src.buffer = buf;
     const f = ctx.createBiquadFilter();
@@ -211,7 +262,14 @@ class SoundEngine {
     send.gain.value = 0.9;
     out.connect(send).connect(this.wet);
 
-    const note = (midi: number, at: number, dur: number, gain: number, type: OscillatorType = "triangle", cutoff = 2400) => {
+    const note = (
+      midi: number,
+      at: number,
+      dur: number,
+      gain: number,
+      type: OscillatorType = "triangle",
+      cutoff = 2400,
+    ) => {
       const o = ctx.createOscillator();
       const f = ctx.createBiquadFilter();
       const g = ctx.createGain();
@@ -229,9 +287,36 @@ class SoundEngine {
 
     // Chord progressions (root MIDI note + intervals), one bar each.
     const songs: Record<string, { chords: number[][]; lead: number[]; style: "pad" | "arp" | "pulse" }> = {
-      aurora: { chords: [[50, 57, 61, 64, 69], [47, 54, 59, 62, 66], [43, 50, 55, 59, 64], [45, 52, 57, 61, 64]], lead: [76, 74, 73, 71, 69, 71, 73, 76], style: "pad" },
-      harbor: { chords: [[48, 55, 60, 64], [45, 52, 57, 60], [41, 48, 53, 57], [43, 50, 55, 59]], lead: [72, 76, 79, 76, 74, 72, 71, 74], style: "arp" },
-      "night-train": { chords: [[45, 52, 57, 60], [41, 48, 53, 57], [48, 55, 60, 64], [43, 50, 55, 59]], lead: [69, 72, 76, 74, 72, 69, 67, 69], style: "pulse" },
+      aurora: {
+        chords: [
+          [50, 57, 61, 64, 69],
+          [47, 54, 59, 62, 66],
+          [43, 50, 55, 59, 64],
+          [45, 52, 57, 61, 64],
+        ],
+        lead: [76, 74, 73, 71, 69, 71, 73, 76],
+        style: "pad",
+      },
+      harbor: {
+        chords: [
+          [48, 55, 60, 64],
+          [45, 52, 57, 60],
+          [41, 48, 53, 57],
+          [43, 50, 55, 59],
+        ],
+        lead: [72, 76, 79, 76, 74, 72, 71, 74],
+        style: "arp",
+      },
+      "night-train": {
+        chords: [
+          [45, 52, 57, 60],
+          [41, 48, 53, 57],
+          [48, 55, 60, 64],
+          [43, 50, 55, 59],
+        ],
+        lead: [69, 72, 76, 74, 72, 69, 67, 69],
+        style: "pulse",
+      },
     };
     const song = songs[id];
     const beat = 60 / track.bpm;
@@ -255,7 +340,8 @@ class SoundEngine {
         for (let s = 0; s < 8; s++) note(chord[0] - 12, t + s * (beat / 2), beat * 0.4, 0.07, "sawtooth", 380);
         chord.slice(1).forEach((m, k) => note(m, t, beat * 1.5, 0.025 / (1 + k * 0.2), "triangle", 1800));
         chord.slice(1).forEach((m, k) => note(m, t + beat * 2.5, beat, 0.02 / (1 + k * 0.2), "triangle", 1800));
-        for (let s = 0; s < 4; s++) note(song.lead[(i * 4 + s) % song.lead.length], t + s * beat + beat / 2, beat * 0.4, 0.025, "square", 2200);
+        for (let s = 0; s < 4; s++)
+          note(song.lead[(i * 4 + s) % song.lead.length], t + s * beat + beat / 2, beat * 0.4, 0.025, "square", 2200);
       }
     };
 

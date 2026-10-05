@@ -1,0 +1,439 @@
+/* ==========================================================================
+   Internet Explorer 11 (ie-*): the navigation row in the window color (round Back / Forward, address bar,
+   tabs, Home / Favorites / Tools), the optional menu bar, and the built-in pages.
+   ========================================================================== */
+.ie {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  color: #000;
+}
+.ie-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  padding: 0 2px 2px;
+  background: var(--frame, #6aa9e9);
+  color: var(--caption-ink, #000);
+}
+
+/* round Back / Forward */
+.ie-nav {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #1c5aa8;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+.ie-nav.back {
+  width: 30px;
+  height: 30px;
+}
+.ie-nav.fwd {
+  width: 23px;
+  height: 23px;
+  margin: 0 6px 0 -1px;
+}
+.ie-nav:hover:not(:disabled) {
+  background: #1c5aa8;
+  color: #fff;
+}
+.ie-nav:disabled {
+  color: #9a9a9a;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* address bar */
+.ie-addr {
+  flex: 0 1 380px;
+  min-width: 150px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 4px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  color: #000;
+}
+.ie-addr input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  font: inherit;
+  color: #000;
+  background: transparent;
+  user-select: text;
+}
+.ie-addr input::placeholder {
+  color: #8a8a8a;
+}
+.ie-addr button {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  color: #444;
+}
+.ie-addr button:hover {
+  background: #e5f3ff;
+  color: #1c5aa8;
+}
+
+/* tabs share the row with the address bar */
+.ie-tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  align-self: stretch;
+  gap: 1px;
+  padding-top: 6px;
+  overflow: hidden;
+}
+.ie-tab {
+  flex: 0 1 190px;
+  min-width: 52px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 2px 0 6px;
+  background: rgba(255, 255, 255, 0.35);
+  color: inherit;
+  cursor: default;
+}
+.ie-tab:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+.ie-tab.on {
+  background: #fff;
+  color: #000;
+}
+.ie-tab-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ie-tab-x {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  font-size: 15px;
+  color: inherit;
+  visibility: hidden;
+}
+.ie-tab.on .ie-tab-x,
+.ie-tab:hover .ie-tab-x {
+  visibility: visible;
+}
+.ie-tab-x:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+.ie-newtab {
+  flex: none;
+  width: 28px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+}
+.ie-newtab span {
+  width: 14px;
+  height: 12px;
+  border: 1px solid currentColor;
+  opacity: 0.8;
+}
+.ie-newtab:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* Home / Favorites / Tools */
+.ie-tool {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  color: inherit;
+}
+.ie-tool:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.ie-menubar {
+  flex: none;
+  background: #fff;
+  border-bottom: 1px solid #e3e3e3;
+}
+
+/* page area */
+.ie-view {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+}
+.ie-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+.ie-doc {
+  height: 100%;
+  overflow: auto;
+  user-select: text;
+}
+.ie-link {
+  color: #0066cc;
+  padding: 0;
+  text-align: left;
+}
+.ie-link:hover {
+  text-decoration: underline;
+}
+
+/* home page (MSN-like) */
+.ie-home {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+  font-size: 13px;
+}
+.ie-home-top {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e3e3e3;
+}
+.ie-home-brand {
+  font-size: 26px;
+  font-weight: 300;
+  color: #1c1c1c;
+}
+.ie-home-sub {
+  color: #666;
+}
+.ie-home-search {
+  margin-left: auto;
+  display: flex;
+  align-self: center;
+}
+.ie-home-search input {
+  width: 260px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #c7c7c7;
+  border-right: 0;
+  outline: none;
+  font: inherit;
+  user-select: text;
+}
+.ie-home-search input:focus {
+  border-color: #008373;
+}
+.ie-home-search button {
+  height: 30px;
+  padding: 0 12px;
+  background: #008373;
+  color: #fff;
+  font-weight: 600;
+}
+.ie-home-main {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  padding: 18px 24px;
+  max-width: 1100px;
+}
+.ie-home-news {
+  flex: 1;
+  min-width: 0;
+}
+.ie-home h2 {
+  margin: 18px 0 8px;
+  font-size: 18px;
+  font-weight: 400;
+  color: #1c1c1c;
+}
+.ie-home-hero {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+  text-align: left;
+  color: #fff;
+}
+.ie-home-hero svg,
+.ie-home-card svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ie-home-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 30px 18px 14px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  font-size: 14px;
+}
+.ie-home-cap b {
+  font-size: 24px;
+  font-weight: 300;
+}
+.ie-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.ie-home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 8px;
+  background: #fff;
+  text-align: left;
+  color: #1c1c1c;
+}
+.ie-home-card svg {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  margin-bottom: 6px;
+}
+.ie-home-card b,
+.ie-home-card span {
+  padding: 0 10px;
+}
+.ie-home-card span {
+  color: #777;
+  font-size: 12px;
+}
+.ie-home-card:hover:not(:disabled) b,
+.ie-home-hero:hover:not(:disabled) b {
+  text-decoration: underline;
+}
+.ie-home-side {
+  flex: 0 0 280px;
+  padding: 0 16px 16px;
+  background: #fff;
+  align-self: flex-start;
+}
+.ie-home-side p {
+  margin: 0 0 8px;
+  line-height: 1.45;
+  color: #333;
+}
+.ie-home-who,
+.ie-home-exp {
+  display: flex;
+  flex-direction: column;
+}
+.ie-home-side .ie-link {
+  display: block;
+  margin-bottom: 6px;
+}
+.ie-home-foot {
+  padding: 12px 24px;
+  color: #777;
+  font-size: 12px;
+}
+
+/* about:Tabs */
+.ie-tabs-page {
+  padding: 40px 60px;
+}
+.ie-tabs-page h1 {
+  margin: 0 0 18px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #444;
+}
+.ie-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 150px);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.ie-tile {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e3e3e3;
+  text-align: left;
+}
+.ie-tile:hover {
+  border-color: #a6a6a6;
+}
+.ie-tile-face {
+  height: 72px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 300;
+}
+.ie-tile-name {
+  padding: 5px 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #333;
+}
+
+/* "can't be displayed" pages */
+.ie-msg {
+  max-width: 640px;
+  padding: 40px 48px;
+  font-size: 13px;
+  color: #333;
+}
+.ie-msg h1 {
+  margin: 0 0 18px;
+  font-size: 26px;
+  font-weight: 300;
+  color: #1c1c1c;
+}
+.ie-msg p,
+.ie-msg li {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+.ie-msg ul {
+  padding-left: 18px;
+}
+.ie-msg-url {
+  color: #666;
+  word-break: break-all;
+}
+.ie-msg-btn {
+  height: 30px;
+  padding: 0 16px;
+  background: #e5e5e5;
+  border: 1px solid #c7c7c7;
+  color: #000;
+}
+.ie-msg-btn:hover {
+  background: #dcecfc;
+  border-color: #7eb4ea;
+}

@@ -11,14 +11,34 @@ import { sound } from "@/lib/sound";
 import { KNOWN, fs, join, useFS } from "@/lib/fs";
 import { Icon } from "../Icons";
 import { AppBar, type AppBarCmd } from "./AppBar";
-import { download, fileStamp, hms, mediaError, mediaStore, mimeExt, recorderMime, stopStream, useSessionMedia } from "./mediaStore";
+import {
+  download,
+  fileStamp,
+  hms,
+  mediaError,
+  mediaStore,
+  mimeExt,
+  recorderMime,
+  stopStream,
+  useSessionMedia,
+} from "./mediaStore";
 import "./camera.css";
 
 /** Where Windows 8.1 (Turkish) keeps camera pictures. */
 export const CAMERA_ROLL = `${KNOWN.pictures}\\Film Rulosu`;
 
 type Status = "starting" | "live" | "denied" | "missing";
-type RollItem = { key: string; kind: "photo" | "video"; name: string; url: string; created: number; path?: string; mediaId?: string; duration?: number; poster?: string };
+type RollItem = {
+  key: string;
+  kind: "photo" | "video";
+  name: string;
+  url: string;
+  created: number;
+  path?: string;
+  mediaId?: string;
+  duration?: number;
+  poster?: string;
+};
 type Res = { w: number; h: number };
 
 const PRESETS: Res[] = [
@@ -34,7 +54,15 @@ const PRESETS: Res[] = [
 /** Camcorder glyph for the video button (Segoe-like: body + lens wedge). */
 function Camcorder({ size = 26 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <rect x="2.5" y="7" width="12.5" height="10" rx="1" />
       <path d="M15 10.6 21.5 7.2v9.6L15 13.4z" fill="currentColor" stroke="none" />
     </svg>
@@ -44,7 +72,15 @@ function Camcorder({ size = 26 }: { size?: number }) {
 /** Panorama glyph: a wide, slightly curved frame. */
 function Panorama({ size = 22 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <path d="M2.5 7.2c6.3-1.8 12.7-1.8 19 0v9.6c-6.3-1.8-12.7-1.8-19 0z" />
       <path d="m6 14.5 3.5-3.5 3 3 2-2 3.5 3.5" strokeWidth="1.3" />
     </svg>
@@ -57,12 +93,14 @@ export function CameraApp() {
   const fsv = useFS();
   const videoEl = useRef<HTMLVideoElement>(null);
   const stream = useRef<MediaStream | null>(null);
-  const [status, setStatus] = useState<Status>("starting");
+  const [status, setStatus] = useState<Status>(() => (navigator.mediaDevices ? "starting" : "missing"));
   const [attempt, setAttempt] = useState(0);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [mode, setMode] = useState<"photo" | "video">("photo");
-  const [rec, setRec] = useState<{ start: number; recorder: MediaRecorder | null; mic: MediaStream | null } | null>(null);
+  const [rec, setRec] = useState<{ start: number; recorder: MediaRecorder | null; mic: MediaStream | null } | null>(
+    null,
+  );
   const [now, setNow] = useState(0);
   const [timer, setTimer] = useState<0 | 3 | 10>(0);
   const [count, setCount] = useState<number | null>(null);
@@ -79,13 +117,11 @@ export function CameraApp() {
   // ---- the camera stream ----
   useEffect(() => {
     let cancelled = false;
-    const md = typeof navigator !== "undefined" ? navigator.mediaDevices : undefined;
-    setStatus("starting");
-    if (!md?.getUserMedia) {
-      setStatus("missing");
-      return;
-    }
-    const video: MediaTrackConstraints = deviceId ? { deviceId: { exact: deviceId } } : { width: { ideal: 1280 }, height: { ideal: 720 } };
+    const md = navigator.mediaDevices;
+    if (!md) return;
+    const video: MediaTrackConstraints = deviceId
+      ? { deviceId: { exact: deviceId } }
+      : { width: { ideal: 1280 }, height: { ideal: 720 } };
     md.getUserMedia({ video, audio: false })
       .then(async (s) => {
         if (cancelled) {
@@ -106,7 +142,8 @@ export function CameraApp() {
         const maxW = caps?.width?.max ?? set?.width ?? 640;
         const maxH = caps?.height?.max ?? set?.height ?? 480;
         const list = PRESETS.filter((p) => p.w <= maxW && p.h <= maxH);
-        if (set?.width && set.height && !list.some((p) => p.w === set.width && p.h === set.height)) list.unshift({ w: set.width, h: set.height });
+        if (set?.width && set.height && !list.some((p) => p.w === set.width && p.h === set.height))
+          list.unshift({ w: set.width, h: set.height });
         setResList(list);
         setRes(set?.width && set.height ? { w: set.width, h: set.height } : null);
         const all = await md.enumerateDevices().catch(() => [] as MediaDeviceInfo[]);
@@ -138,7 +175,6 @@ export function CameraApp() {
   // Recording clock.
   useEffect(() => {
     if (!rec) return;
-    setNow(Date.now());
     const id = window.setInterval(() => setNow(Date.now()), 250);
     return () => window.clearInterval(id);
   }, [rec]);
@@ -150,8 +186,24 @@ export function CameraApp() {
     const photos: RollItem[] = fs
       .list(CAMERA_ROLL)
       .filter((n) => n.kind === "img" && n.data)
-      .map((n) => ({ key: `p:${n.name}`, kind: "photo", name: n.name, url: n.data!, created: n.created, path: join(CAMERA_ROLL, n.name) }));
-    const videos: RollItem[] = vids.map((m) => ({ key: `v:${m.id}`, kind: "video", name: m.name, url: m.url, created: m.created, mediaId: m.id, duration: m.duration, poster: m.poster }));
+      .map((n) => ({
+        key: `p:${n.name}`,
+        kind: "photo",
+        name: n.name,
+        url: n.data!,
+        created: n.created,
+        path: join(CAMERA_ROLL, n.name),
+      }));
+    const videos: RollItem[] = vids.map((m) => ({
+      key: `v:${m.id}`,
+      kind: "video",
+      name: m.name,
+      url: m.url,
+      created: m.created,
+      mediaId: m.id,
+      duration: m.duration,
+      poster: m.poster,
+    }));
     return [...photos, ...videos].sort((a, b) => b.created - a.created);
   }, [fsv, vids]);
 
@@ -221,7 +273,16 @@ export function CameraApp() {
       const type = recorder.mimeType || mime || "video/webm";
       const blob = new Blob(chunks, { type });
       if (!blob.size) return;
-      mediaStore.add({ kind: "video", source: "camera", name: `WIN_${stamp}.${mimeExt(type, "mp4")}`, url: URL.createObjectURL(blob), blob, poster, created: started, duration: Date.now() - started });
+      mediaStore.add({
+        kind: "video",
+        source: "camera",
+        name: `WIN_${stamp}.${mimeExt(type, "mp4")}`,
+        url: URL.createObjectURL(blob),
+        blob,
+        poster,
+        created: started,
+        duration: Date.now() - started,
+      });
       setPop((p) => p + 1);
     };
     recorder.start(1000);
@@ -294,6 +355,7 @@ export function CameraApp() {
     const cur = stream.current?.getVideoTracks()[0]?.getSettings().deviceId ?? deviceId;
     const i = devices.findIndex((d) => d.deviceId === cur);
     setDeviceId(devices[(i + 1) % devices.length].deviceId);
+    setStatus("starting");
   };
 
   const applyRes = (r: Res) => {
@@ -313,9 +375,7 @@ export function CameraApp() {
 
   // ---- roll viewer ----
   const cur = roll !== null ? items[Math.min(roll, items.length - 1)] : null;
-  useEffect(() => {
-    if (roll !== null && !items.length) setRoll(null);
-  }, [roll, items.length]);
+  if (roll !== null && !items.length) setRoll(null);
   useEffect(() => {
     if (roll === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -346,23 +406,47 @@ export function CameraApp() {
       ? {
           left: [
             { icon: "trash", label: L({ tr: "Sil", en: "Delete" }), onClick: removeCur, disabled: !cur },
-            { icon: "save", label: L({ tr: "İndir", en: "Download" }), onClick: () => cur && download(cur.url, cur.name), disabled: !cur },
+            {
+              icon: "save",
+              label: L({ tr: "İndir", en: "Download" }),
+              onClick: () => cur && download(cur.url, cur.name),
+              disabled: !cur,
+            },
           ],
-          right: [{ icon: "camera", label: L({ tr: "Kameraya dön", en: "Back to camera" }), onClick: () => setRoll(null) }],
+          right: [
+            { icon: "camera", label: L({ tr: "Kameraya dön", en: "Back to camera" }), onClick: () => setRoll(null) },
+          ],
         }
       : {
           left: [
-            { icon: "settings", label: L({ tr: "Kamera seçenekleri", en: "Camera options" }), onClick: () => setOptions((o) => !o), disabled: status !== "live" },
+            {
+              icon: "settings",
+              label: L({ tr: "Kamera seçenekleri", en: "Camera options" }),
+              onClick: () => setOptions((o) => !o),
+              disabled: status !== "live",
+            },
             {
               icon: "timer",
-              label: timer ? `${L({ tr: "Zamanlayıcı", en: "Timer" })} · ${timer} ${L({ tr: "sn", en: "s" })}` : L({ tr: "Zamanlayıcı", en: "Timer" }),
+              label: timer
+                ? `${L({ tr: "Zamanlayıcı", en: "Timer" })} · ${timer} ${L({ tr: "sn", en: "s" })}`
+                : L({ tr: "Zamanlayıcı", en: "Timer" }),
               onClick: () => setTimer((t) => (t === 0 ? 3 : t === 3 ? 10 : 0)),
               active: timer > 0,
             },
           ],
           right: [
-            { icon: "camera-switch", label: L({ tr: "Kamerayı değiştir", en: "Change camera" }), onClick: switchCamera, disabled: devices.length < 2 || !!rec },
-            { icon: "photos", label: L({ tr: "Film rulosu", en: "Camera roll" }), onClick: () => items.length && setRoll(0), disabled: !items.length },
+            {
+              icon: "camera-switch",
+              label: L({ tr: "Kamerayı değiştir", en: "Change camera" }),
+              onClick: switchCamera,
+              disabled: devices.length < 2 || !!rec,
+            },
+            {
+              icon: "photos",
+              label: L({ tr: "Film rulosu", en: "Camera roll" }),
+              onClick: () => items.length && setRoll(0),
+              disabled: !items.length,
+            },
           ],
         };
 
@@ -370,7 +454,8 @@ export function CameraApp() {
     <div
       className={`cam ${rec ? "cam-recording" : ""}`}
       onPointerDown={(e) => {
-        if (e.button === 0 && !(e.target as HTMLElement).closest("button, select, .cam-options")) swipe.current = { x: e.clientX, y: e.clientY };
+        if (e.button === 0 && !(e.target as HTMLElement).closest("button, select, .cam-options"))
+          swipe.current = { x: e.clientX, y: e.clientY };
       }}
       onPointerUp={(e) => {
         const s = swipe.current;
@@ -378,7 +463,13 @@ export function CameraApp() {
         if (s && roll === null && items.length && e.clientX - s.x > 120 && Math.abs(e.clientY - s.y) < 80) setRoll(0);
       }}
     >
-      <video ref={videoEl} className={`cam-preview ${status === "live" && roll === null ? "on" : ""}`} muted playsInline autoPlay />
+      <video
+        ref={videoEl}
+        className={`cam-preview ${status === "live" && roll === null ? "on" : ""}`}
+        muted
+        playsInline
+        autoPlay
+      />
       {status === "live" && grid && (
         <div className="cam-grid" aria-hidden="true">
           <i />
@@ -403,13 +494,32 @@ export function CameraApp() {
       {(status === "denied" || status === "missing") && (
         <div className="cam-msg">
           <Icon name="camera" size={92} strokeWidth={1.1} />
-          <h2>{status === "missing" ? L({ tr: "Kameranızı bağlayın", en: "Connect your camera" }) : L({ tr: "Bu uygulamanın web kameranızı kullanmasına izin verin.", en: "Let this app use your webcam." })}</h2>
+          <h2>
+            {status === "missing"
+              ? L({ tr: "Kameranızı bağlayın", en: "Connect your camera" })
+              : L({
+                  tr: "Bu uygulamanın web kameranızı kullanmasına izin verin.",
+                  en: "Let this app use your webcam.",
+                })}
+          </h2>
           <p>
             {status === "missing"
-              ? L({ tr: "Kamera bulunamadı. Bir web kamerası bağlayın veya açın, ardından yeniden deneyin.", en: "We can't find your camera. Connect or turn on a webcam, then try again." })
-              : L({ tr: "Kamera erişimi engellendi. Tarayıcının adres çubuğundaki kamera simgesinden izin verin, ardından yeniden deneyin.", en: "Camera access is blocked. Allow it from the camera icon in the browser's address bar, then try again." })}
+              ? L({
+                  tr: "Kamera bulunamadı. Bir web kamerası bağlayın veya açın, ardından yeniden deneyin.",
+                  en: "We can't find your camera. Connect or turn on a webcam, then try again.",
+                })
+              : L({
+                  tr: "Kamera erişimi engellendi. Tarayıcının adres çubuğundaki kamera simgesinden izin verin, ardından yeniden deneyin.",
+                  en: "Camera access is blocked. Allow it from the camera icon in the browser's address bar, then try again.",
+                })}
           </p>
-          <button className="cam-retry" onClick={() => setAttempt((a) => a + 1)}>
+          <button
+            className="cam-retry"
+            onClick={() => {
+              setStatus("starting");
+              setAttempt((a) => a + 1);
+            }}
+          >
             {L({ tr: "Yeniden dene", en: "Try again" })}
           </button>
         </div>
@@ -460,7 +570,12 @@ export function CameraApp() {
           </button>
         )}
         {!rec && (
-          <button className="cam-btn pano" disabled aria-label={L({ tr: "Panorama", en: "Panorama" })} title={L({ tr: "Panorama (bu kamerada kullanılamıyor)", en: "Panorama (not available on this camera)" })}>
+          <button
+            className="cam-btn pano"
+            disabled
+            aria-label={L({ tr: "Panorama", en: "Panorama" })}
+            title={L({ tr: "Panorama (bu kamerada kullanılamıyor)", en: "Panorama (not available on this camera)" })}
+          >
             <Panorama />
           </button>
         )}
@@ -468,11 +583,16 @@ export function CameraApp() {
 
       {/* Camera roll behind the left edge. */}
       {latest && roll === null && (
-        <button className="cam-rollbtn" onClick={() => setRoll(0)} aria-label={L({ tr: "Film rulosu", en: "Camera roll" })} title={L({ tr: "Film rulosu", en: "Camera roll" })}>
+        <button
+          className="cam-rollbtn"
+          onClick={() => setRoll(0)}
+          aria-label={L({ tr: "Film rulosu", en: "Camera roll" })}
+          title={L({ tr: "Film rulosu", en: "Camera roll" })}
+        >
           <Icon name="back" size={22} />
           <span key={pop} className="cam-rollthumb">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={latest.kind === "photo" ? latest.url : latest.poster ?? ""} alt="" />
+            <img src={latest.kind === "photo" ? latest.url : (latest.poster ?? "")} alt="" />
             {latest.kind === "video" && <Camcorder size={14} />}
           </span>
         </button>
@@ -492,21 +612,33 @@ export function CameraApp() {
             >
               {resList.map((r) => (
                 <option key={`${r.w}x${r.h}`} value={`${r.w}x${r.h}`}>
-                  {r.w}×{r.h} ({((r.w * r.h) / 1e6).toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: 1 })} MP) {Math.abs(r.w / r.h - 16 / 9) < 0.02 ? "16:9" : Math.abs(r.w / r.h - 4 / 3) < 0.02 ? "4:3" : ""}
+                  {r.w}×{r.h} (
+                  {((r.w * r.h) / 1e6).toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: 1 })}{" "}
+                  MP) {Math.abs(r.w / r.h - 16 / 9) < 0.02 ? "16:9" : Math.abs(r.w / r.h - 4 / 3) < 0.02 ? "4:3" : ""}
                 </option>
               ))}
             </select>
           </label>
           <div className="cam-opt-row">
             <span>{L({ tr: "Kılavuz çizgileri", en: "Grid lines" })}</span>
-            <button className={`cam-toggle ${grid ? "on" : ""}`} onClick={() => setGrid((g) => !g)} role="switch" aria-checked={grid}>
+            <button
+              className={`cam-toggle ${grid ? "on" : ""}`}
+              onClick={() => setGrid((g) => !g)}
+              role="switch"
+              aria-checked={grid}
+            >
               <i />
             </button>
             <small>{grid ? L({ tr: "Açık", en: "On" }) : L({ tr: "Kapalı", en: "Off" })}</small>
           </div>
           <div className="cam-opt-row">
             <span>{L({ tr: "Videoda ses kaydet", en: "Record audio with video" })}</span>
-            <button className={`cam-toggle ${withAudio ? "on" : ""}`} onClick={() => setWithAudio((a) => !a)} role="switch" aria-checked={withAudio}>
+            <button
+              className={`cam-toggle ${withAudio ? "on" : ""}`}
+              onClick={() => setWithAudio((a) => !a)}
+              role="switch"
+              aria-checked={withAudio}
+            >
               <i />
             </button>
             <small>{withAudio ? L({ tr: "Açık", en: "On" }) : L({ tr: "Kapalı", en: "Off" })}</small>
@@ -524,17 +656,30 @@ export function CameraApp() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={cur.url} alt={cur.name} />
             ) : (
-              <video src={cur.url} controls autoPlay poster={cur.poster} ref={(v) => void (v && (v.volume = sound.level))} />
+              <video
+                src={cur.url}
+                controls
+                autoPlay
+                poster={cur.poster}
+                ref={(v) => void (v && (v.volume = sound.level))}
+              />
             )}
           </div>
           <header className="cam-roll-head">
-            <button className="circle-btn" onClick={() => setRoll(null)} aria-label={L({ tr: "Kameraya dön", en: "Back to camera" })}>
+            <button
+              className="circle-btn"
+              onClick={() => setRoll(null)}
+              aria-label={L({ tr: "Kameraya dön", en: "Back to camera" })}
+            >
               <Icon name="back" size={20} />
             </button>
             <div>
               <b>{cur.name}</b>
               <small>
-                {new Date(cur.created).toLocaleString(lang === "tr" ? "tr-TR" : "en-US", { dateStyle: "long", timeStyle: "short" })}
+                {new Date(cur.created).toLocaleString(lang === "tr" ? "tr-TR" : "en-US", {
+                  dateStyle: "long",
+                  timeStyle: "short",
+                })}
                 {cur.duration ? ` · ${hms(cur.duration)}` : ""}
               </small>
             </div>
@@ -543,20 +688,32 @@ export function CameraApp() {
             </span>
           </header>
           {roll < items.length - 1 && (
-            <button className="cam-roll-nav prev" onClick={() => setRoll(roll + 1)} aria-label={L({ tr: "Önceki", en: "Previous" })}>
+            <button
+              className="cam-roll-nav prev"
+              onClick={() => setRoll(roll + 1)}
+              aria-label={L({ tr: "Önceki", en: "Previous" })}
+            >
               <Icon name="back" size={22} />
             </button>
           )}
           {roll > 0 && (
-            <button className="cam-roll-nav next" onClick={() => setRoll(roll - 1)} aria-label={L({ tr: "Sonraki", en: "Next" })}>
+            <button
+              className="cam-roll-nav next"
+              onClick={() => setRoll(roll - 1)}
+              aria-label={L({ tr: "Sonraki", en: "Next" })}
+            >
               <Icon name="forward" size={22} />
             </button>
           )}
           <div className="cam-strip">
             {items.map((it, i) => (
               <button key={it.key} className={i === roll ? "on" : ""} onClick={() => setRoll(i)} title={it.name}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                {it.kind === "photo" || it.poster ? <img src={it.kind === "photo" ? it.url : it.poster} alt="" /> : <span />}
+                {it.kind === "photo" || it.poster ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- blob: URLs, next/image can't optimize them
+                  <img src={it.kind === "photo" ? it.url : it.poster} alt="" />
+                ) : (
+                  <span />
+                )}
                 {it.kind === "video" && (
                   <em>
                     <Camcorder size={12} />
