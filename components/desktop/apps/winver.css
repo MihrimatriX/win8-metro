@@ -1,0 +1,76 @@
+/* About Windows (winver): white dialog, blue logo banner, etched rule, 9pt text, OK bottom right. */
+.wv {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+  line-height: 15px;
+  user-select: text;
+}
+.wv-banner {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 92px;
+  padding-top: 4px;
+  color: #00adef;
+  font-family: "Segoe UI Light", "Segoe UI", "Selawik", var(--font);
+  font-weight: 300;
+  font-size: 46px;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  user-select: none;
+}
+.wv-logo {
+  margin-right: 14px;
+  flex: none;
+}
+.wv-word {
+  margin-top: -4px;
+}
+.wv-ver {
+  margin: -4px 0 0 12px;
+}
+.wv-rule {
+  flex: none;
+  height: 2px;
+  margin: 0 10px;
+  border-top: 1px solid #a0a0a0;
+  border-bottom: 1px solid #fff;
+  background: transparent;
+}
+.wv-text {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 24px 0 44px;
+  overflow: hidden;
+}
+.wv-text p {
+  margin: 0 0 15px;
+}
+.wv-text p.wv-license {
+  margin-bottom: 0;
+}
+.wv-owner {
+  padding-left: 22px;
+}
+.wv-link {
+  display: inline;
+  padding: 0;
+  font: inherit;
+  color: #0066cc;
+  cursor: pointer;
+}
+.wv-link:hover {
+  color: #3399ff;
+  text-decoration: underline;
+}
+.wv-btns {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px 12px;
+}

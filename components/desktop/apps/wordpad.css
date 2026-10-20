@@ -1,0 +1,227 @@
+/* ==========================================================================
+   WordPad (wp-*): the ribbon's small controls, the ruler, the grey workspace with the white page,
+   and the zoom status bar. The page's text styles (DOC_CSS in WordPad.tsx) are repeated here.
+   ========================================================================== */
+.wp {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  color: #000;
+}
+
+/* small ribbon buttons, dropdowns and the font / paragraph rows */
+.wp-tb {
+  height: 22px;
+  min-width: 22px;
+  padding: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  color: #000;
+}
+.wp-tb:hover {
+  background: #e5f3ff;
+  border-color: #cde6f7;
+}
+.wp-tb.on,
+.wp-tb:active {
+  background: #c4e0f7;
+  border-color: #92c0e0;
+}
+.wp-tb.wp-arrow {
+  min-width: 11px;
+  padding: 0;
+}
+.wp-caret {
+  font-size: 8px;
+  margin-left: 1px;
+  color: #444;
+}
+.wp-split {
+  display: inline-flex;
+}
+.wp-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 2px 0;
+}
+.wp-row {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 24px;
+}
+.wp-font {
+  width: 128px;
+  height: 22px;
+}
+.wp-size {
+  width: 46px;
+  height: 22px;
+  margin: 0 4px 0 2px;
+}
+.wp-glyph {
+  font-size: 14px;
+  line-height: 1;
+}
+.wp-glyph.small {
+  font-size: 12px;
+}
+.wp-glyph.serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.wp-glyph sup,
+.wp-glyph sub {
+  font-size: 7px;
+}
+.wp-color {
+  padding: 0 2px;
+  border-bottom: 4px solid;
+}
+.wp-swatch {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #8a8a8a;
+}
+.wp-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 6px 0;
+}
+.wp-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.wp-help {
+  width: 22px;
+  color: #1e70c8;
+  font-weight: 600;
+}
+
+/* ruler and workspace share the same centered canvas, so the ruler lines up with the page */
+.wp-ruler {
+  flex: none;
+  height: 22px;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+  background: #f5f6f7;
+  border-bottom: 1px solid #dadbdc;
+}
+.wp-canvas {
+  display: flex;
+  justify-content: center;
+  min-width: fit-content;
+  min-height: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.wp-canvas.left {
+  justify-content: flex-start;
+}
+.wp-ruler-svg {
+  display: block;
+  margin-top: 1px;
+}
+.wp-work {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  background: #e3e3e3;
+}
+.wp-page {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: #fff;
+  cursor: text;
+}
+.wp-page.wrap-window,
+.wp-page.wrap-none {
+  flex: 1;
+}
+.wp-page.wrap-none .wp-doc {
+  white-space: pre;
+}
+.wp-doc {
+  flex: 1;
+  outline: none;
+  user-select: text;
+  font:
+    11pt Calibri,
+    Carlito,
+    "Segoe UI",
+    sans-serif;
+  color: #000;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  tab-size: 48px;
+}
+.wp-doc p,
+.wp-doc li {
+  margin: 0 0 10pt;
+  line-height: 1.15;
+}
+.wp-doc ul,
+.wp-doc ol {
+  margin: 0;
+  padding-left: 0.5in;
+}
+.wp-doc img {
+  max-width: 100%;
+}
+.wp-doc ::selection {
+  background: #3399ff;
+  color: #fff;
+}
+
+/* status bar: zoom percentage, minus, slider, plus */
+.wp-status {
+  flex: none;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 0 16px;
+  background: #f0f0f0;
+  border-top: 1px solid #d7d7d7;
+  font-size: 12px;
+}
+.wp-zoom-pct {
+  min-width: 36px;
+  text-align: right;
+  margin-right: 6px;
+}
+.wp-zoom-btn {
+  width: 16px;
+  height: 16px;
+  line-height: 14px;
+  color: #333;
+}
+.wp-zoom-btn:hover {
+  background: #e5f3ff;
+}
+.wp-zoom {
+  width: 110px;
+  height: 14px;
+  accent-color: #555;
+}
+
+/* Date and Time dialog */
+.wp-date {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wp-date-list {
+  flex: 1;
+  height: auto;
+}

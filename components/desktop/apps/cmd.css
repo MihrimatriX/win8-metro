@@ -1,0 +1,64 @@
+/* ==========================================================================
+   Command Prompt (cmd-*): the console window. Colors come from `color XY` (inline), the default is
+   light grey on black; the cursor is a blinking underscore under the character it sits on.
+   ========================================================================== */
+.cmd {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  font:
+    14px/1.2 Consolas,
+    "Lucida Console",
+    monospace;
+}
+.cmd-screen {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 3px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  cursor: default;
+  user-select: text;
+  scrollbar-color: #c2c2c2 #f0f0f0;
+}
+.cmd-screen ::selection {
+  background: #c0c0c0;
+  color: #000;
+}
+.cmd-out {
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.cmd-cursor {
+  position: relative;
+}
+.cmd-cursor.on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  height: 3px;
+  background: currentColor;
+  animation: cmd-blink 1.06s steps(1) infinite;
+}
+@keyframes cmd-blink {
+  50% {
+    opacity: 0;
+  }
+}
+/* Keyboard input goes to an invisible text box (paste, IME and mobile keyboards work through it). */
+.cmd-input {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}

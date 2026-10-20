@@ -1,0 +1,113 @@
+/* Run: white upper part (icon, hint, "Open:" combo box), grey button strip at the bottom. */
+.run {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+}
+.run-main {
+  flex: 1;
+  padding: 16px 12px 0 12px;
+}
+.run-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.run-head svg {
+  flex: none;
+  margin-top: 1px;
+}
+.run-head p {
+  margin: 0;
+  line-height: 15px;
+  padding-top: 1px;
+}
+.run-row {
+  display: flex;
+  align-items: center;
+  margin-top: 18px;
+}
+.run-row > label {
+  width: 46px;
+  flex: none;
+}
+.run-row u {
+  text-decoration: underline;
+  text-underline-offset: 1px;
+}
+.run-combo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  height: 23px;
+  border: 1px solid #abadb3;
+  background: #fff;
+}
+.run-combo:hover,
+.run-combo:focus-within {
+  border-color: #3399ff;
+}
+.run-combo input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  padding: 0 3px;
+  font: inherit;
+  color: #000;
+  background: transparent;
+  user-select: text;
+}
+.run-drop {
+  width: 17px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: #444;
+  border-left: 1px solid transparent;
+}
+.run-combo:hover .run-drop {
+  background: #e5f1fb;
+  border-left-color: #3399ff;
+}
+.run-drop.on {
+  background: #cce4f7 !important;
+}
+.run-list {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: -1px;
+  right: -1px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #646464;
+  z-index: 10;
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.18);
+}
+.run-list > div {
+  padding: 1px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 16px;
+}
+.run-list > div.on {
+  background: #3399ff;
+  color: #fff;
+}
+.run-list .run-empty {
+  height: 16px;
+}
+.run-btns {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 9px 11px 10px;
+  background: #f0f0f0;
+  border-top: 1px solid #dfdfdf;
+}

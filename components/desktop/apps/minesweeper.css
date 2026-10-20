@@ -1,0 +1,273 @@
+/* ==========================================================================
+   Minesweeper (ms-*), the Windows 7 look: glossy raised tiles on a soft blue field, pale sunken open squares,
+   classic number colors, and the clock / mines counters under the field.
+   ========================================================================== */
+.ms,
+.ms-deck {
+  --ms-tile: 22px;
+  --t-top: #7ea6f2;
+  --t-mid: #3e6fd8;
+  --t-low: #2c58c4;
+  --t-edge: #1c3f93;
+  --t-hot: #8fc0ff;
+}
+.ms {
+  flex: none;
+  align-self: flex-start;
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  color: #000;
+  background: #fff;
+}
+.ms.ms-green,
+.ms-deck.ms-green {
+  --t-top: #8fd47a;
+  --t-mid: #3ea12c;
+  --t-low: #2b8a1f;
+  --t-edge: #1d5e15;
+  --t-hot: #b7f0a0;
+}
+.ms-body {
+  padding: 18px 22px 10px;
+  background: linear-gradient(#3d5d96, #5d82c0 55%, #87a8dc);
+}
+.ms-field {
+  display: grid;
+  gap: 1px;
+  padding: 2px;
+  background: #23365e;
+  border: 1px solid #172644;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  touch-action: manipulation;
+}
+
+/* ----- tiles ----- */
+.ms-cell {
+  position: relative;
+  width: var(--ms-tile);
+  height: var(--ms-tile);
+  display: grid;
+  place-items: center;
+  border-radius: 2px;
+  border: 1px solid var(--t-edge);
+  background: linear-gradient(var(--t-top), var(--t-mid) 48%, var(--t-low) 52%, var(--t-mid));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  font:
+    bold 15px/1 "Segoe UI",
+    var(--font);
+  cursor: default;
+}
+.ms-cell.live:not(.open):hover {
+  background: linear-gradient(var(--t-hot), var(--t-top) 48%, var(--t-mid) 52%, var(--t-top));
+}
+.ms-cell.down,
+.ms-cell.down:hover {
+  background: #c3cde0;
+  border-color: #9aa9c4;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.25);
+}
+.ms-cell.open {
+  border-color: #b4c0d6;
+  background: linear-gradient(#e6ebf5, #d7dfee);
+  box-shadow: none;
+}
+.ms-cell.boom {
+  background: radial-gradient(#ffb36b, #e2361d 70%);
+  border-color: #9a1a0c;
+}
+.ms-n1 {
+  color: #4050be;
+}
+.ms-n2 {
+  color: #1e6a14;
+}
+.ms-n3 {
+  color: #b20a0a;
+}
+.ms-n4 {
+  color: #050585;
+}
+.ms-n5 {
+  color: #7c0505;
+}
+.ms-n6 {
+  color: #077a7a;
+}
+.ms-n7 {
+  color: #000;
+}
+.ms-n8 {
+  color: #666;
+}
+.ms-q {
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+.ms-mine,
+.ms-flag {
+  width: 76%;
+  height: 76%;
+}
+
+/* ----- counters ----- */
+.ms-counters {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.ms-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ms-counter > span {
+  min-width: 38px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  border: 1px solid #22365c;
+  background: linear-gradient(#2c4675, #1c2f53);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font:
+    600 14px/20px "Segoe UI",
+    var(--font);
+  text-align: center;
+}
+.ms-counter svg {
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+/* ----- dialogs ----- */
+.ms-dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 14px 14px 12px;
+  color: #000;
+  font-size: 12px;
+}
+.ms-dlg fieldset {
+  border: 1px solid #d5dfe5;
+  border-radius: 3px;
+  padding: 4px 10px 8px;
+}
+.ms-end-main {
+  font-size: 15px;
+  color: #003399;
+}
+.ms-end-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 18px;
+}
+.ms-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: auto;
+}
+.ms-stats {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+.ms-levels {
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #abadb3;
+  background: #fff;
+}
+.ms-levels button {
+  text-align: left;
+  padding: 2px 5px;
+}
+.ms-levels button.on {
+  background: #3399ff;
+  color: #fff;
+}
+.ms-best {
+  width: 140px;
+}
+.ms-best div {
+  display: flex;
+  justify-content: space-between;
+  height: 18px;
+}
+.ms-nums {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-content: start;
+  gap: 3px 10px;
+}
+.ms-nums b {
+  font-weight: normal;
+}
+.ms-diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+.ms-radio {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.ms-radio span {
+  display: flex;
+  flex-direction: column;
+}
+.ms-radio b {
+  font-weight: normal;
+}
+.ms-radio small {
+  font-size: 11px;
+  color: #444;
+  white-space: pre-line;
+}
+.ms-custom {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 20px;
+}
+.ms-custom label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.ms-custom .w8-input {
+  width: 46px;
+}
+.ms-check {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ms-decks {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.ms-deck {
+  display: grid;
+  grid-template-columns: repeat(2, var(--ms-tile));
+  gap: 1px;
+  padding: 8px 10px 4px;
+  border: 1px solid transparent;
+}
+.ms-deck.on {
+  border-color: #3399ff;
+  background: #e5f3ff;
+}
+.ms-deck small {
+  grid-column: span 2;
+  font-size: 12px;
+}
